@@ -1,1 +1,1 @@
-# Sampoom-Management-Android
+# SampoomManagement-Android
