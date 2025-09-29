@@ -1,0 +1,40 @@
+### IDE & Project ###
+*.iml
+.gradle/
+local.properties
+
+# Android Studio project files
+/.idea/
+/.idea/*
+!.idea/codeStyles
+!.idea/runConfigurations
+
+### Build artifacts ###
+/build/
+/app/build/
+/captures/
+/output.json
+
+### Native build ###
+.cxx/
+/externalNativeBuild/
+
+### OS-specific ###
+.DS_Store
+Thumbs.db
+
+### Logs & caches ###
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+*.log
+
+### Others ###
+/captures
+*.apk
+*.ap_
+*.aab
+*.hprof
