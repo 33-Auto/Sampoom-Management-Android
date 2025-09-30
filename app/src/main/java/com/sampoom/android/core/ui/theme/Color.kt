@@ -1,4 +1,4 @@
-package com.sampoom.android.ui.theme
+package com.sampoom.android.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
