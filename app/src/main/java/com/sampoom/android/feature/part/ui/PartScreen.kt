@@ -7,10 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sampoom.android.R
 
 @Composable
 fun PartScreen(
@@ -24,7 +26,7 @@ fun PartScreen(
             .padding(16.dp)
     ) {
         Text(
-            text = "인벤토리",
+            text = stringResource(R.string.part_title),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -47,12 +49,12 @@ fun PartScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "오류가 발생했습니다: ${uiState.error}",
+                        text = "${stringResource(R.string.common_error)}: ${uiState.error}",
                         color = MaterialTheme.colorScheme.error
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = { viewModel.refreshPart() }) {
-                        Text("다시 시도")
+                        Text(stringResource((R.string.common_retry)))
                     }
                 }
             }
@@ -62,7 +64,7 @@ fun PartScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("인벤토리가 비어있습니다")
+                    Text(stringResource(R.string.part_empty))
                 }
             }
             
