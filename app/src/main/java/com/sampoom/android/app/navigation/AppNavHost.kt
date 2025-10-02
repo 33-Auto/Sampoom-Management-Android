@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,13 +40,13 @@ const val ROUTE_DETAIL = "detail"
 
 sealed class BottomNavItem(
     val route: String,
-    val title: String,
+    val title: Int,
     val icon: Int
 ) {
-    object Part : BottomNavItem(ROUTE_PART, "Part", R.drawable.outline_home_24)
-    object Inventory : BottomNavItem(ROUTE_INVENTORY, "인벤토리", R.drawable.outline_home_24)
-    object Profile : BottomNavItem(ROUTE_PROFILE, "프로필", R.drawable.outline_home_24)
-    object Settings : BottomNavItem(ROUTE_SETTINGS, "설정", R.drawable.outline_home_24)
+    object Part : BottomNavItem(ROUTE_PART, R.string.nav_part, R.drawable.outline_home_24)
+    object Inventory : BottomNavItem(ROUTE_INVENTORY, R.string.nav_inventory, R.drawable.outline_home_24)
+    object Profile : BottomNavItem(ROUTE_PROFILE, R.string.nav_profile, R.drawable.outline_home_24)
+    object Settings : BottomNavItem(ROUTE_SETTINGS, R.string.nav_setting, R.drawable.outline_home_24)
 }
 
 @Composable
@@ -110,8 +111,8 @@ fun BottomNavigationBar(navController: NavHostController) {
             val currentDestination = navBackStackEntry?.destination
 
             NavigationBarItem(
-                icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) },
-                label = { Text(item.title) },
+                icon = { Icon(painterResource(id = item.icon), contentDescription = stringResource(item.title)) },
+                label = { Text(stringResource(item.title)) },
                 selected = currentDestination?.route == item.route,
                 onClick = {
                     navController.navigate(item.route) {

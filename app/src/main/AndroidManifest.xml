@@ -15,6 +15,11 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.SampoomManagement">
+
+        <meta-data
+            android:name="com.android.application.theme_icon"
+            android:value="true" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

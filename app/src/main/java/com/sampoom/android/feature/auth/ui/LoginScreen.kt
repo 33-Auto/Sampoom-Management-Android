@@ -15,9 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.sampoom.android.R
 
 @Composable
 fun LoginScreen(
@@ -34,19 +36,19 @@ fun LoginScreen(
                 .padding(innerPadding)
                 .padding(24.dp)
         ) {
-            Text("로그인", style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.login_title), style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(16.dp))
             OutlinedTextField(
                 value = state.email,
                 onValueChange = { viewModel.onEvent(LoginUiEvent.EmailChanged(it)) },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.login_placeholder_email)) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(
                 value = state.password,
                 onValueChange = { viewModel.onEvent(LoginUiEvent.PasswordChanged(it)) },
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.login_placeholder_password)) },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -55,7 +57,7 @@ fun LoginScreen(
                 onClick = { viewModel.onEvent(LoginUiEvent.Submit) },
                 enabled = !state.loading,
                 modifier = Modifier.fillMaxWidth()
-            ) { Text(if (state.loading) "로그인 중..." else "로그인") }
+            ) { Text(if (state.loading) stringResource(R.string.login_button_login_loading) else stringResource(R.string.login_button_login)) }
 
             state.error?.let {
                 Spacer(Modifier.height(8.dp))
