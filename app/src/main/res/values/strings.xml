@@ -2,10 +2,10 @@
     <string name="app_name">삼품관리</string>
 
     <!-- Navigation Bar -->
-    <string name="nav_part">부품 조회</string>
-    <string name="nav_inventory">인벤토리</string>
-    <string name="nav_profile">프로필</string>
-    <string name="nav_setting">설정</string>
+    <string name="nav_dashboard">대시보드</string>
+    <string name="nav_delivery">출고목록</string>
+    <string name="nav_cart">장바구니</string>
+    <string name="nav_order">주문관리</string>
 
     <!-- 로그인 -->
     <string name="login_title">로그인</string>

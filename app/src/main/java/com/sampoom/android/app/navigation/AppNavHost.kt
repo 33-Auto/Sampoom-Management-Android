@@ -1,11 +1,7 @@
 package com.sampoom.android.app.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -14,7 +10,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
@@ -30,23 +25,25 @@ const val ROUTE_LOGIN = "login"
 const val ROUTE_HOME = "home"
 
 // Main Screen
-const val ROUTE_PART = "part"
-const val ROUTE_INVENTORY = "inventory"
-const val ROUTE_PROFILE = "profile"
-const val ROUTE_SETTINGS = "settings"
+const val ROUTE_DASHBOARD = "dashboard"
+const val ROUTE_DELIVERY = "delivery"
+const val ROUTE_CART = "cart"
+const val ROUTE_ORDERS = "orders"
 
 // Detail Screen
-const val ROUTE_DETAIL = "detail"
+const val ROUTE_PARTS = "parts"
+const val ROUTE_EMPLOYEE = "employee"
+const val ROUTE_SETTINGS = "settings"
 
 sealed class BottomNavItem(
     val route: String,
     val title: Int,
     val icon: Int
 ) {
-    object Part : BottomNavItem(ROUTE_PART, R.string.nav_part, R.drawable.outline_home_24)
-    object Inventory : BottomNavItem(ROUTE_INVENTORY, R.string.nav_inventory, R.drawable.outline_home_24)
-    object Profile : BottomNavItem(ROUTE_PROFILE, R.string.nav_profile, R.drawable.outline_home_24)
-    object Settings : BottomNavItem(ROUTE_SETTINGS, R.string.nav_setting, R.drawable.outline_home_24)
+    object Dashboard : BottomNavItem(ROUTE_DASHBOARD, R.string.nav_dashboard, R.drawable.dashboard)
+    object Delivery : BottomNavItem(ROUTE_DELIVERY, R.string.nav_delivery, R.drawable.delivery)
+    object Cart : BottomNavItem(ROUTE_CART, R.string.nav_cart, R.drawable.cart)
+    object Orders : BottomNavItem(ROUTE_ORDERS, R.string.nav_order, R.drawable.orders)
 }
 
 @Composable
@@ -68,7 +65,7 @@ fun AppNavHost() {
             })
         }
         composable(ROUTE_HOME) { MainScreen(navController) }
-        composable(ROUTE_DETAIL) { DetailScreen() }
+        composable(ROUTE_PARTS) { PartScreen() }
     }
 }
 
@@ -79,30 +76,46 @@ fun MainScreen(
     val navController = rememberNavController()
 
     Scaffold(
-        bottomBar = {
-            BottomNavigationBar(navController)
-        }
+        floatingActionButton = { PartsFab(parentNavController) },
+        bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = ROUTE_PART,
-            modifier = Modifier.background(Color.Green).padding(innerPadding)
+            startDestination = ROUTE_DASHBOARD,
+            modifier = Modifier.padding(innerPadding)
         ) {
-            composable(ROUTE_PART) { PartScreen() }
-            composable(ROUTE_INVENTORY) { InventoryScreen() }
-            composable(ROUTE_PROFILE) { ProfileScreen() }
-            composable(ROUTE_SETTINGS) { SettingsScreen(parentNavController) }
+            composable(ROUTE_DASHBOARD) { DashboardScreen() }
+            composable(ROUTE_DELIVERY) { DeliveryScreen() }
+            composable(ROUTE_CART) { CartScreen() }
+            composable(ROUTE_ORDERS) { OrderScreen() }
         }
+    }
+}
+
+@Composable
+fun PartsFab(navController: NavHostController) {
+    FloatingActionButton(
+        onClick = {
+            navController.navigate(ROUTE_PARTS) {
+                popUpTo(navController.graph.startDestinationId) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    ) {
+        Icon(painterResource(R.drawable.parts), contentDescription = stringResource(R.string.part_title))
     }
 }
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val bottomNavItems = listOf(
-        BottomNavItem.Part,
-        BottomNavItem.Inventory,
-        BottomNavItem.Profile,
-        BottomNavItem.Settings,
+        BottomNavItem.Dashboard,
+        BottomNavItem.Delivery,
+        BottomNavItem.Cart,
+        BottomNavItem.Orders,
     )
 
     NavigationBar {
@@ -130,41 +143,25 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 // 임시 화면들 (실제로는 각각의 feature 모듈에서 구현)
 @Composable
-private fun InventoryScreen() {
+private fun DashboardScreen() {
     // 홈 화면 구현
-    Text("인벤토리 화면")
+    Text("대시보드 화면")
 }
 
 @Composable
-private fun ProfileScreen() {
+private fun DeliveryScreen() {
     // 프로필 화면 구현
-    Text("프로필 화면")
+    Text("Delivery 화면")
 }
 
 @Composable
-private fun SettingsScreen(
-    navController: NavHostController
-) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // 설정 화면 구현
-        Text("설정 화면")
-        Button(
-            onClick = { navController.navigate(ROUTE_DETAIL) }
-        ) {
-            Text("상세 화면")
-        }
-    }
+private fun CartScreen() {
+    // 프로필 화면 구현
+    Text("Cart 화면")
 }
 
 @Composable
-private fun DetailScreen() {
-    // 설정 화면 구현
-    Scaffold { innerPadding ->
-        Box(Modifier.fillMaxSize().background(Color.Red).padding(innerPadding)
-            ) {
-            Text("상세 화면")
-        }
-    }
+private fun OrderScreen() {
+    // 프로필 화면 구현
+    Text("Order 화면")
 }
