@@ -76,7 +76,7 @@ fun MainScreen(
     val navController = rememberNavController()
 
     Scaffold(
-        floatingActionButton = { FloatingActionButton(parentNavController) },
+        floatingActionButton = { PartsFab(parentNavController) },
         bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
         NavHost(
@@ -93,7 +93,7 @@ fun MainScreen(
 }
 
 @Composable
-fun FloatingActionButton(navController: NavHostController) {
+fun PartsFab(navController: NavHostController) {
     FloatingActionButton(
         onClick = {
             navController.navigate(ROUTE_PARTS) {
