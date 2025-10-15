@@ -113,6 +113,7 @@ fun CommonButton(
                     disabledContentColor = textSecondaryColor()
                 )
             ) {
+                if (leadingIcon != null) leadingIcon()
                 content()
             }
         }
@@ -129,6 +130,7 @@ fun CommonButton(
                     disabledContentColor = textSecondaryColor()
                 )
             ) {
+                if (leadingIcon != null) leadingIcon()
                 content()
             }
         }
@@ -147,6 +149,7 @@ fun CommonButton(
                     disabledContentColor = textSecondaryColor()
                 )
             ) {
+                if (leadingIcon != null) leadingIcon()
                 content()
             }
         }

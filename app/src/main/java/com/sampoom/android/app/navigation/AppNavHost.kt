@@ -73,7 +73,7 @@ fun AppNavHost() {
             SignUpScreen(
                 onSuccess = {
                     navController.navigate(ROUTE_HOME) {
-                        popUpTo(ROUTE_SIGNUP) { inclusive = true }
+                        popUpTo(ROUTE_LOGIN) { inclusive = true }
                     }
                 },
                 onNavigateBack = {

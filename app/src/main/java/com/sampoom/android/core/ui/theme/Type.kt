@@ -16,20 +16,21 @@ val GmarketSansFamily = FontFamily(
 )
 
 // Set of Material typography styles to start with
+private val baseTypography = Typography()
 val Typography = Typography(
-    displayLarge = TextStyle(fontFamily = GmarketSansFamily),
-    displayMedium = TextStyle(fontFamily = GmarketSansFamily),
-    displaySmall = TextStyle(fontFamily = GmarketSansFamily),
-    headlineLarge = TextStyle(fontFamily = GmarketSansFamily),
-    headlineMedium = TextStyle(fontFamily = GmarketSansFamily),
-    headlineSmall = TextStyle(fontFamily = GmarketSansFamily),
-    titleLarge = TextStyle(fontFamily = GmarketSansFamily),
-    titleMedium = TextStyle(fontFamily = GmarketSansFamily),
-    titleSmall = TextStyle(fontFamily = GmarketSansFamily),
-    bodyLarge = TextStyle(fontFamily = GmarketSansFamily),
-    bodyMedium = TextStyle(fontFamily = GmarketSansFamily),
-    bodySmall = TextStyle(fontFamily = GmarketSansFamily),
-    labelLarge = TextStyle(fontFamily = GmarketSansFamily),
-    labelMedium = TextStyle(fontFamily = GmarketSansFamily),
-    labelSmall = TextStyle(fontFamily = GmarketSansFamily)
+    displayLarge = baseTypography.displayLarge.copy(fontFamily = GmarketSansFamily),
+    displayMedium = baseTypography.displayMedium.copy(fontFamily = GmarketSansFamily),
+    displaySmall = baseTypography.displaySmall.copy(fontFamily = GmarketSansFamily),
+    headlineLarge = baseTypography.headlineLarge.copy(fontFamily = GmarketSansFamily),
+    headlineMedium = baseTypography.headlineMedium.copy(fontFamily = GmarketSansFamily),
+    headlineSmall = baseTypography.headlineSmall.copy(fontFamily = GmarketSansFamily),
+    titleLarge = baseTypography.titleLarge.copy(fontFamily = GmarketSansFamily),
+    titleMedium = baseTypography.titleMedium.copy(fontFamily = GmarketSansFamily),
+    titleSmall = baseTypography.titleSmall.copy(fontFamily = GmarketSansFamily),
+    bodyLarge = baseTypography.bodyLarge.copy(fontFamily = GmarketSansFamily),
+    bodyMedium = baseTypography.bodyMedium.copy(fontFamily = GmarketSansFamily),
+    bodySmall = baseTypography.bodySmall.copy(fontFamily = GmarketSansFamily),
+    labelLarge = baseTypography.labelLarge.copy(fontFamily = GmarketSansFamily),
+    labelMedium = baseTypography.labelMedium.copy(fontFamily = GmarketSansFamily),
+    labelSmall = baseTypography.labelSmall.copy(fontFamily = GmarketSansFamily)
 )

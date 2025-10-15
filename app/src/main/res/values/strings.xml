@@ -44,6 +44,7 @@
     <!-- Common -->
     <string name="common_error">오류가 발생했습니다</string>
     <string name="common_retry">다시 시도</string>
+    <string name="common_close">닫기</string>
 
     <!-- Validation -->
     <string name="validation_email_required">이메일을 입력해주세요</string>

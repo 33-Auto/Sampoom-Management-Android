@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import com.sampoom.android.R
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun rememberCommonSnackBarHostState(): SnackbarHostState = remember { SnackbarHostState() }
@@ -98,7 +99,7 @@ fun TopSnackBarHost(
                             IconButton(onClick = { data.dismiss() }) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.outline_close),
-                                    contentDescription = null,
+                                    contentDescription = stringResource(R.string.common_close),
                                     tint = textColor()
                                 )
                             }
