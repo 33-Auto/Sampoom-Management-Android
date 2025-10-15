@@ -1,11 +1,8 @@
 package com.sampoom.android.core.ui.component
 
-import android.R.attr.onClick
-import android.R.attr.text
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
@@ -126,7 +123,7 @@ fun CommonButton(
                 shape = shape,
                 modifier = modifier.height(height),
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = disableColor(),
+                    contentColor = textSecondaryColor(),
                     disabledContentColor = textSecondaryColor()
                 )
             ) {

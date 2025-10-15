@@ -54,6 +54,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -77,6 +78,9 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+
+    // OKHttp
+    implementation(libs.logging.interceptor)
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
