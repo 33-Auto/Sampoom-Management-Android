@@ -61,7 +61,10 @@ fun SignUpScreen(
     val state by viewModel.state.collectAsState()
     val labelTextSize = 16.sp
 
-    if (state.success) onSuccess()
+    LaunchedEffect(state.success) {
+        if (state.success) onSuccess()
+    }
+
     val snackBarHostState = rememberCommonSnackBarHostState()
     ShowErrorSnackBar(
         errorMessage = state.error,

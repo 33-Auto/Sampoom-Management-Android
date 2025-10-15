@@ -59,7 +59,10 @@ fun LoginScreen(
 
     val state by viewModel.state.collectAsState()
 
-    if (state.success) onSuccess()
+    LaunchedEffect(state.success) {
+        if (state.success) onSuccess()
+    }
+
     val snackBarHostState = rememberCommonSnackBarHostState()
     ShowErrorSnackBar(
         errorMessage = state.error,

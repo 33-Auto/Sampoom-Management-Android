@@ -78,6 +78,9 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.material)
     implementation(libs.androidx.material.icons.core)

@@ -41,9 +41,7 @@ class AuthRepositoryImpl @Inject constructor(
         return dto.data.toModel()
     }
 
-    override suspend fun signOut() {
-        preferences.clear()
-    }
+    override suspend fun signOut() { preferences.clear() }
 
     override fun isSignedIn(): Boolean = preferences.hasToken()
 }
