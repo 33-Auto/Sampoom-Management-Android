@@ -8,7 +8,7 @@ import com.sampoom.android.R
 
 val GmarketSansFamily = FontFamily(
     Font(R.font.gmarket_sans_light, FontWeight.Light),
-    Font(R.font.gmarket_sans_medium, FontWeight.Normal),
+    Font(R.font.gmarket_sans_medium, FontWeight.Medium),
     Font(R.font.gmarket_sans_bold, FontWeight.Bold)
 )
 
