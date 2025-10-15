@@ -1,6 +1,9 @@
 package com.sampoom.android.core.ui.component
 
+import android.R.attr.onClick
+import android.R.attr.text
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -18,6 +21,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sampoom.android.core.ui.theme.Main500
+import com.sampoom.android.core.ui.theme.White
+import com.sampoom.android.core.ui.theme.disableColor
+import com.sampoom.android.core.ui.theme.textSecondaryColor
 
 /**
  * Sampoom common button with multiple visual variants.
@@ -40,15 +47,14 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun CommonButton(
-    text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     variant: ButtonVariant = ButtonVariant.Primary,
     size: ButtonSize = ButtonSize.Large,
     leadingIcon: (@Composable (() -> Unit))? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    content: @Composable RowScope.() -> Unit
 ) {
-    val cs = MaterialTheme.colorScheme
     val shape = MaterialTheme.shapes.large
     val height = when (size) {
         ButtonSize.Large -> 56.dp
@@ -64,21 +70,14 @@ fun CommonButton(
                 shape = shape,
                 modifier = modifier.height(height),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = cs.primary,
-                    contentColor = cs.onPrimary,
-                    disabledContainerColor = cs.onSurface.copy(alpha = 0.12f),
-                    disabledContentColor = cs.onSurface.copy(alpha = 0.38f),
+                    containerColor = Main500,
+                    contentColor = White,
+                    disabledContainerColor = disableColor(),
+                    disabledContentColor = textSecondaryColor()
                 )
             ) {
-                if (leadingIcon != null) {
-                    leadingIcon()
-                }
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(start = if (leadingIcon != null) 8.dp else 0.dp)
-                )
+                if (leadingIcon != null) leadingIcon()
+                content()
             }
         }
 
@@ -90,21 +89,14 @@ fun CommonButton(
                 shape = shape,
                 modifier = modifier.height(height),
                 colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = cs.secondaryContainer,
-                    contentColor = cs.onSecondaryContainer,
-                    disabledContainerColor = cs.onSurface.copy(alpha = 0.08f),
-                    disabledContentColor = cs.onSurface.copy(alpha = 0.38f)
+                    containerColor = Main500,
+                    contentColor = White,
+                    disabledContainerColor = disableColor(),
+                    disabledContentColor = textSecondaryColor()
                 )
             ) {
-                if (leadingIcon != null) {
-                    leadingIcon()
-                }
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(start = if (leadingIcon != null) 8.dp else 0.dp)
-                )
+                if (leadingIcon != null) leadingIcon()
+                content()
             }
         }
 
@@ -115,17 +107,13 @@ fun CommonButton(
                 enabled = enabled,
                 shape = shape,
                 modifier = modifier.height(height),
-                border = BorderStroke(1.dp, cs.primary),
+                border = BorderStroke(1.dp, Main500),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = cs.primary,
-                    disabledContentColor = cs.onSurface.copy(alpha = 0.38f)
+                    contentColor = Main500,
+                    disabledContentColor = textSecondaryColor()
                 )
             ) {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold
-                )
+                content()
             }
         }
 
@@ -137,15 +125,11 @@ fun CommonButton(
                 shape = shape,
                 modifier = modifier.height(height),
                 colors = ButtonDefaults.textButtonColors(
-                    contentColor = cs.onSurface,
-                    disabledContentColor = cs.onSurface.copy(alpha = 0.38f)
+                    contentColor = disableColor(),
+                    disabledContentColor = textSecondaryColor()
                 )
             ) {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold
-                )
+                content()
             }
         }
 
@@ -159,15 +143,11 @@ fun CommonButton(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF000000),
                     contentColor = Color.White,
-                    disabledContainerColor = cs.onSurface.copy(alpha = 0.12f),
-                    disabledContentColor = cs.onSurface.copy(alpha = 0.38f),
+                    disabledContainerColor = disableColor(),
+                    disabledContentColor = textSecondaryColor()
                 )
             ) {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold
-                )
+                content()
             }
         }
     }
@@ -197,7 +177,7 @@ enum class ButtonSize { Large, Medium, Small }
 private fun CommonButtonPreview_All() {
     // Primary
     CommonButton(
-        text = "Button",
+        content = { Text("Button", fontWeight = FontWeight.Bold) },
         variant = ButtonVariant.Primary,
         onClick = {}
     )
@@ -207,7 +187,7 @@ private fun CommonButtonPreview_All() {
 @Composable
 private fun CommonButtonPreview_Primary_WithIcon() {
     CommonButton(
-        text = "Button",
+        content = { Text("Button", fontWeight = FontWeight.Bold) },
         variant = ButtonVariant.Primary,
         leadingIcon = { Icon(painterResource(android.R.drawable.ic_menu_call), contentDescription = null) },
         onClick = {}
@@ -218,7 +198,7 @@ private fun CommonButtonPreview_Primary_WithIcon() {
 @Composable
 private fun CommonButtonPreview_Tonal() {
     CommonButton(
-        text = "Button",
+        content = { Text("Button", fontWeight = FontWeight.Bold) },
         variant = ButtonVariant.Secondary,
         onClick = {}
     )
@@ -228,7 +208,7 @@ private fun CommonButtonPreview_Tonal() {
 @Composable
 private fun CommonButtonPreview_Outlined() {
     CommonButton(
-        text = "Button",
+        content = { Text("Button", fontWeight = FontWeight.Bold) },
         variant = ButtonVariant.Outlined,
         onClick = {}
     )
@@ -238,7 +218,7 @@ private fun CommonButtonPreview_Outlined() {
 @Composable
 private fun CommonButtonPreview_Ghost() {
     CommonButton(
-        text = "Button",
+        content = { Text("Button", fontWeight = FontWeight.Bold) },
         variant = ButtonVariant.Ghost,
         onClick = {}
     )
@@ -248,7 +228,7 @@ private fun CommonButtonPreview_Ghost() {
 @Composable
 private fun CommonButtonPreview_Neutral_Disabled() {
     CommonButton(
-        text = "Button",
+        content = { Text("Button", fontWeight = FontWeight.Bold) },
         variant = ButtonVariant.Neutral,
         enabled = false,
         onClick = {}

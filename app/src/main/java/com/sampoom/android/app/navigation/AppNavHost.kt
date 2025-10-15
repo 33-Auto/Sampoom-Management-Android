@@ -19,9 +19,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sampoom.android.R
 import com.sampoom.android.feature.auth.ui.LoginScreen
+import com.sampoom.android.feature.auth.ui.SignUpScreen
 import com.sampoom.android.feature.part.ui.PartScreen
 
 const val ROUTE_LOGIN = "login"
+const val ROUTE_SIGNUP = "signup"
 const val ROUTE_HOME = "home"
 
 // Main Screen
@@ -51,7 +53,7 @@ fun AppNavHost() {
     val navController = rememberNavController()
 
     // TODO: 임시 로그인 상태 확인 -> AuthRepository에서 확인하도록 변경
-    val isLoggedIn = true
+    val isLoggedIn = false
 
     NavHost(
         navController = navController,
@@ -62,7 +64,22 @@ fun AppNavHost() {
                 navController.navigate(ROUTE_HOME) {
                     popUpTo(ROUTE_LOGIN) { inclusive = true } // 로그인 화면 스택 제거
                 }
-            })
+            },
+                onNavigateSignUp = {
+                    navController.navigate(ROUTE_SIGNUP)
+                })
+        }
+        composable(ROUTE_SIGNUP) {
+            SignUpScreen(
+                onSuccess = {
+                    navController.navigate(ROUTE_HOME) {
+                        popUpTo(ROUTE_SIGNUP) { inclusive = true }
+                    }
+                },
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
         }
         composable(ROUTE_HOME) { MainScreen(navController) }
         composable(ROUTE_PARTS) { PartScreen() }
