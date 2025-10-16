@@ -1,10 +1,19 @@
 package com.sampoom.android.feature.part.ui
 
-import com.sampoom.android.feature.part.domain.model.Part
+import com.sampoom.android.feature.part.domain.model.Category
+import com.sampoom.android.feature.part.domain.model.Group
 
 data class PartUiState(
-    val loading: Boolean = false,
-    val error: String? = null,
-    val success: Boolean = false,
-    val partList: List<Part> = emptyList()
+    // Part
+    val groupList: List<Group> = emptyList(),
+    val groupLoading: Boolean = false,
+    val groupError: String? = null,
+
+    // 선택된 Category
+    val selectedCategory: Category? = null,
+
+    // Category
+    val categoryList: List<Category> = emptyList(),
+    val categoryLoading: Boolean = false,
+    val categoryError: String? = null
 )

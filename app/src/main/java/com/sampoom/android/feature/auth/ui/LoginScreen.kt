@@ -7,20 +7,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,6 +31,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.component.CommonTextField
@@ -42,6 +39,7 @@ import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.component.ShowErrorSnackBar
 import com.sampoom.android.core.ui.component.rememberCommonSnackBarHostState
 import com.sampoom.android.core.ui.component.TopSnackBarHost
+import com.sampoom.android.core.ui.theme.backgroundColor
 
 @Composable
 fun LoginScreen(
@@ -57,15 +55,15 @@ fun LoginScreen(
         viewModel.bindLabel(emailLabel, passwordLabel, errorLabel)
     }
 
-    val state by viewModel.state.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(state.success) {
-        if (state.success) onSuccess()
+    LaunchedEffect(uiState.success) {
+        if (uiState.success) onSuccess()
     }
 
     val snackBarHostState = rememberCommonSnackBarHostState()
     ShowErrorSnackBar(
-        errorMessage = state.error,
+        errorMessage = uiState.error,
         snackBarHostState = snackBarHostState,
         onConsumed = { viewModel.consumeError() }
     )
@@ -101,30 +99,30 @@ fun LoginScreen(
                 Spacer(Modifier.height(48.dp))
                 CommonTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = state.email,
+                    value = uiState.email,
                     onValueChange = { viewModel.onEvent(LoginUiEvent.EmailChanged(it)) },
                     placeholder = stringResource(R.string.login_placeholder_email),
-                    isError = state.emailError != null,
-                    errorMessage = state.emailError
+                    isError = uiState.emailError != null,
+                    errorMessage = uiState.emailError
                 )
                 Spacer(Modifier.height(8.dp))
                 CommonTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = state.password,
+                    value = uiState.password,
                     onValueChange = { viewModel.onEvent(LoginUiEvent.PasswordChanged(it)) },
                     placeholder = stringResource(R.string.login_placeholder_password),
                     isPassword = true,
-                    isError = state.passwordError != null,
-                    errorMessage = state.passwordError
+                    isError = uiState.passwordError != null,
+                    errorMessage = uiState.passwordError
                 )
                 Spacer(Modifier.height(48.dp))
                 CommonButton(
                     onClick = { viewModel.onEvent(LoginUiEvent.Submit) },
-                    enabled = state.isValid && !state.loading,
+                    enabled = uiState.isValid && !uiState.loading,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        if (state.loading) stringResource(R.string.login_button_login_loading)
+                        if (uiState.loading) stringResource(R.string.login_button_login_loading)
                         else stringResource(R.string.login_button_login)
                     )
                 }

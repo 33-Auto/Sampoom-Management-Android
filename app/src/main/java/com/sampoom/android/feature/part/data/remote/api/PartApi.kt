@@ -1,10 +1,15 @@
 package com.sampoom.android.feature.part.data.remote.api
 
 import com.sampoom.android.core.network.ApiResponse
-import com.sampoom.android.feature.part.data.remote.dto.PartDto
+import com.sampoom.android.feature.part.data.remote.dto.CategoryDto
+import com.sampoom.android.feature.part.data.remote.dto.GroupDto
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface PartApi {
-    @GET("part")
-    suspend fun getPartList(): ApiResponse<List<PartDto>>
+    @GET("agency/category")
+    suspend fun getCategoryList(): ApiResponse<List<CategoryDto>>
+
+    @GET("agency/category/{categoryId}")
+    suspend fun getGroupList(@Path("categoryId") categoryId: Long): ApiResponse<List<GroupDto>>
 }

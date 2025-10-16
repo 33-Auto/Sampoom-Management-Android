@@ -1,5 +1,6 @@
 package com.sampoom.android.app.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -18,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sampoom.android.R
+import com.sampoom.android.core.ui.theme.backgroundColor
 import com.sampoom.android.feature.auth.ui.LoginScreen
 import com.sampoom.android.feature.auth.ui.SignUpScreen
 import com.sampoom.android.feature.part.ui.PartScreen
@@ -53,7 +55,7 @@ fun AppNavHost() {
     val navController = rememberNavController()
 
     // TODO: 임시 로그인 상태 확인 -> AuthRepository에서 확인하도록 변경
-    val isLoggedIn = false
+    val isLoggedIn = true
 
     NavHost(
         navController = navController,
@@ -82,7 +84,11 @@ fun AppNavHost() {
             )
         }
         composable(ROUTE_HOME) { MainScreen(navController) }
-        composable(ROUTE_PARTS) { PartScreen() }
+        composable(ROUTE_PARTS) { PartScreen(
+            onNavigateBack = {
+                navController.navigateUp()
+            }
+        ) }
     }
 }
 
