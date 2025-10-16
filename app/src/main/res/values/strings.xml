@@ -2,6 +2,7 @@
     <string name="app_name">삼품관리</string>
 
     <!-- Navigation Bar -->
+    <string name="nav_back">뒤로가기</string>
     <string name="nav_dashboard">대시보드</string>
     <string name="nav_delivery">출고목록</string>
     <string name="nav_cart">장바구니</string>
@@ -9,10 +10,32 @@
 
     <!-- 로그인 -->
     <string name="login_title">로그인</string>
-    <string name="login_placeholder_email">이메일</string>
-    <string name="login_placeholder_password">비밀번호</string>
+    <string name="login_title_email">이메일</string>
+    <string name="login_title_password">비밀번호</string>
+    <string name="login_placeholder_email">이메일 입력</string>
+    <string name="login_placeholder_password">비밀번호 입력</string>
     <string name="login_button_login">로그인</string>
     <string name="login_button_login_loading">로그인 중…</string>
+    <string name="login_need_account">계정이 없으신가요?</string>
+    <string name="login_signup">회원가입</string>
+    <string name="login_do">하기</string>
+
+    <!-- 회원가입 -->
+    <string name="signup_title">회원가입</string>
+    <string name="signup_title_name">이름</string>
+    <string name="signup_title_branch">지점</string>
+    <string name="signup_title_position">직급</string>
+    <string name="signup_title_email">이메일</string>
+    <string name="signup_title_password">비밀번호</string>
+    <string name="signup_title_password_check">비밀번호 확인</string>
+    <string name="signup_placeholder_name">이름 입력</string>
+    <string name="signup_placeholder_branch">지점 선택</string>
+    <string name="signup_placeholder_position">직급 선택</string>
+    <string name="signup_placeholder_email">이메일 입력</string>
+    <string name="signup_placeholder_password">비밀번호 입력</string>
+    <string name="signup_placeholder_password_check">비밀번호 입력 확인</string>
+    <string name="signup_button_signup">회원가입</string>
+    <string name="signup_button_signup_loading">회원 가입 중…</string>
 
     <!-- 부품 목록 -->
     <string name="part_title">부품 목록</string>
@@ -21,4 +44,16 @@
     <!-- Common -->
     <string name="common_error">오류가 발생했습니다</string>
     <string name="common_retry">다시 시도</string>
+    <string name="common_close">닫기</string>
+
+    <!-- Validation -->
+    <string name="validation_email_required">이메일을 입력해주세요</string>
+    <string name="validation_email_invalid">올바른 이메일 형식이 아닙니다</string>
+    <string name="validation_password_required">비밀번호를 입력해주세요</string>
+    <string name="validation_password_min_length">비밀번호는 최소 8자 이상이어야 합니다</string>
+    <string name="validation_password_max_length">비밀번호는 최대 30자까지 가능합니다</string>
+    <string name="validation_password_complexity">영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다</string>
+    <string name="validation_password_confirm_required">비밀번호 확인을 입력해주세요</string>
+    <string name="validation_password_mismatch">비밀번호가 일치하지 않습니다</string>
+    <string name="validation_field_required">%s을(를) 입력해주세요</string>
 </resources>

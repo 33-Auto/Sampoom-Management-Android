@@ -1,10 +1,13 @@
 package com.sampoom.android.core.ui.component
 
+import android.R.attr.singleLine
+import android.R.attr.text
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation.Companion.keyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -17,32 +20,36 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sampoom.android.core.ui.theme.FailRed
+import com.sampoom.android.core.ui.theme.Main500
+import com.sampoom.android.core.ui.theme.backgroundColor
 
 enum class TextFieldVariant { Outlined, Filled }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTextField(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    label: String,
     placeholder: String,
-    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isPassword: Boolean = false,
-    variant: TextFieldVariant = TextFieldVariant.Outlined
+    variant: TextFieldVariant = TextFieldVariant.Outlined,
+    isError: Boolean = false,
+    errorMessage: String? = null
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
-    val darkTheme = isSystemInDarkTheme()
-    val cs = MaterialTheme.colorScheme
 
-    val textColor = if (darkTheme) Color.White else Color.Black
-    val containerColor = if (variant == TextFieldVariant.Filled) {
-        if (darkTheme) Color(0xFF1C1C1E) else Color(0xFFF3F3F3)
-    } else Color.Transparent
+    val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
+    val containerColor = if (variant == TextFieldVariant.Filled) backgroundColor() else Color.Transparent
 
-    val focusedBorderColor = cs.primary
-    val unfocusedBorderColor = if (darkTheme) Color(0xFF666666) else Color(0xFFCCCCCC)
+    val focusedBorderColor = if (isError) FailRed else Main500
+    val unfocusedBorderColor = when {
+        isError -> FailRed
+        isSystemInDarkTheme() -> Color(0xFF666666)
+        else -> Color(0xFFCCCCCC)
+    }
 
     val trailingIconView = if (isPassword) {
         @Composable {
@@ -50,9 +57,20 @@ fun CommonTextField(
                 Icon(
                     imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                     contentDescription = null,
-                    tint = if (darkTheme) Color.White else Color.Black
+                    tint = textColor
                 )
             }
+        }
+    } else null
+
+    // 에러 메시지 표시용
+    val supportingTextView = if (isError && errorMessage != null) {
+        @Composable {
+            Text(
+                text = errorMessage,
+                color = FailRed,
+                style = MaterialTheme.typography.bodySmall
+            )
         }
     } else null
 
@@ -61,19 +79,21 @@ fun CommonTextField(
             OutlinedTextField(
                 value = value,
                 onValueChange = onValueChange,
-                label = { Text(text = label, color = textColor) },
                 placeholder = { Text(text = placeholder, color = textColor.copy(alpha = 0.4f)) },
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
                 singleLine = true,
                 enabled = enabled,
+                isError = isError,
                 trailingIcon = trailingIconView,
+                supportingText = supportingTextView,
                 visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = focusedBorderColor,
                     unfocusedBorderColor = unfocusedBorderColor,
+                    errorBorderColor = FailRed,
                     disabledBorderColor = Color.Gray,
                     focusedLabelColor = focusedBorderColor,
                     unfocusedLabelColor = textColor.copy(alpha = 0.7f),
@@ -81,7 +101,7 @@ fun CommonTextField(
                     focusedTextColor = textColor,
                     unfocusedTextColor = textColor
                 ),
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.large
             )
         }
 
@@ -89,19 +109,21 @@ fun CommonTextField(
             TextField(
                 value = value,
                 onValueChange = onValueChange,
-                label = { Text(text = label, color = textColor) },
                 placeholder = { Text(text = placeholder, color = textColor.copy(alpha = 0.4f)) },
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
                 singleLine = true,
                 enabled = enabled,
+                isError = isError,
                 trailingIcon = trailingIconView,
+                supportingText = supportingTextView,
                 visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = containerColor,
                     unfocusedContainerColor = containerColor,
+                    errorContainerColor = FailRed,
                     disabledContainerColor = containerColor.copy(alpha = 0.5f),
                     focusedIndicatorColor = focusedBorderColor,
                     unfocusedIndicatorColor = unfocusedBorderColor,
@@ -109,7 +131,7 @@ fun CommonTextField(
                     focusedTextColor = textColor,
                     unfocusedTextColor = textColor
                 ),
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.large
             )
         }
     }
@@ -123,14 +145,12 @@ fun Preview_Light_CommonTextFields() {
             CommonTextField(
                 value = "Example@naver.com",
                 onValueChange = {},
-                label = "이메일 입력",
                 placeholder = "Example@naver.com",
                 variant = TextFieldVariant.Outlined
             )
             CommonTextField(
                 value = "",
                 onValueChange = {},
-                label = "비밀번호 입력",
                 placeholder = "비밀번호 입력",
                 isPassword = true,
                 variant = TextFieldVariant.Outlined
@@ -144,20 +164,33 @@ fun Preview_Light_CommonTextFields() {
 fun Preview_Dark_CommonTextFields() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Column {
+            // 정상
             CommonTextField(
                 value = "Example@naver.com",
                 onValueChange = {},
-                label = "이메일 입력",
-                placeholder = "Example@naver.com",
-                variant = TextFieldVariant.Filled
+                placeholder = "이메일",
+                variant = TextFieldVariant.Outlined
             )
+
+            // 에러
             CommonTextField(
-                value = "",
+                value = "invalid",
                 onValueChange = {},
-                label = "비밀번호 입력",
-                placeholder = "비밀번호 입력",
+                placeholder = "이메일",
+                variant = TextFieldVariant.Outlined,
+                isError = true,
+                errorMessage = "올바른 이메일 형식이 아닙니다"
+            )
+
+            // 비밀번호 에러
+            CommonTextField(
+                value = "123",
+                onValueChange = {},
+                placeholder = "비밀번호",
                 isPassword = true,
-                variant = TextFieldVariant.Filled
+                variant = TextFieldVariant.Outlined,
+                isError = true,
+                errorMessage = "비밀번호는 최소 8자 이상이어야 합니다"
             )
         }
     }
