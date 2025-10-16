@@ -43,6 +43,7 @@
     <string name="part_title_category">카테고리 선택</string>
     <string name="part_title_group">그룹 선택</string>
     <string name="part_empty_category">카테고리 목록이 없습니다.</string>
+    <string name="part_empty_part">부품 목록이 없습니다.</string>
     <string name="part_select_category">카테고리를 선택해주세요.</string>
     <string name="part_empty_group">그룹 목록이 없습니다.</string>
 

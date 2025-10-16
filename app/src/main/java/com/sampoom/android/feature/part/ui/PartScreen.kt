@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.Main500
@@ -26,11 +27,13 @@ import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.model.Group
+import com.sampoom.android.feature.part.ui.PartItemCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartScreen(
     onNavigateBack: () -> Unit = {},
+    onNavigatePartList: (Group) -> Unit,
     viewModel: PartViewModel = hiltViewModel()
 ) {
     val errorLabel = stringResource(R.string.common_error)
@@ -40,12 +43,6 @@ fun PartScreen(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-//    val snackBarHostState = rememberCommonSnackBarHostState()
-//    ShowErrorSnackBar(
-//        errorMessage = uiState.categoryError,
-//        snackBarHostState = snackBarHostState,
-//        onConsumed = { viewModel.consumeError() }
-//    )
 
     Scaffold(
         topBar = {
@@ -244,8 +241,11 @@ fun PartScreen(
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(uiState.groupList) { inventory ->
-                                PartItemCard(group = inventory)
+                            items(uiState.groupList) { group ->
+                                PartItemCard(
+                                    group = group,
+                                    onClick = { onNavigatePartList(group) }
+                                )
                             }
                         }
                     }
@@ -306,9 +306,11 @@ private fun resourceMapper(code: String): Int {
 
 @Composable
 private fun PartItemCard(
-    group: Group
+    group: Group,
+    onClick: () -> Unit
 ) {
     Card(
+        onClick = { onClick() },
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = backgroundCardColor()),
     ) {
