@@ -1,6 +1,7 @@
 package com.sampoom.android.feature.auth.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,7 @@ import com.sampoom.android.core.ui.component.CommonTextField
 import com.sampoom.android.core.ui.component.ShowErrorSnackBar
 import com.sampoom.android.core.ui.component.rememberCommonSnackBarHostState
 import com.sampoom.android.core.ui.component.TopSnackBarHost
+import com.sampoom.android.core.ui.theme.backgroundColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

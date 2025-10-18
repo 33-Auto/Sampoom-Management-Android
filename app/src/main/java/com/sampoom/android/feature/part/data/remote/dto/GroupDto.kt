@@ -1,8 +1,8 @@
 package com.sampoom.android.feature.part.data.remote.dto
 
-data class PartDto(
-    val partId: Long,
+data class GroupDto(
+    val id: Long,
     val code: String,
     val name: String,
-    val quantity: Long
+    val categoryId: Long
 )

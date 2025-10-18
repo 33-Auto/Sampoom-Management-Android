@@ -20,8 +20,8 @@ class LoginViewModel @Inject constructor(
     private val singIn: LoginUseCase,
     private val application: Application
 ) : ViewModel() {
-    private val _state = MutableStateFlow(LoginUiState())
-    val state: StateFlow<LoginUiState> = _state
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState: StateFlow<LoginUiState> = _uiState
 
     private var emailLabel: String = ""
     private var passwordLabel: String = ""
@@ -35,26 +35,26 @@ class LoginViewModel @Inject constructor(
 
     fun onEvent(e: LoginUiEvent) = when (e) {
         is LoginUiEvent.EmailChanged -> {
-            _state.value = _state.value.copy(email = e.email)
+            _uiState.value = _uiState.value.copy(email = e.email)
             validateEmail()
         }
         is LoginUiEvent.PasswordChanged -> {
-            _state.value = _state.value.copy(password = e.password)
+            _uiState.value = _uiState.value.copy(password = e.password)
             validatePassword()
         }
         LoginUiEvent.Submit -> submit()
     }
 
     private fun validateEmail() {
-        val result = AuthValidator.validateNotEmpty(_state.value.email, emailLabel)
-        _state.value = _state.value.copy(
+        val result = AuthValidator.validateNotEmpty(_uiState.value.email, emailLabel)
+        _uiState.value = _uiState.value.copy(
             emailError = result.toErrorMessage()
         )
     }
 
     private fun validatePassword() {
-        val result = AuthValidator.validateNotEmpty(_state.value.password, passwordLabel)
-        _state.value = _state.value.copy(
+        val result = AuthValidator.validateNotEmpty(_uiState.value.password, passwordLabel)
+        _uiState.value = _uiState.value.copy(
             passwordError = result.toErrorMessage()
         )
     }
@@ -71,22 +71,22 @@ class LoginViewModel @Inject constructor(
         validateEmail()
         validatePassword()
 
-        if (!_state.value.isValid) return@launch
+        if (!_uiState.value.isValid) return@launch
 
-        val s = _state.value
-        _state.update { it.copy(loading = true, error = null) }
+        val s = _uiState.value
+        _uiState.update { it.copy(loading = true, error = null) }
         runCatching { singIn(s.email, s.password) }
-            .onSuccess { _state.update { it.copy(loading = false, success = true) } }
+            .onSuccess { _uiState.update { it.copy(loading = false, success = true) } }
             .onFailure { throwable ->
                 val backendMessage = throwable.serverMessageOrNull()
-                _state.update {
+                _uiState.update {
                     it.copy(loading = false, error = backendMessage ?: (throwable.message ?: errorLabel))
                 }
             }
-        Log.d("LoginViewModel", "submit: ${_state.value}")
+        Log.d("LoginViewModel", "submit: ${_uiState.value}")
     }
 
     fun consumeError() {
-        _state.update { it.copy(error = null) }
+        _uiState.update { it.copy(error = null) }
     }
 }

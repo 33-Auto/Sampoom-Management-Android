@@ -1,11 +1,11 @@
 package com.sampoom.android.feature.part.domain.usecase
 
-import com.sampoom.android.feature.part.domain.model.PartList
+import com.sampoom.android.feature.part.domain.model.CategoryList
 import com.sampoom.android.feature.part.domain.repository.PartRepository
 import javax.inject.Inject
 
-class GetPartUseCase @Inject constructor(
+class GetCategoryUseCase @Inject constructor(
     private val repository: PartRepository
 ) {
-    suspend operator fun invoke(groupId: Long): PartList = repository.getPartList(groupId)
+    suspend operator fun invoke(): CategoryList = repository.getCategoryList()
 }
