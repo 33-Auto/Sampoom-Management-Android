@@ -3,13 +3,16 @@ package com.sampoom.android.feature.part.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -63,8 +66,11 @@ fun PartScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
+            Spacer(Modifier.height(16.dp))
+
             // 검색 바
             OutlinedTextField(
                 value = "uiState.searchQuery",
@@ -131,34 +137,12 @@ fun PartScreen(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // 첫 번째 줄 (3개)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            uiState.categoryList.take(3).forEach { category ->
-                                CategoryItem(
-                                    category = category,
-                                    isSelected = category.id == uiState.selectedCategory?.id,
-                                    onClick = {
-                                        viewModel.onEvent(
-                                            PartUiEvent.CategorySelected(
-                                                category
-                                            )
-                                        )
-                                    },
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-                        }
-
-                        // 두 번째 줄 (3개)
-                        if (uiState.categoryList.size > 3) {
+                        uiState.categoryList.chunked(3).forEach { categoryChunk ->
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                uiState.categoryList.drop(3).take(3).forEach { category ->
+                                categoryChunk.forEach { category ->
                                     CategoryItem(
                                         category = category,
                                         isSelected = category.id == uiState.selectedCategory?.id,
@@ -171,6 +155,11 @@ fun PartScreen(
                                         },
                                         modifier = Modifier.weight(1f)
                                     )
+                                }
+
+                                // 3개 미만인 경우 빈 공간 채우기
+                                repeat(3 - categoryChunk.size) {
+                                    Spacer(modifier = Modifier.weight(1f))
                                 }
                             }
                         }
@@ -238,10 +227,11 @@ fun PartScreen(
                     }
 
                     else -> {
-                        LazyColumn(
+                        Column(
+                            Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(uiState.groupList) { group ->
+                            uiState.groupList.forEach { group ->
                                 PartItemCard(
                                     group = group,
                                     onClick = { onNavigatePartList(group) }
@@ -251,6 +241,8 @@ fun PartScreen(
                     }
                 }
             }
+
+            Spacer(Modifier.height(32.dp))
         }
     }
 }
