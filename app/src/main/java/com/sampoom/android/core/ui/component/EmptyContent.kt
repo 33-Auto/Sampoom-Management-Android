@@ -1,7 +1,6 @@
 package com.sampoom.android.core.ui.component
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,7 +12,7 @@ fun EmptyContent(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Text(message)

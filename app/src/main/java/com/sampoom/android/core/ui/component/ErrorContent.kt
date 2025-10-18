@@ -21,7 +21,7 @@ fun ErrorContent(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -31,7 +31,7 @@ fun ErrorContent(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onRetry) {
-            Text(stringResource((R.string.common_retry)))
+            Text(stringResource(R.string.common_retry))
         }
     }
 }
