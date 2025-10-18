@@ -1,7 +1,6 @@
 package com.sampoom.android.feature.part.ui
 
 import android.util.Log
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
