@@ -39,8 +39,8 @@ const val ROUTE_ORDERS = "orders"
 
 // Detail Screen
 const val ROUTE_PARTS = "parts"
-const val ROUTE_PART_LIST = "{agencyId}/group/{groupId}"
-fun routePartList(agencyId: Long, groupId: Long): String = "$agencyId/group/$groupId"
+const val ROUTE_PART_LIST = "parts/{agencyId}/group/{groupId}"
+fun routePartList(agencyId: Long, groupId: Long): String = "parts/$agencyId/group/$groupId"
 const val ROUTE_EMPLOYEE = "employee"
 const val ROUTE_SETTINGS = "settings"
 

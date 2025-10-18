@@ -1,6 +1,7 @@
 package com.sampoom.android.feature.part.ui
 
 import android.util.Log
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,7 +33,8 @@ class PartListViewModel @Inject constructor(
     }
 
     init {
-        loadPartList(groupId)
+        if (groupId > 0L) loadPartList(groupId)
+        else _uiState.update { it.copy(partListError = errorLabel) }
     }
 
     fun onEvent(event: PartListUiEvent) {

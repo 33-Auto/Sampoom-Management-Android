@@ -1,8 +1,7 @@
 package com.sampoom.android.feature.part.ui
 
+import android.R.attr.singleLine
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -12,7 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -20,9 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sampoom.android.R
-import com.sampoom.android.core.ui.theme.FailRed
+import com.sampoom.android.core.ui.component.EmptyContent
+import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.White
 import com.sampoom.android.core.ui.theme.backgroundCardColor
@@ -30,7 +28,6 @@ import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.model.Group
-import com.sampoom.android.feature.part.ui.PartItemCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,11 +72,11 @@ fun PartScreen(
             OutlinedTextField(
                 value = "uiState.searchQuery",
                 onValueChange = { "viewModel.onSearchQueryChanged(it)" },
-                placeholder = { Text("부품명으로 검색") },
+                placeholder = { Text(stringResource(R.string.part_placeholder_search)) },
                 trailingIcon = {
                     Icon(
                         Icons.Default.Search,
-                        contentDescription = "검색",
+                        contentDescription = stringResource(R.string.part_title_search),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
@@ -323,39 +320,5 @@ private fun PartItemCard(
                 contentDescription = stringResource(R.string.common_detail)
             )
         }
-    }
-}
-
-@Composable
-fun ErrorContent(
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = stringResource(R.string.common_error),
-            color = FailRed
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onRetry) {
-            Text(stringResource((R.string.common_retry)))
-        }
-    }
-}
-
-@Composable
-fun EmptyContent(
-    message: String,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(message)
     }
 }

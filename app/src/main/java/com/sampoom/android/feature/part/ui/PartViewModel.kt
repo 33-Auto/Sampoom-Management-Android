@@ -8,6 +8,7 @@ import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.usecase.GetCategoryUseCase
 import com.sampoom.android.feature.part.domain.usecase.GetGroupUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -22,6 +23,7 @@ class PartViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(PartUiState())
     val uiState: StateFlow<PartUiState> = _uiState
 
+    private var groupLoadJob: Job? = null
     private var errorLabel: String = ""
 
     fun bindLabel(error: String) {
@@ -71,16 +73,20 @@ class PartViewModel @Inject constructor(
     private fun selectCategory(category: Category) {
         viewModelScope.launch {
             _uiState.update { it.copy(selectedCategory = category) }
+            groupLoadJob?.cancel()  // 기존 그룹 로드 취소 후 새 요청
             loadGroup(category.id)
         }
     }
 
     private fun loadGroup(categoryId: Long) {
-        viewModelScope.launch {
+        groupLoadJob?.cancel()
+        groupLoadJob = viewModelScope.launch {
             _uiState.update { it.copy(groupLoading = true, groupError = null) }
 
             runCatching { getGroupUseCase(categoryId) }
                 .onSuccess { groupList ->
+                    // 최신 선택과 불일치하면 무시
+                    if (_uiState.value.selectedCategory?.id != categoryId) return@onSuccess
                     _uiState.update {
                         it.copy(
                             groupList = groupList.items,
@@ -91,6 +97,7 @@ class PartViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    if (_uiState.value.selectedCategory?.id != categoryId) return@onFailure
                     _uiState.update {
                         it.copy(
                             groupLoading = false,
