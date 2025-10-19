@@ -58,9 +58,25 @@
 
     <!-- 출고 목록 -->
     <string name="outbound_title">출고목록</string>
+    <string name="outbound_empty_list">출고목록 비우기</string>
     <string name="outbound_empty_outbound">출고목록이 없습니다.</string>
     <string name="outbound_dialog_text">출고 목록에 추가하시겠습니까?</string>
     <string name="outbound_toast_success">출고 목록에 추가되었습니다</string>
+    <string name="outbound_dialog_order_text">출고 처리하시겠습니까?</string>
+    <string name="outbound_dialog_empty_text">출고목록을 비우시겠습니까?</string>
+    <string name="outbound_toast_order_text">출고 처리되었습니다</string>
+    <string name="outbound_order_parts">부품 출고처리</string>
+
+    <!-- 장바구니 목록 -->
+    <string name="cart_title">장바구니</string>
+    <string name="cart_empty_list">장바구니 비우기</string>
+    <string name="cart_empty_outbound">장바구니 목록이 없습니다.</string>
+    <string name="cart_dialog_text">장바구니 목록에 추가하시겠습니까?</string>
+    <string name="cart_toast_success">장바구니 목록에 추가되었습니다</string>
+    <string name="cart_dialog_order_text">장바구니에 추가하시겠습니까?</string>
+    <string name="cart_dialog_empty_text">장바구니를 비우시겠습니까?</string>
+    <string name="cart_toast_order_text">추가되었습니다</string>
+    <string name="cart_order_parts">부품 주문</string>
 
     <!-- Common -->
     <string name="common_error">오류가 발생했습니다</string>

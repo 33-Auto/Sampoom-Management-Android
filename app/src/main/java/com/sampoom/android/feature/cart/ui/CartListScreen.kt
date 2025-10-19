@@ -1,10 +1,7 @@
-package com.sampoom.android.feature.outbound.ui
+package com.sampoom.android.feature.cart.ui
 
-import android.util.Log.v
-import android.view.RoundedCorner
+import android.R.attr.onClick
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,25 +11,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,16 +29,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.ButtonSize
 import com.sampoom.android.core.ui.component.ButtonVariant
@@ -58,21 +43,20 @@ import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.theme.FailRed
-import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
-import com.sampoom.android.feature.outbound.domain.model.OutboundPart
-import com.sampoom.android.feature.part.ui.PartDetailUiEvent
+import com.sampoom.android.feature.cart.domain.model.CartPart
+import com.sampoom.android.feature.outbound.ui.OutboundListUiEvent
+import kotlin.collections.forEach
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OutboundListScreen(
-    viewModel: OutboundListViewModel = hiltViewModel()
+fun CartListScreen(
+    viewModel: CartListViewModel = hiltViewModel()
 ) {
     val errorLabel = stringResource(R.string.common_error)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var showEmptyOutboundDialog by remember { mutableStateOf(false) }
+    var showEmptyCartDialog by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -82,12 +66,16 @@ fun OutboundListScreen(
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)
-        viewModel.onEvent(OutboundListUiEvent.LoadOutboundList)
+        viewModel.onEvent(CartListUiEvent.LoadCartList)
     }
 
     LaunchedEffect(uiState.isOrderSuccess) {
         if (uiState.isOrderSuccess) {
-            Toast.makeText(context, context.getString(R.string.outbound_toast_order_text), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                context,
+                context.getString(R.string.cart_toast_order_text),
+                Toast.LENGTH_SHORT
+            ).show()
         }
         viewModel.clearSuccess()
     }
@@ -103,21 +91,21 @@ fun OutboundListScreen(
             Text(
                 modifier = Modifier
                     .padding(vertical = 16.dp),
-                text = stringResource(R.string.outbound_title),
+                text = stringResource(R.string.cart_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = textColor()
             )
 
             when {
-                uiState.outboundLoading -> {}
-                uiState.outboundError != null -> {}
-                uiState.outboundList.isEmpty() -> {}
+                uiState.cartLoading -> {}
+                uiState.cartError != null -> {}
+                uiState.cartList.isEmpty() -> {}
                 else -> {
                     TextButton(
-                        onClick = { showEmptyOutboundDialog = true }
+                        onClick = { showEmptyCartDialog = true }
                     ) {
                         Text(
-                            text = stringResource(R.string.outbound_empty_list),
+                            text = stringResource(R.string.cart_empty_list),
                             style = MaterialTheme.typography.titleMedium,
                             color = FailRed
                         )
@@ -126,8 +114,9 @@ fun OutboundListScreen(
             }
         }
 
+
         when {
-            uiState.outboundLoading -> {
+            uiState.cartLoading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -137,27 +126,27 @@ fun OutboundListScreen(
                 }
             }
 
-            uiState.outboundError != null -> {
+            uiState.cartError != null -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     ErrorContent(
-                        onRetry = { viewModel.onEvent(OutboundListUiEvent.RetryOutboundList) },
+                        onRetry = { viewModel.onEvent(CartListUiEvent.RetryCartList) },
                         modifier = Modifier.height(200.dp)
                     )
                 }
             }
 
-            uiState.outboundList.isEmpty() -> {
+            uiState.cartList.isEmpty() -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     EmptyContent(
-                        message = stringResource(R.string.outbound_empty_outbound),
+                        message = stringResource(R.string.cart_empty_outbound),
                         modifier = Modifier.height(200.dp)
                     )
                 }
@@ -171,10 +160,10 @@ fun OutboundListScreen(
                             .padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        uiState.outboundList.forEach { category ->
+                        uiState.cartList.forEach { category ->
                             category.groups.forEach { group ->
                                 item {
-                                    OutboundSection(
+                                    CartSection(
                                         categoryName = category.categoryName,
                                         groupName = group.groupName,
                                         parts = group.parts,
@@ -194,24 +183,24 @@ fun OutboundListScreen(
                             .align(Alignment.BottomEnd)
                             .padding(16.dp)
                             .padding(end = 72.dp),
-                        variant = ButtonVariant.Error,
+                        variant = ButtonVariant.Primary,
                         size = ButtonSize.Large,
                         onClick = { showConfirmDialog = true }
-                    ) { Text(stringResource(R.string.outbound_order_parts)) }
+                    ) { Text(stringResource(R.string.cart_order_parts)) }
                 }
             }
         }
     }
 
-    if (showEmptyOutboundDialog) {
+    if (showEmptyCartDialog) {
         AlertDialog(
-            onDismissRequest = { showEmptyOutboundDialog = false },
-            text = { Text(stringResource(R.string.outbound_dialog_empty_text)) },
+            onDismissRequest = { showEmptyCartDialog = false },
+            text = { Text(stringResource(R.string.cart_dialog_empty_text)) },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        showEmptyOutboundDialog = false
-                        viewModel.onEvent(OutboundListUiEvent.DeleteAllOutbound)
+                        showEmptyCartDialog = false
+                        viewModel.onEvent(CartListUiEvent.DeleteAllCart)
                     }
                 ) {
                     Text(stringResource(R.string.common_confirm))
@@ -219,7 +208,7 @@ fun OutboundListScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { showEmptyOutboundDialog = false }
+                    onClick = { showConfirmDialog = false }
                 ) {
                     Text(stringResource(R.string.common_cancel))
                 }
@@ -230,12 +219,12 @@ fun OutboundListScreen(
     if (showConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showConfirmDialog = false },
-            text = { Text(stringResource(R.string.outbound_dialog_order_text)) },
+            text = { Text(stringResource(R.string.cart_dialog_order_text)) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         showConfirmDialog = false
-                        viewModel.onEvent(OutboundListUiEvent.ProcessOutbound)
+                        viewModel.onEvent(CartListUiEvent.ProcessOrder)
                     }
                 ) {
                     Text(stringResource(R.string.common_confirm))
@@ -253,13 +242,13 @@ fun OutboundListScreen(
 }
 
 @Composable
-private fun OutboundSection(
+private fun CartSection(
     categoryName: String,
     groupName: String,
-    parts: List<OutboundPart>,
+    parts: List<CartPart>,
     isUpdating: Boolean,
     isDeleting: Boolean,
-    onEvent: (OutboundListUiEvent) -> Unit
+    onEvent: (CartListUiEvent) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -271,7 +260,7 @@ private fun OutboundSection(
         )
 
         parts.forEach { part ->
-            OutboundPartItem(
+            CartPartItem(
                 part = part,
                 isUpdating = isUpdating,
                 isDeleting = isDeleting,
@@ -282,11 +271,11 @@ private fun OutboundSection(
 }
 
 @Composable
-private fun OutboundPartItem(
-    part: OutboundPart,
+private fun CartPartItem(
+    part: CartPart,
     isUpdating: Boolean,
     isDeleting: Boolean,
-    onEvent: (OutboundListUiEvent) -> Unit
+    onEvent: (CartListUiEvent) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -321,7 +310,7 @@ private fun OutboundPartItem(
 
                 IconButton(
                     onClick = {
-                        onEvent(OutboundListUiEvent.DeleteOutbound(part.outboundId))
+                        onEvent(CartListUiEvent.DeleteCart(part.cartItemId))
                     },
                     enabled = !isDeleting
                 ) {
@@ -349,8 +338,8 @@ private fun OutboundPartItem(
                         size = ButtonSize.Large,
                         onClick = {
                             if (part.quantity > 1) onEvent(
-                                OutboundListUiEvent.UpdateQuantity(
-                                    part.outboundId,
+                                CartListUiEvent.UpdateQuantity(
+                                    part.cartItemId,
                                     part.quantity - 1
                                 )
                             )
@@ -397,8 +386,8 @@ private fun OutboundPartItem(
                         size = ButtonSize.Large,
                         onClick = {
                             onEvent(
-                                OutboundListUiEvent.UpdateQuantity(
-                                    part.outboundId,
+                                CartListUiEvent.UpdateQuantity(
+                                    part.cartItemId,
                                     part.quantity + 1
                                 )
                             )

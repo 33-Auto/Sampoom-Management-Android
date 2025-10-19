@@ -52,7 +52,8 @@ fun PartDetailBottomSheet(
 ) {
     val errorLabel = stringResource(R.string.common_error)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var showConfirmDialog by remember { mutableStateOf(false) }
+    var showOutboundDialog by remember { mutableStateOf(false) }
+    var showCartDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -68,9 +69,17 @@ fun PartDetailBottomSheet(
     }
 
     // 성공 시 Toast 표시 후 다이얼로그 닫기
-    LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
+    LaunchedEffect(uiState.isOutboundSuccess) {
+        if (uiState.isOutboundSuccess) {
             Toast.makeText(context, context.getString(R.string.outbound_toast_success), Toast.LENGTH_SHORT).show()
+        }
+        viewModel.clearSuccess()
+    }
+
+    // 성공 시 Toast 표시 후 다이얼로그 닫기
+    LaunchedEffect(uiState.isCartSuccess) {
+        if (uiState.isCartSuccess) {
+            Toast.makeText(context, context.getString(R.string.cart_toast_success), Toast.LENGTH_SHORT).show()
         }
         viewModel.clearSuccess()
     }
@@ -191,7 +200,7 @@ fun PartDetailBottomSheet(
                         contentDescription = null
                     )
                 },
-                onClick = { showConfirmDialog = true }
+                onClick = { showOutboundDialog = true }
             ) { Text(stringResource(R.string.part_add_delivery)) }
             Spacer(Modifier.width(8.dp))
             CommonButton(
@@ -199,20 +208,20 @@ fun PartDetailBottomSheet(
                 variant = ButtonVariant.Primary,
                 size = ButtonSize.Large,
                 leadingIcon = { Icon(painterResource(R.drawable.cart), contentDescription = null) },
-                onClick = {}    // TODO: API 연동
+                onClick = { showCartDialog = true }
             ) { Text(stringResource(R.string.part_add_cart)) }
         }
     }
 
     // 확인 다이얼로그
-    if (showConfirmDialog) {
+    if (showOutboundDialog) {
         AlertDialog(
-            onDismissRequest = { showConfirmDialog = false },
+            onDismissRequest = { showOutboundDialog = false },
             text = { Text(stringResource(R.string.outbound_dialog_text)) },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        showConfirmDialog = false
+                        showOutboundDialog = false
                         viewModel.onEvent(
                             PartDetailUiEvent.AddToOutbound(
                                 partId = part.partId,
@@ -226,7 +235,36 @@ fun PartDetailBottomSheet(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { showConfirmDialog = false }
+                    onClick = { showOutboundDialog = false }
+                ) {
+                    Text(stringResource(R.string.common_cancel))
+                }
+            }
+        )
+    }
+
+    if (showCartDialog) {
+        AlertDialog(
+            onDismissRequest = { showCartDialog = false },
+            text = { Text(stringResource(R.string.cart_dialog_text)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showCartDialog = false
+                        viewModel.onEvent(
+                            PartDetailUiEvent.AddToCart(
+                                partId = part.partId,
+                                quantity = uiState.quantity
+                            )
+                        )
+                    }
+                ) {
+                    Text(stringResource(R.string.common_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showCartDialog = false }
                 ) {
                     Text(stringResource(R.string.common_cancel))
                 }

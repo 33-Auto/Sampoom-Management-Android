@@ -35,4 +35,8 @@ interface OutboundApi {
         @Path("outboundId") outboundId: Long,
         @Body body: UpdateOutboundRequestDto
     ): ApiSuccessResponse
+
+    // 출고 목록 전체 비우기
+    @DELETE("agency/1/outbound/clear")
+    suspend fun deleteAllOutbound(): ApiSuccessResponse
 }

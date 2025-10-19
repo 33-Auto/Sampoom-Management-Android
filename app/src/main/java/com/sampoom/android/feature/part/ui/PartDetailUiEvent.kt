@@ -8,6 +8,7 @@ sealed interface PartDetailUiEvent {
     object DecreaseQuantity : PartDetailUiEvent
     data class SetQuantity(val quantity: Long) : PartDetailUiEvent
     data class AddToOutbound(val partId: Long, val quantity: Long) : PartDetailUiEvent
+    data class AddToCart(val partId: Long, val quantity: Long) : PartDetailUiEvent
     object ClearError : PartDetailUiEvent
     object Dismiss : PartDetailUiEvent
 }

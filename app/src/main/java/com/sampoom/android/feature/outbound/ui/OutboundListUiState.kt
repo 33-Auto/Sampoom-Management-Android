@@ -10,5 +10,6 @@ data class OutboundListUiState(
     val isUpdating: Boolean = false,
     val updateError: String? = null,
     val isDeleting: Boolean = false,
-    val deleteError: String? = null
+    val deleteError: String? = null,
+    val isOrderSuccess: Boolean = false
 )

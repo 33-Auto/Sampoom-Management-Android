@@ -22,6 +22,7 @@ import androidx.navigation.navArgument
 import com.sampoom.android.R
 import com.sampoom.android.feature.auth.ui.LoginScreen
 import com.sampoom.android.feature.auth.ui.SignUpScreen
+import com.sampoom.android.feature.cart.ui.CartListScreen
 import com.sampoom.android.feature.outbound.ui.OutboundListScreen
 import com.sampoom.android.feature.part.ui.PartListScreen
 import com.sampoom.android.feature.part.ui.PartScreen
@@ -132,7 +133,7 @@ fun MainScreen(
         ) {
             composable(ROUTE_DASHBOARD) { DashboardScreen() }
             composable(ROUTE_OUTBOUND) { OutboundListScreen() }
-            composable(ROUTE_CART) { CartScreen() }
+            composable(ROUTE_CART) { CartListScreen() }
             composable(ROUTE_ORDERS) { OrderScreen() }
         }
     }
@@ -200,12 +201,6 @@ fun BottomNavigationBar(navController: NavHostController) {
 private fun DashboardScreen() {
     // 홈 화면 구현
     Text("대시보드 화면")
-}
-
-@Composable
-private fun CartScreen() {
-    // 프로필 화면 구현
-    Text("Cart 화면")
 }
 
 @Composable

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
+import com.sampoom.android.feature.cart.domain.usecase.AddCartUseCase
 import com.sampoom.android.feature.outbound.domain.usecase.AddOutboundUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PartDetailViewModel @Inject constructor(
-    private val addOutboundUseCase: AddOutboundUseCase
+    private val addOutboundUseCase: AddOutboundUseCase,
+    private val addCartUseCase: AddCartUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PartDetailUiState())
     val uiState: StateFlow<PartDetailUiState> = _uiState
@@ -34,7 +36,8 @@ class PartDetailViewModel @Inject constructor(
                         quantity = 1,
                         isUpdating = false,
                         updateError = null,
-                        isSuccess = false
+                        isOutboundSuccess = false,
+                        isCartSuccess = false
                     )
                 }
             }
@@ -58,6 +61,13 @@ class PartDetailViewModel @Inject constructor(
                     addToOutbound(part.partId, quantity)
                 }
             }
+            is PartDetailUiEvent.AddToCart -> {
+                val part = _uiState.value.part
+                val quantity = _uiState.value.quantity
+                if (part != null) {
+                    addToCart(part.partId, quantity)
+                }
+            }
             is PartDetailUiEvent.ClearError -> _uiState.update { it.copy(updateError = null) }
             is PartDetailUiEvent.Dismiss -> {
                 _uiState.update {
@@ -77,7 +87,28 @@ class PartDetailViewModel @Inject constructor(
 
             runCatching { addOutboundUseCase(partId, quantity) }
                 .onSuccess {
-                    _uiState.update { it.copy(isUpdating = false, isSuccess = true) }
+                    _uiState.update { it.copy(isUpdating = false, isOutboundSuccess = true) }
+                }
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    _uiState.update {
+                        it.copy(
+                            isUpdating = false,
+                            updateError = backendMessage ?: (throwable.message ?: errorLabel)
+                        )
+                    }
+                }
+            Log.d("OutboundDetailViewModel", "submit: ${_uiState.value}")
+        }
+    }
+
+    private fun addToCart(partId: Long, quantity: Long) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isUpdating = true, updateError = null) }
+
+            runCatching { addCartUseCase(partId, quantity) }
+                .onSuccess {
+                    _uiState.update { it.copy(isUpdating = false, isCartSuccess = true) }
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
@@ -93,6 +124,6 @@ class PartDetailViewModel @Inject constructor(
     }
 
     fun clearSuccess() {
-        _uiState.update { it.copy(isSuccess = false) }
+        _uiState.update { it.copy(isOutboundSuccess = false, isCartSuccess = false) }
     }
 }
