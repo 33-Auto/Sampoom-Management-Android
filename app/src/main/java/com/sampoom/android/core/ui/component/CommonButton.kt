@@ -1,5 +1,6 @@
 package com.sampoom.android.core.ui.component
 
+import android.R.attr.enabled
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
@@ -12,15 +13,18 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.White
 import com.sampoom.android.core.ui.theme.disableColor
+import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 
 /**
@@ -140,8 +144,26 @@ fun CommonButton(
                 shape = shape,
                 modifier = modifier.height(height),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF000000),
-                    contentColor = Color.White,
+                    containerColor = disableColor(),
+                    contentColor = textColor(),
+                    disabledContainerColor = disableColor(),
+                    disabledContentColor = textSecondaryColor()
+                )
+            ) {
+                if (leadingIcon != null) leadingIcon()
+                content()
+            }
+        }
+
+        ButtonVariant.Error -> {
+            Button(
+                onClick = onClick,
+                enabled = enabled,
+                shape = shape,
+                modifier = modifier.height(height),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = FailRed,
+                    contentColor = White,
                     disabledContainerColor = disableColor(),
                     disabledContentColor = textSecondaryColor()
                 )
@@ -168,6 +190,8 @@ enum class ButtonVariant {
 
     /** Solid dark/neutral fill. */
     Neutral,
+
+    Error
 }
 
 enum class ButtonSize { Large, Medium, Small }

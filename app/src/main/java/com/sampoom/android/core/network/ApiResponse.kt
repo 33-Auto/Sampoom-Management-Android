@@ -6,3 +6,9 @@ data class ApiResponse<T>(
     val message: String,
     val data: T
 )
+
+data class ApiSuccessResponse(
+    val status: Int,
+    val success: Boolean,
+    val message: String
+)

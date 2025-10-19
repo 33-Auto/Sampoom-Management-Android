@@ -48,11 +48,45 @@
     <string name="part_select_category">카테고리를 선택해주세요.</string>
     <string name="part_empty_group">그룹 목록이 없습니다.</string>
 
+    <!-- 부품 조회 Bottom Sheet -->
+    <string name="part_current_quantity">현재 재고 : </string>
+    <string name="part_title_quantity">수량</string>
+    <string name="part_minus">-</string>
+    <string name="part_plus">+</string>
+    <string name="part_add_delivery">출고목록에 추가</string>
+    <string name="part_add_cart">장바구니에 추가</string>
+
+    <!-- 출고 목록 -->
+    <string name="outbound_title">출고목록</string>
+    <string name="outbound_empty_list">출고목록 비우기</string>
+    <string name="outbound_empty_outbound">출고목록이 없습니다.</string>
+    <string name="outbound_dialog_text">출고 목록에 추가하시겠습니까?</string>
+    <string name="outbound_toast_success">출고 목록에 추가되었습니다</string>
+    <string name="outbound_dialog_order_text">출고 처리하시겠습니까?</string>
+    <string name="outbound_dialog_empty_text">출고목록을 비우시겠습니까?</string>
+    <string name="outbound_toast_order_text">출고 처리되었습니다</string>
+    <string name="outbound_order_parts">부품 출고처리</string>
+
+    <!-- 장바구니 목록 -->
+    <string name="cart_title">장바구니</string>
+    <string name="cart_empty_list">장바구니 비우기</string>
+    <string name="cart_empty_outbound">장바구니 목록이 없습니다.</string>
+    <string name="cart_dialog_text">장바구니 목록에 추가하시겠습니까?</string>
+    <string name="cart_toast_success">장바구니 목록에 추가되었습니다</string>
+    <string name="cart_dialog_order_text">장바구니에 추가하시겠습니까?</string>
+    <string name="cart_dialog_empty_text">장바구니를 비우시겠습니까?</string>
+    <string name="cart_toast_order_text">추가되었습니다</string>
+    <string name="cart_order_parts">부품 주문</string>
+
     <!-- Common -->
     <string name="common_error">오류가 발생했습니다</string>
     <string name="common_retry">다시 시도</string>
+    <string name="common_confirm">확인</string>
+    <string name="common_cancel">취소</string>
     <string name="common_close">닫기</string>
+    <string name="common_delete">삭제</string>
     <string name="common_detail">상세 보기</string>
+    <string name="common_EA">EA</string>
 
     <!-- Validation -->
     <string name="validation_email_required">이메일을 입력해주세요</string>

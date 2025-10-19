@@ -20,6 +20,11 @@ class LoginViewModel @Inject constructor(
     private val singIn: LoginUseCase,
     private val application: Application
 ) : ViewModel() {
+
+    private companion object {
+        private const val TAG = "LoginViewModel"
+    }
+
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
 
@@ -83,7 +88,7 @@ class LoginViewModel @Inject constructor(
                     it.copy(loading = false, error = backendMessage ?: (throwable.message ?: errorLabel))
                 }
             }
-        Log.d("LoginViewModel", "submit: ${_uiState.value}")
+        Log.d(TAG, "submit: ${_uiState.value}")
     }
 
     fun consumeError() {

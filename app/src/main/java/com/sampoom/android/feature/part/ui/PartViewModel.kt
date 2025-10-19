@@ -20,6 +20,11 @@ class PartViewModel @Inject constructor(
     private val getCategoryUseCase: GetCategoryUseCase,
     private val getGroupUseCase: GetGroupUseCase
 ) : ViewModel() {
+
+    private companion object {
+        private const val TAG = "PartViewModel"
+    }
+
     private val _uiState = MutableStateFlow(PartUiState())
     val uiState: StateFlow<PartUiState> = _uiState
 
@@ -66,7 +71,7 @@ class PartViewModel @Inject constructor(
                         )
                     }
                 }
-            Log.d("PartViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "loadCategory: ${_uiState.value}")
         }
     }
 
@@ -105,7 +110,7 @@ class PartViewModel @Inject constructor(
                         )
                     }
                 }
-            Log.d("PartViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "loadGroup: ${_uiState.value}")
         }
     }
 
@@ -115,8 +120,4 @@ class PartViewModel @Inject constructor(
             loadGroup(selectedCategory.id)
         }
     }
-
-//    fun refreshPart() {
-//        loadCategory()
-//    }
 }
