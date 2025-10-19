@@ -1,5 +1,7 @@
 package com.sampoom.android.feature.part.ui
 
+import android.app.ProgressDialog.show
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,12 +20,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -33,10 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sampoom.android.R
+import com.sampoom.android.core.ui.component.EmptyContent
+import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.part.domain.model.Part
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,6 +62,11 @@ fun PartListScreen(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // ModalBottomSheet 상태 관리
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -113,9 +129,31 @@ fun PartListScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(uiState.partList) { part ->
-                        PartListItemCard(part = part)
+                        PartListItemCard(
+                            part = part,
+                            onClick = {
+                                viewModel.onEvent(PartListUiEvent.ShowBottomSheet(part))
+                                showBottomSheet = true
+                            }
+                        )
                     }
                 }
+            }
+        }
+    }
+
+    if (showBottomSheet) {
+        uiState.selectedPart?.let { selectedPart ->
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                    viewModel.onEvent(PartListUiEvent.DismissBottomSheet)
+                },
+                sheetState = sheetState
+            ) {
+                PartDetailBottomSheet(
+                    part = selectedPart
+                )
             }
         }
     }
@@ -123,9 +161,11 @@ fun PartListScreen(
 
 @Composable
 private fun PartListItemCard(
-    part: Part
+    part: Part,
+    onClick: () -> Unit
 ) {
     Card(
+        onClick = { onClick() },
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = backgroundCardColor())
     ) {

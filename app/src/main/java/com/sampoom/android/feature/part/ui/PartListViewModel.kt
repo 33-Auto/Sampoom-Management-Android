@@ -40,6 +40,8 @@ class PartListViewModel @Inject constructor(
         when (event) {
             is PartListUiEvent.LoadPartList -> loadPartList(groupId)
             is PartListUiEvent.RetryPartList -> loadPartList(groupId)
+            is PartListUiEvent.ShowBottomSheet -> _uiState.update { it.copy(selectedPart = event.part) }
+            is PartListUiEvent.DismissBottomSheet -> _uiState.update { it.copy(selectedPart = null) }
         }
     }
 

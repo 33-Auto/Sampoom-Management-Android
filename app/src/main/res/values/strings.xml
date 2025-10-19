@@ -48,11 +48,20 @@
     <string name="part_select_category">카테고리를 선택해주세요.</string>
     <string name="part_empty_group">그룹 목록이 없습니다.</string>
 
+    <!-- 부품 조회 Bottom Sheet -->
+    <string name="part_current_quantity">현재 재고 : </string>
+    <string name="part_title_quantity">수량</string>
+    <string name="part_minus">-</string>
+    <string name="part_plus">+</string>
+    <string name="part_add_delivery">출고목록에 추가</string>
+    <string name="part_add_cart">장바구니에 추가</string>
+
     <!-- Common -->
     <string name="common_error">오류가 발생했습니다</string>
     <string name="common_retry">다시 시도</string>
     <string name="common_close">닫기</string>
     <string name="common_detail">상세 보기</string>
+    <string name="common_EA">EA</string>
 
     <!-- Validation -->
     <string name="validation_email_required">이메일을 입력해주세요</string>
