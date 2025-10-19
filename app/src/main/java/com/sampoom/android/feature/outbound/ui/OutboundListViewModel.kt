@@ -1,7 +1,6 @@
 package com.sampoom.android.feature.outbound.ui
 
 import android.util.Log
-import android.util.Log.v
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
@@ -11,11 +10,11 @@ import com.sampoom.android.feature.outbound.domain.usecase.GetOutboundUseCase
 import com.sampoom.android.feature.outbound.domain.usecase.ProcessOutboundUseCase
 import com.sampoom.android.feature.outbound.domain.usecase.UpdateOutboundQuantityUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class OutboundListViewModel @Inject constructor(
@@ -25,6 +24,11 @@ class OutboundListViewModel @Inject constructor(
     private val deleteOutboundUseCase: DeleteOutboundUseCase,
     private val deleteAllOutboundUseCase: DeleteAllOutboundUseCase
 ) : ViewModel() {
+
+    private companion object {
+        private const val TAG = "OutboundListViewModel"
+    }
+
     private val _uiState = MutableStateFlow(OutboundListUiState())
     val uiState: StateFlow<OutboundListUiState> = _uiState
 
@@ -75,7 +79,7 @@ class OutboundListViewModel @Inject constructor(
                     }
 
                 }
-            Log.d("OutboundListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 
@@ -83,21 +87,22 @@ class OutboundListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(outboundLoading = true, outboundError = null) }
 
-            runCatching { processOutboundUseCase() }
+            processOutboundUseCase()
                 .onSuccess {
-                    _uiState.update { it.copy(isUpdating = false, isOrderSuccess = true) }
+                    _uiState.update { it.copy(outboundLoading = false, isUpdating = false, isOrderSuccess = true) }
                     loadOutboundList()
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
                     _uiState.update {
                         it.copy(
+                            outboundLoading = false,
                             isUpdating = false,
-                            updateError = backendMessage ?: (throwable.message ?: errorLabel)
+                            outboundError = backendMessage ?: (throwable.message ?: errorLabel)
                         )
                     }
                 }
-            Log.d("OutboundListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 
@@ -105,7 +110,7 @@ class OutboundListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isUpdating = true, updateError = null) }
 
-            runCatching { updateOutboundQuantityUseCase(outboundId, newQuantity) }
+            updateOutboundQuantityUseCase(outboundId, newQuantity)
                 .onSuccess {
                     _uiState.update { it.copy(isUpdating = false) }
                     updateLocalQuantity(outboundId, newQuantity)
@@ -119,7 +124,7 @@ class OutboundListViewModel @Inject constructor(
                         )
                     }
                 }
-            Log.d("OutboundListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 
@@ -148,7 +153,7 @@ class OutboundListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isDeleting = true, deleteError = null) }
 
-            runCatching { deleteOutboundUseCase(outboundId) }
+            deleteOutboundUseCase(outboundId)
                 .onSuccess {
                     _uiState.update { it.copy(isDeleting = false) }
                     removeFromLocalList(outboundId)
@@ -157,12 +162,12 @@ class OutboundListViewModel @Inject constructor(
                     val backendMessage = throwable.serverMessageOrNull()
                     _uiState.update {
                         it.copy(
-                            isUpdating = false,
-                            updateError = backendMessage ?: (throwable.message ?: errorLabel)
+                            isDeleting = false,
+                            deleteError = backendMessage ?: (throwable.message ?: errorLabel)
                         )
                     }
                 }
-            Log.d("OutboundListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 
@@ -170,7 +175,7 @@ class OutboundListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isDeleting = true, deleteError = null) }
 
-            runCatching { deleteAllOutboundUseCase() }
+            deleteAllOutboundUseCase()
                 .onSuccess {
                     _uiState.update { it.copy(isDeleting = false) }
                     removeAllFromLocalList()
@@ -179,12 +184,12 @@ class OutboundListViewModel @Inject constructor(
                     val backendMessage = throwable.serverMessageOrNull()
                     _uiState.update {
                         it.copy(
-                            isUpdating = false,
-                            updateError = backendMessage ?: (throwable.message ?: errorLabel)
+                            isDeleting = false,
+                            deleteError = backendMessage ?: (throwable.message ?: errorLabel)
                         )
                     }
                 }
-            Log.d("OutboundListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 

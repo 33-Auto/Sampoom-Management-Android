@@ -18,6 +18,11 @@ class PartListViewModel @Inject constructor(
     private val getPartListUseCase: GetPartUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private companion object {
+        private const val TAG = "PartListViewModel"
+    }
+
     private val _uiState = MutableStateFlow(PartListUiState())
     val uiState: StateFlow<PartListUiState> = _uiState
 
@@ -68,7 +73,7 @@ class PartListViewModel @Inject constructor(
                         )
                     }
                 }
-            Log.d("PartListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 }

@@ -22,6 +22,11 @@ class CartListViewModel @Inject constructor(
     private val deleteCartUseCase: DeleteCartUseCase,
     private val deleteAllCartUseCase: DeleteAllCartUseCase
 ) : ViewModel() {
+
+    private companion object {
+        private const val TAG = "CartListViewModel"
+    }
+
     private val _uiState = MutableStateFlow(CartListUiState())
     val uiState: StateFlow<CartListUiState> = _uiState
 
@@ -72,16 +77,16 @@ class CartListViewModel @Inject constructor(
                     }
 
                 }
-            Log.d("CartListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 
     // TODO() : 주문 생성 로직
     private fun processOrder() {
         viewModelScope.launch {
-            _uiState.update { it.copy(cartLoading = true, cartError = null) }
-
-//            runCatching { processCartUseCase() }
+//            _uiState.update { it.copy(cartLoading = true, cartError = null) }
+//
+//            processCartUseCase()
 //                .onSuccess {
 //                    _uiState.update { it.copy(isUpdating = false, isOrderSuccess = true) }
 //                    loadCartList()
@@ -95,7 +100,7 @@ class CartListViewModel @Inject constructor(
 //                        )
 //                    }
 //                }
-            Log.d("OutboundListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 
@@ -103,7 +108,7 @@ class CartListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isUpdating = true, updateError = null) }
 
-            runCatching { updateCartQuantityUseCase(cartItemId, newQuantity) }
+            updateCartQuantityUseCase(cartItemId, newQuantity)
                 .onSuccess {
                     _uiState.update { it.copy(isUpdating = false) }
                     updateLocalQuantity(cartItemId, newQuantity)
@@ -117,7 +122,7 @@ class CartListViewModel @Inject constructor(
                         )
                     }
                 }
-            Log.d("CartListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 
@@ -146,7 +151,7 @@ class CartListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isDeleting = true, deleteError = null) }
 
-            runCatching { deleteCartUseCase(cartItemId) }
+            deleteCartUseCase(cartItemId)
                 .onSuccess {
                     _uiState.update { it.copy(isDeleting = false) }
                     removeFromLocalList(cartItemId)
@@ -155,12 +160,12 @@ class CartListViewModel @Inject constructor(
                     val backendMessage = throwable.serverMessageOrNull()
                     _uiState.update {
                         it.copy(
-                            isUpdating = false,
-                            updateError = backendMessage ?: (throwable.message ?: errorLabel)
+                            isDeleting = false,
+                            deleteError = backendMessage ?: (throwable.message ?: errorLabel)
                         )
                     }
                 }
-            Log.d("CartListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 
@@ -168,7 +173,7 @@ class CartListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isDeleting = true, deleteError = null) }
 
-            runCatching { deleteAllCartUseCase() }
+            deleteAllCartUseCase()
                 .onSuccess {
                     _uiState.update { it.copy(isDeleting = false) }
                     removeAllFromLocalList()
@@ -177,12 +182,12 @@ class CartListViewModel @Inject constructor(
                     val backendMessage = throwable.serverMessageOrNull()
                     _uiState.update {
                         it.copy(
-                            isUpdating = false,
-                            updateError = backendMessage ?: (throwable.message ?: errorLabel)
+                            isDeleting = false,
+                            deleteError = backendMessage ?: (throwable.message ?: errorLabel)
                         )
                     }
                 }
-            Log.d("CartListViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 

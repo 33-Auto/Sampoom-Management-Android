@@ -1,7 +1,7 @@
 package com.sampoom.android.feature.cart.domain.usecase
 
 import com.sampoom.android.feature.cart.domain.repository.CartRepository
-import jakarta.inject.Inject
+import javax.inject.Inject
 
 class AddCartUseCase @Inject constructor(
     private val repository: CartRepository

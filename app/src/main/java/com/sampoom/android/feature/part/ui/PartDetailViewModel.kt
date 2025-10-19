@@ -7,17 +7,22 @@ import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.feature.cart.domain.usecase.AddCartUseCase
 import com.sampoom.android.feature.outbound.domain.usecase.AddOutboundUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class PartDetailViewModel @Inject constructor(
     private val addOutboundUseCase: AddOutboundUseCase,
     private val addCartUseCase: AddCartUseCase
 ) : ViewModel() {
+
+    private companion object {
+        private const val TAG = "OutboundDetailViewModel"
+    }
+
     private val _uiState = MutableStateFlow(PartDetailUiState())
     val uiState: StateFlow<PartDetailUiState> = _uiState
 
@@ -47,7 +52,7 @@ class PartDetailViewModel @Inject constructor(
             }
             is PartDetailUiEvent.DecreaseQuantity -> {
                 val currentQuantity = _uiState.value.quantity
-                _uiState.update { it.copy(quantity = currentQuantity - 1) }
+                _uiState.update { it.copy(quantity = maxOf(1L, currentQuantity - 1)) }
             }
             is PartDetailUiEvent.SetQuantity -> {
                 if (event.quantity > 0) {
@@ -85,7 +90,7 @@ class PartDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isUpdating = true, updateError = null) }
 
-            runCatching { addOutboundUseCase(partId, quantity) }
+            addOutboundUseCase(partId, quantity)
                 .onSuccess {
                     _uiState.update { it.copy(isUpdating = false, isOutboundSuccess = true) }
                 }
@@ -98,7 +103,7 @@ class PartDetailViewModel @Inject constructor(
                         )
                     }
                 }
-            Log.d("OutboundDetailViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 
@@ -106,7 +111,7 @@ class PartDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isUpdating = true, updateError = null) }
 
-            runCatching { addCartUseCase(partId, quantity) }
+            addCartUseCase(partId, quantity)
                 .onSuccess {
                     _uiState.update { it.copy(isUpdating = false, isCartSuccess = true) }
                 }
@@ -119,7 +124,7 @@ class PartDetailViewModel @Inject constructor(
                         )
                     }
                 }
-            Log.d("OutboundDetailViewModel", "submit: ${_uiState.value}")
+            Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 

@@ -32,7 +32,7 @@ interface CartApi {
         @Body body: UpdateCartRequestDto
     ): ApiSuccessResponse
 
-    // 징바구니 전체 비우기
+    // 장바구니 전체 비우기
     @DELETE("agency/1/cart/clear")
     suspend fun deleteAllCart(): ApiSuccessResponse
 }
