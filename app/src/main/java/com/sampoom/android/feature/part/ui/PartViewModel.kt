@@ -71,7 +71,7 @@ class PartViewModel @Inject constructor(
                         )
                     }
                 }
-            Log.d(TAG, "submit: ${_uiState.value}")
+            Log.d(TAG, "loadCategory: ${_uiState.value}")
         }
     }
 
@@ -110,7 +110,7 @@ class PartViewModel @Inject constructor(
                         )
                     }
                 }
-            Log.d(TAG, "submit: ${_uiState.value}")
+            Log.d(TAG, "loadGroup: ${_uiState.value}")
         }
     }
 

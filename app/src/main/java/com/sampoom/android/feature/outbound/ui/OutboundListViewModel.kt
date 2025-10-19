@@ -89,7 +89,7 @@ class OutboundListViewModel @Inject constructor(
 
             processOutboundUseCase()
                 .onSuccess {
-                    _uiState.update { it.copy(outboundLoading = false, isUpdating = false, isOrderSuccess = true) }
+                    _uiState.update { it.copy(outboundLoading = false, isOrderSuccess = true) }
                     loadOutboundList()
                 }
                 .onFailure { throwable ->
@@ -97,7 +97,6 @@ class OutboundListViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             outboundLoading = false,
-                            isUpdating = false,
                             outboundError = backendMessage ?: (throwable.message ?: errorLabel)
                         )
                     }
