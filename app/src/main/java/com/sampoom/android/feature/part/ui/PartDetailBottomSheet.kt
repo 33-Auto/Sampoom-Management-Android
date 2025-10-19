@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.part.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,17 +10,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -35,16 +42,45 @@ import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.part.domain.model.Part
+import kotlinx.coroutines.delay
 
 @Composable
 fun PartDetailBottomSheet(
     part: Part,
+    onDismiss: () -> Unit,
     viewModel: PartDetailViewModel = hiltViewModel()
 ) {
+    val errorLabel = stringResource(R.string.common_error)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    LaunchedEffect(part) {
+    LaunchedEffect(Unit) {
+        viewModel.clearSuccess()
+    }
+
+    LaunchedEffect(errorLabel) {
+        viewModel.bindLabel(errorLabel)
+    }
+
+    LaunchedEffect(part.partId) {
         viewModel.onEvent(PartDetailUiEvent.Initialize(part))
+    }
+
+    // 성공 시 Toast 표시 후 다이얼로그 닫기
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            Toast.makeText(context, context.getString(R.string.outbound_toast_success), Toast.LENGTH_SHORT).show()
+        }
+        viewModel.clearSuccess()
+    }
+
+    // 실패 시 Toast 표시
+    LaunchedEffect(uiState.updateError) {
+        uiState.updateError?.let { error ->
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+            viewModel.onEvent(PartDetailUiEvent.ClearError)
+        }
     }
 
     Column(
@@ -151,11 +187,11 @@ fun PartDetailBottomSheet(
                 size = ButtonSize.Large,
                 leadingIcon = {
                     Icon(
-                        painterResource(R.drawable.delivery),
+                        painterResource(R.drawable.outbound),
                         contentDescription = null
                     )
                 },
-                onClick = {}    // TODO: API 연동
+                onClick = { showConfirmDialog = true }
             ) { Text(stringResource(R.string.part_add_delivery)) }
             Spacer(Modifier.width(8.dp))
             CommonButton(
@@ -167,17 +203,34 @@ fun PartDetailBottomSheet(
             ) { Text(stringResource(R.string.part_add_cart)) }
         }
     }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun PartDetailBottomSheetPreview() {
-    PartDetailBottomSheet(
-        part = Part(
-            partId = 1,
-            name = "엔진",
-            code = "ENG",
-            quantity = 12
+    // 확인 다이얼로그
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            text = { Text(stringResource(R.string.outbound_dialog_text)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showConfirmDialog = false
+                        viewModel.onEvent(
+                            PartDetailUiEvent.AddToOutbound(
+                                partId = part.partId,
+                                quantity = uiState.quantity
+                            )
+                        )
+                    }
+                ) {
+                    Text(stringResource(R.string.common_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showConfirmDialog = false }
+                ) {
+                    Text(stringResource(R.string.common_cancel))
+                }
+            }
         )
-    )
+    }
 }

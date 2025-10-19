@@ -22,6 +22,7 @@ import androidx.navigation.navArgument
 import com.sampoom.android.R
 import com.sampoom.android.feature.auth.ui.LoginScreen
 import com.sampoom.android.feature.auth.ui.SignUpScreen
+import com.sampoom.android.feature.outbound.ui.OutboundListScreen
 import com.sampoom.android.feature.part.ui.PartListScreen
 import com.sampoom.android.feature.part.ui.PartScreen
 
@@ -31,7 +32,7 @@ const val ROUTE_HOME = "home"
 
 // Main Screen
 const val ROUTE_DASHBOARD = "dashboard"
-const val ROUTE_DELIVERY = "delivery"
+const val ROUTE_OUTBOUND = "outbound"
 const val ROUTE_CART = "cart"
 const val ROUTE_ORDERS = "orders"
 
@@ -48,7 +49,7 @@ sealed class BottomNavItem(
     val icon: Int
 ) {
     object Dashboard : BottomNavItem(ROUTE_DASHBOARD, R.string.nav_dashboard, R.drawable.dashboard)
-    object Delivery : BottomNavItem(ROUTE_DELIVERY, R.string.nav_delivery, R.drawable.delivery)
+    object Delivery : BottomNavItem(ROUTE_OUTBOUND, R.string.nav_delivery, R.drawable.outbound)
     object Cart : BottomNavItem(ROUTE_CART, R.string.nav_cart, R.drawable.cart)
     object Orders : BottomNavItem(ROUTE_ORDERS, R.string.nav_order, R.drawable.orders)
 }
@@ -130,7 +131,7 @@ fun MainScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(ROUTE_DASHBOARD) { DashboardScreen() }
-            composable(ROUTE_DELIVERY) { DeliveryScreen() }
+            composable(ROUTE_OUTBOUND) { OutboundListScreen() }
             composable(ROUTE_CART) { CartScreen() }
             composable(ROUTE_ORDERS) { OrderScreen() }
         }
@@ -199,12 +200,6 @@ fun BottomNavigationBar(navController: NavHostController) {
 private fun DashboardScreen() {
     // 홈 화면 구현
     Text("대시보드 화면")
-}
-
-@Composable
-private fun DeliveryScreen() {
-    // 프로필 화면 구현
-    Text("Delivery 화면")
 }
 
 @Composable

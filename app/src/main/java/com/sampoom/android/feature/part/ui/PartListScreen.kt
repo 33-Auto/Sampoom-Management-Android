@@ -1,7 +1,5 @@
 package com.sampoom.android.feature.part.ui
 
-import android.app.ProgressDialog.show
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -152,7 +150,11 @@ fun PartListScreen(
                 sheetState = sheetState
             ) {
                 PartDetailBottomSheet(
-                    part = selectedPart
+                    part = selectedPart,
+                    onDismiss = {
+                        showBottomSheet = false
+                        viewModel.onEvent(PartListUiEvent.DismissBottomSheet)
+                    }
                 )
             }
         }

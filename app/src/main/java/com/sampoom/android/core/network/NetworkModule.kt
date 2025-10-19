@@ -33,7 +33,7 @@ object NetworkModule {
     @Provides @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         val gson = GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
             .create()
         return Retrofit.Builder()
             .baseUrl("https://sampoom.store/api/")

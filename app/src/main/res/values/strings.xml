@@ -56,10 +56,19 @@
     <string name="part_add_delivery">출고목록에 추가</string>
     <string name="part_add_cart">장바구니에 추가</string>
 
+    <!-- 출고 목록 -->
+    <string name="outbound_title">출고목록</string>
+    <string name="outbound_empty_outbound">출고목록이 없습니다.</string>
+    <string name="outbound_dialog_text">출고 목록에 추가하시겠습니까?</string>
+    <string name="outbound_toast_success">출고 목록에 추가되었습니다</string>
+
     <!-- Common -->
     <string name="common_error">오류가 발생했습니다</string>
     <string name="common_retry">다시 시도</string>
+    <string name="common_confirm">확인</string>
+    <string name="common_cancel">취소</string>
     <string name="common_close">닫기</string>
+    <string name="common_delete">삭제</string>
     <string name="common_detail">상세 보기</string>
     <string name="common_EA">EA</string>
 

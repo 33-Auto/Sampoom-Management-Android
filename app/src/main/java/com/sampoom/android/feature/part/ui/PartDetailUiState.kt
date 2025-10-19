@@ -6,5 +6,6 @@ data class PartDetailUiState(
     val part: Part? = null,
     val quantity: Long = 1,
     val isUpdating: Boolean = false,
-    val updateError: String? = null
+    val updateError: String? = null,
+    val isSuccess: Boolean = false
 )
