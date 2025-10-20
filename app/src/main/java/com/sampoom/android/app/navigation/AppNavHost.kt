@@ -23,6 +23,9 @@ import com.sampoom.android.R
 import com.sampoom.android.feature.auth.ui.LoginScreen
 import com.sampoom.android.feature.auth.ui.SignUpScreen
 import com.sampoom.android.feature.cart.ui.CartListScreen
+import com.sampoom.android.feature.order.domain.model.OrderList
+import com.sampoom.android.feature.order.ui.OrderDetailScreen
+import com.sampoom.android.feature.order.ui.OrderListScreen
 import com.sampoom.android.feature.outbound.ui.OutboundListScreen
 import com.sampoom.android.feature.part.ui.PartListScreen
 import com.sampoom.android.feature.part.ui.PartScreen
@@ -41,6 +44,8 @@ const val ROUTE_ORDERS = "orders"
 const val ROUTE_PARTS = "parts"
 const val ROUTE_PART_LIST = "parts/{agencyId}/group/{groupId}"
 fun routePartList(agencyId: Long, groupId: Long): String = "parts/$agencyId/group/$groupId"
+const val ROUTE_ORDER_DETAIL = "orders/{agencyId}/orders/{orderId}"
+fun routeOrderDetail(agencyId: Long, orderId: Long): String = "orders/$agencyId/orders/$orderId"
 const val ROUTE_EMPLOYEE = "employee"
 const val ROUTE_SETTINGS = "settings"
 
@@ -134,7 +139,26 @@ fun MainScreen(
             composable(ROUTE_DASHBOARD) { DashboardScreen() }
             composable(ROUTE_OUTBOUND) { OutboundListScreen() }
             composable(ROUTE_CART) { CartListScreen() }
-            composable(ROUTE_ORDERS) { OrderScreen() }
+            composable(ROUTE_ORDERS) {
+                OrderListScreen(
+                    onNavigateOrderDetail = { order ->
+                        navController.navigate(routeOrderDetail(1, order.orderId))
+                    }
+                )
+            }
+            composable(
+                ROUTE_ORDER_DETAIL,
+                arguments = listOf(
+                    navArgument("agencyId") { type = NavType.LongType },
+                    navArgument("orderId") { type = NavType.LongType }
+                )
+            ) {
+                OrderDetailScreen(
+                    onNavigateBack = {
+                        navController.navigateUp()
+                    }
+                )
+            }
         }
     }
 }
@@ -201,10 +225,4 @@ fun BottomNavigationBar(navController: NavHostController) {
 private fun DashboardScreen() {
     // 홈 화면 구현
     Text("대시보드 화면")
-}
-
-@Composable
-private fun OrderScreen() {
-    // 프로필 화면 구현
-    Text("Order 화면")
 }
