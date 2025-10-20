@@ -53,29 +53,21 @@ fun OrderDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Column(Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onNavigateBack) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_back),
-                    contentDescription = stringResource(R.string.nav_back)
-                )
-            }
-            Text(
-                modifier = Modifier
-                    .padding(vertical = 16.dp),
-                text = stringResource(R.string.order_detail_title),
-                style = MaterialTheme.typography.titleLarge,
-                color = textColor()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.order_detail_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_back),
+                            contentDescription = stringResource(R.string.nav_back)
+                        )
+                    }
+                }
             )
         }
-
+    ) { innerPadding ->
         when {
             uiState.orderDetailLoading -> {
                 Box(
@@ -106,6 +98,7 @@ fun OrderDetailScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(innerPadding)
                         .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {

@@ -118,6 +118,19 @@ fun AppNavHost() {
                 }
             )
         }
+        composable(
+            ROUTE_ORDER_DETAIL,
+            arguments = listOf(
+                navArgument("agencyId") { type = NavType.LongType },
+                navArgument("orderId") { type = NavType.LongType }
+            )
+        ) {
+            OrderDetailScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
     }
 }
 
@@ -142,20 +155,7 @@ fun MainScreen(
             composable(ROUTE_ORDERS) {
                 OrderListScreen(
                     onNavigateOrderDetail = { order ->
-                        navController.navigate(routeOrderDetail(1, order.orderId))
-                    }
-                )
-            }
-            composable(
-                ROUTE_ORDER_DETAIL,
-                arguments = listOf(
-                    navArgument("agencyId") { type = NavType.LongType },
-                    navArgument("orderId") { type = NavType.LongType }
-                )
-            ) {
-                OrderDetailScreen(
-                    onNavigateBack = {
-                        navController.navigateUp()
+                        parentNavController.navigate(routeOrderDetail(1, order.orderId))
                     }
                 )
             }
