@@ -7,10 +7,14 @@ import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.feature.order.domain.usecase.GetOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +30,7 @@ class OrderListViewModel @Inject constructor(
     val uiState: StateFlow<OrderListUiState> = _uiState
 
     private var errorLabel: String = ""
+    private var loadJob: Job? = null
 
     fun bindLabel(error: String) {
         errorLabel = error
@@ -43,11 +48,12 @@ class OrderListViewModel @Inject constructor(
     }
 
     private fun loadOrderList() {
-        viewModelScope.launch {
+        if (loadJob?.isActive == true) return
+        loadJob = viewModelScope.launch {
             _uiState.update { it.copy(orderLoading = true, orderError = null) }
 
             try {
-                val orderList = getOrderListUseCase()
+                val orderList = withContext(Dispatchers.IO) { getOrderListUseCase() }
                 _uiState.update {
                     it.copy(
                         orderList = orderList.items,

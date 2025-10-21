@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.order.ui
 
+import android.R.attr.onClick
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,7 +57,7 @@ fun OrderResultBottomSheet(
     var showCancelOrderDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    LaunchedEffect(order) {
+    LaunchedEffect(order.firstOrNull()?.orderId) {
         if (order.isNotEmpty()) viewModel.setOrderIdFromApi(order.first().orderId)
     }
 
@@ -107,8 +108,9 @@ fun OrderResultBottomSheet(
                 CommonButton(
                     modifier = Modifier.weight(1f),
                     variant = ButtonVariant.Error,
-                    enabled = order.firstOrNull()?.status != OrderStatus.COMPLETED &&
-                            order.firstOrNull()?.status != OrderStatus.CANCELED,
+                    enabled = order.firstOrNull()?.let {
+                        it.status != OrderStatus.COMPLETED && it.status != OrderStatus.CANCELED
+                    } ?: false,
                     onClick = { showCancelOrderDialog = true }
                 ) {
                     Text(stringResource(R.string.order_detail_order_cancel))

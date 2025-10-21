@@ -96,8 +96,8 @@
 
     <!-- 주문 상태 -->
     <string name="order_status_pending">승인대기</string>
-    <string name="order_status_completed">배송완료</string>
-    <string name="order_status_canceled">주문실패</string>
+    <string name="order_status_completed">입고완료</string>
+    <string name="order_status_canceled">주문취소</string>
 
     <!-- Common -->
     <string name="common_error">오류가 발생했습니다</string>

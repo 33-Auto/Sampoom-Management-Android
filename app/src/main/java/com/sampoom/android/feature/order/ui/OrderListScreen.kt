@@ -1,6 +1,5 @@
 package com.sampoom.android.feature.order.ui
 
-import android.R.attr.order
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,7 +50,6 @@ fun OrderListScreen(
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)
-        viewModel.onEvent(OrderListUiEvent.LoadOrderList)
     }
 
     Column(Modifier.fillMaxSize()) {
