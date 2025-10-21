@@ -70,8 +70,8 @@ fun OutboundListScreen(
     LaunchedEffect(uiState.isOrderSuccess) {
         if (uiState.isOrderSuccess) {
             Toast.makeText(context, context.getString(R.string.outbound_toast_order_text), Toast.LENGTH_SHORT).show()
+            viewModel.clearSuccess()
         }
-        viewModel.clearSuccess()
     }
 
     Column(Modifier.fillMaxSize()) {

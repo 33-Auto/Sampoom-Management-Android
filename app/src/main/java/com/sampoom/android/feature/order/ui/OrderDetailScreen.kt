@@ -36,6 +36,7 @@ import com.sampoom.android.core.ui.component.ButtonVariant
 import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
+import com.sampoom.android.feature.order.domain.model.OrderStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,18 +53,18 @@ fun OrderDetailScreen(
     LaunchedEffect(uiState.isProcessingCancelSuccess) {
         if (uiState.isProcessingCancelSuccess) {
             Toast.makeText(context, context.getString(R.string.order_detail_toast_order_cancel), Toast.LENGTH_SHORT).show()
+            viewModel.clearSuccess()
+            viewModel.onEvent(OrderDetailUiEvent.LoadOrder)
         }
-        viewModel.clearSuccess()
-        viewModel.onEvent(OrderDetailUiEvent.LoadOrder)
     }
 
     // 성공 시 Toast 표시 후 다이얼로그 닫기
     LaunchedEffect(uiState.isProcessingReceiveSuccess) {
         if (uiState.isProcessingReceiveSuccess) {
             Toast.makeText(context, context.getString(R.string.order_detail_toast_order_receive), Toast.LENGTH_SHORT).show()
+            viewModel.clearSuccess()
+            viewModel.onEvent(OrderDetailUiEvent.LoadOrder)
         }
-        viewModel.clearSuccess()
-        viewModel.onEvent(OrderDetailUiEvent.LoadOrder)
     }
 
     // 실패 시 Toast 표시
@@ -90,11 +91,15 @@ fun OrderDetailScreen(
         },
         bottomBar = {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
                 CommonButton(
                     modifier = Modifier.weight(1f),
                     variant = ButtonVariant.Error,
+                    enabled = uiState.orderDetail.firstOrNull()?.status != OrderStatus.COMPLETED &&
+                            uiState.orderDetail.firstOrNull()?.status != OrderStatus.CANCELED,
                     onClick = { showCancelOrderDialog = true }
                 ) {
                     Text(stringResource(R.string.order_detail_order_cancel))
@@ -102,6 +107,8 @@ fun OrderDetailScreen(
                 Spacer(Modifier.width(16.dp))
                 CommonButton(
                     modifier = Modifier.weight(1f),
+                    enabled = uiState.orderDetail.firstOrNull()?.status != OrderStatus.PENDING &&
+                            uiState.orderDetail.firstOrNull()?.status != OrderStatus.CANCELED,
                     onClick = { showReceiveOrderDialog = true }
                 ) {
                     Text(stringResource(R.string.order_detail_order_receive))
@@ -124,14 +131,18 @@ fun OrderDetailScreen(
             uiState.orderDetailError != null -> {
                 ErrorContent(
                     onRetry = { viewModel.onEvent(OrderDetailUiEvent.RetryOrder) },
-                    modifier = Modifier.height(200.dp).fillMaxWidth()
+                    modifier = Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
                 )
             }
 
             uiState.orderDetail.isEmpty() -> {
                 EmptyContent(
                     message = stringResource(R.string.order_empty_list),
-                    modifier = Modifier.height(200.dp).fillMaxWidth()
+                    modifier = Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
                 )
             }
 

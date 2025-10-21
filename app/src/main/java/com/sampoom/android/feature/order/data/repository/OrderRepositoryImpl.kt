@@ -5,6 +5,7 @@ import com.sampoom.android.feature.order.data.remote.api.OrderApi
 import com.sampoom.android.feature.order.domain.model.OrderList
 import com.sampoom.android.feature.order.domain.repository.OrderRepository
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 class OrderRepositoryImpl @Inject constructor(
     private val api: OrderApi
@@ -22,9 +23,14 @@ class OrderRepositoryImpl @Inject constructor(
     }
 
     override suspend fun receiveOrder(orderId: Long): Result<Unit> {
-        return runCatching {
+        return try {
             val dto = api.receiveOrder(orderId)
             if (!dto.success) throw Exception(dto.message)
+            Result.success(Unit)
+        } catch (ce : CancellationException) {
+            throw ce
+        } catch (t : Throwable) {
+            Result.failure(t)
         }
     }
 
@@ -35,9 +41,14 @@ class OrderRepositoryImpl @Inject constructor(
     }
 
     override suspend fun cancelOrder(orderId: Long): Result<Unit> {
-        return runCatching {
+        return try {
             val dto = api.cancelOrder(orderId)
             if (!dto.success) throw Exception(dto.message)
+            Result.success(Unit)
+        } catch (ce : CancellationException) {
+            throw ce
+        } catch (t : Throwable) {
+            Result.failure(t)
         }
     }
 }

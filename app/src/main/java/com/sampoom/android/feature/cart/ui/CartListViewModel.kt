@@ -10,6 +10,7 @@ import com.sampoom.android.feature.cart.domain.usecase.GetCartUseCase
 import com.sampoom.android.feature.cart.domain.usecase.UpdateCartQuantityUseCase
 import com.sampoom.android.feature.order.domain.usecase.CreateOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -60,26 +61,26 @@ class CartListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(cartLoading = true, cartError = null) }
 
-            runCatching { getCartListUseCase() }
-                .onSuccess { cartList ->
-                    _uiState.update {
-                        it.copy(
-                            cartList = cartList.items,
-                            cartLoading = false,
-                            cartError = null
-                        )
-                    }
+            try {
+                val cartList = getCartListUseCase()
+                _uiState.update {
+                    it.copy(
+                        cartList = cartList.items,
+                        cartLoading = false,
+                        cartError = null
+                    )
                 }
-                .onFailure { throwable ->
-                    val backendMessage = throwable.serverMessageOrNull()
-                    _uiState.update {
-                        it.copy(
-                            cartLoading = false,
-                            cartError = backendMessage ?: (throwable.message ?: errorLabel)
-                        )
-                    }
-
+            } catch (ce: CancellationException) {
+                throw ce
+            } catch (throwable: Throwable) {
+                val backendMessage = throwable.serverMessageOrNull()
+                _uiState.update {
+                    it.copy(
+                        cartLoading = false,
+                        cartError = backendMessage ?: (throwable.message ?: errorLabel)
+                    )
                 }
+            }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }

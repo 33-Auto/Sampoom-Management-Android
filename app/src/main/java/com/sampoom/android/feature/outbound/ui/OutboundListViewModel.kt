@@ -10,6 +10,7 @@ import com.sampoom.android.feature.outbound.domain.usecase.GetOutboundUseCase
 import com.sampoom.android.feature.outbound.domain.usecase.ProcessOutboundUseCase
 import com.sampoom.android.feature.outbound.domain.usecase.UpdateOutboundQuantityUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -59,26 +60,26 @@ class OutboundListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(outboundLoading = true, outboundError = null) }
 
-            runCatching { getOutboundUseCase() }
-                .onSuccess { outboundList ->
-                    _uiState.update {
-                        it.copy(
-                            outboundList = outboundList.items,
-                            outboundLoading = false,
-                            outboundError = null
-                        )
-                    }
+            try {
+                val outboundList = getOutboundUseCase()
+                _uiState.update {
+                    it.copy(
+                        outboundList = outboundList.items,
+                        outboundLoading = false,
+                        outboundError = null
+                    )
                 }
-                .onFailure { throwable ->
-                    val backendMessage = throwable.serverMessageOrNull()
-                    _uiState.update {
-                        it.copy(
-                            outboundLoading = false,
-                            outboundError = backendMessage ?: (throwable.message ?: errorLabel)
-                        )
-                    }
-
+            } catch (ce: CancellationException) {
+                throw ce
+            } catch (throwable: Throwable) {
+                val backendMessage = throwable.serverMessageOrNull()
+                _uiState.update {
+                    it.copy(
+                        outboundLoading = false,
+                        outboundError = backendMessage ?: (throwable.message ?: errorLabel)
+                    )
                 }
+            }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }

@@ -70,16 +70,16 @@ fun PartDetailBottomSheet(
     LaunchedEffect(uiState.isOutboundSuccess) {
         if (uiState.isOutboundSuccess) {
             Toast.makeText(context, context.getString(R.string.outbound_toast_success), Toast.LENGTH_SHORT).show()
+            viewModel.clearSuccess()
         }
-        viewModel.clearSuccess()
     }
 
     // 성공 시 Toast 표시 후 다이얼로그 닫기
     LaunchedEffect(uiState.isCartSuccess) {
         if (uiState.isCartSuccess) {
             Toast.makeText(context, context.getString(R.string.cart_toast_success), Toast.LENGTH_SHORT).show()
+            viewModel.clearSuccess()
         }
-        viewModel.clearSuccess()
     }
 
     // 실패 시 Toast 표시

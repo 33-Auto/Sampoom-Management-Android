@@ -40,6 +40,7 @@ import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.theme.SuccessGreen
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.feature.order.domain.model.Order
+import com.sampoom.android.feature.order.domain.model.OrderStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,9 +64,9 @@ fun OrderResultBottomSheet(
     LaunchedEffect(uiState.isProcessingCancelSuccess) {
         if (uiState.isProcessingCancelSuccess) {
             Toast.makeText(context, context.getString(R.string.order_detail_toast_order_cancel), Toast.LENGTH_SHORT).show()
+            viewModel.clearSuccess()
+            viewModel.onEvent(OrderDetailUiEvent.LoadOrder)
         }
-        viewModel.clearSuccess()
-        viewModel.onEvent(OrderDetailUiEvent.LoadOrder)
     }
 
     // 실패 시 Toast 표시
@@ -99,11 +100,15 @@ fun OrderResultBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
                 CommonButton(
                     modifier = Modifier.weight(1f),
                     variant = ButtonVariant.Error,
+                    enabled = order.firstOrNull()?.status != OrderStatus.COMPLETED &&
+                            order.firstOrNull()?.status != OrderStatus.CANCELED,
                     onClick = { showCancelOrderDialog = true }
                 ) {
                     Text(stringResource(R.string.order_detail_order_cancel))

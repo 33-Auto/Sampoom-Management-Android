@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.order.ui
 
+import android.R.attr.order
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -114,13 +116,11 @@ fun OrderListScreen(
                         .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    uiState.orderList.forEach { order ->
-                        item {
-                            OrderItem(
-                                order = order,
-                                onClick = { onNavigateOrderDetail(order) }
-                            )
-                        }
+                    items(uiState.orderList) { order ->
+                        OrderItem(
+                            order = order,
+                            onClick = { onNavigateOrderDetail(order) }
+                        )
                     }
                     item { Spacer(Modifier.height(100.dp)) }
                 }

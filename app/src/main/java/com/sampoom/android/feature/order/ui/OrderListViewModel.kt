@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.feature.order.domain.usecase.GetOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -45,25 +46,26 @@ class OrderListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(orderLoading = true, orderError = null) }
 
-            runCatching { getOrderListUseCase() }
-                .onSuccess { orderList ->
-                    _uiState.update {
-                        it.copy(
-                            orderList = orderList.items,
-                            orderLoading = false,
-                            orderError = null
-                        )
-                    }
+            try {
+                val orderList = getOrderListUseCase()
+                _uiState.update {
+                    it.copy(
+                        orderList = orderList.items,
+                        orderLoading = false,
+                        orderError = null
+                    )
                 }
-                .onFailure { throwable ->
-                    val backendMessage = throwable.serverMessageOrNull()
-                    _uiState.update {
-                        it.copy(
-                            orderLoading = false,
-                            orderError = backendMessage ?: (throwable.message ?: errorLabel )
-                        )
-                    }
+            } catch (ce: CancellationException) {
+                throw ce
+            } catch (throwable: Throwable) {
+                val backendMessage = throwable.serverMessageOrNull()
+                _uiState.update {
+                    it.copy(
+                        orderLoading = false,
+                        orderError = backendMessage ?: (throwable.message ?: errorLabel )
+                    )
                 }
+            }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }

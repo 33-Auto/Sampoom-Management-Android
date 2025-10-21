@@ -23,7 +23,6 @@ import com.sampoom.android.R
 import com.sampoom.android.feature.auth.ui.LoginScreen
 import com.sampoom.android.feature.auth.ui.SignUpScreen
 import com.sampoom.android.feature.cart.ui.CartListScreen
-import com.sampoom.android.feature.order.domain.model.OrderList
 import com.sampoom.android.feature.order.ui.OrderDetailScreen
 import com.sampoom.android.feature.order.ui.OrderListScreen
 import com.sampoom.android.feature.outbound.ui.OutboundListScreen
@@ -101,6 +100,7 @@ fun AppNavHost() {
                     navController.navigateUp()
                 },
                 onNavigatePartList = { group ->
+                    // TODO: 실제 사용자의 agencyId 사용
                     navController.navigate(routePartList(1, group.id))
                 }
             )
@@ -155,6 +155,7 @@ fun MainScreen(
             composable(ROUTE_ORDERS) {
                 OrderListScreen(
                     onNavigateOrderDetail = { order ->
+                        // TODO: 실제 사용자의 agencyId 사용
                         parentNavController.navigate(routeOrderDetail(1, order.orderId))
                     }
                 )

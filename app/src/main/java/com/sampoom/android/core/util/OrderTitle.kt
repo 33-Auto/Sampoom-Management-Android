@@ -21,6 +21,6 @@ fun buildOrderTitle(order: Order): String {
     return if (totalParts == 1) {
         "$groupName - ${part.name} ${part.quantity}EA"
     } else {
-        "${part.name} - $groupName ${part.quantity}EA 외 ${totalParts - 1}건"
+        "$groupName - ${part.name} ${part.quantity}EA 외 ${totalParts - 1}건"
     }
 }

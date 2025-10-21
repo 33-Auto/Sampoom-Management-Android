@@ -7,6 +7,7 @@ import com.sampoom.android.feature.part.data.remote.dto.PartDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 
+// TODO: AgencyId 동적 주입
 interface PartApi {
     @GET("agency/category")
     suspend fun getCategoryList(): ApiResponse<List<CategoryDto>>

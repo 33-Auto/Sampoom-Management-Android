@@ -12,6 +12,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
+// TODO: AgencyId 동적 주입
 interface CartApi {
     // 장바구니 목록 조회
     @GET("agency/1/cart")

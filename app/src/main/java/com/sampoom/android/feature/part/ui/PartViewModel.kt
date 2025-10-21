@@ -8,6 +8,7 @@ import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.usecase.GetCategoryUseCase
 import com.sampoom.android.feature.part.domain.usecase.GetGroupUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,25 +53,26 @@ class PartViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(categoryLoading = true, categoryError = null) }
 
-            runCatching { getCategoryUseCase() }
-                .onSuccess { categoryList ->
-                    _uiState.update {
-                        it.copy(
-                            categoryList = categoryList.items,
-                            categoryLoading = false,
-                            categoryError = null
-                        )
-                    }
+            try {
+                val categoryList = getCategoryUseCase()
+                _uiState.update {
+                    it.copy(
+                        categoryList = categoryList.items,
+                        categoryLoading = false,
+                        categoryError = null
+                    )
                 }
-                .onFailure { throwable ->
-                    val backendMessage = throwable.serverMessageOrNull()
-                    _uiState.update {
-                        it.copy(
-                            categoryLoading = false,
-                            categoryError = backendMessage ?: (throwable.message ?: errorLabel)
-                        )
-                    }
+            } catch (ce: CancellationException) {
+                throw ce
+            } catch (throwable: Throwable) {
+                val backendMessage = throwable.serverMessageOrNull()
+                _uiState.update {
+                    it.copy(
+                        categoryLoading = false,
+                        categoryError = backendMessage ?: (throwable.message ?: errorLabel)
+                    )
                 }
+            }
             Log.d(TAG, "loadCategory: ${_uiState.value}")
         }
     }
@@ -88,28 +90,29 @@ class PartViewModel @Inject constructor(
         groupLoadJob = viewModelScope.launch {
             _uiState.update { it.copy(groupLoading = true, groupError = null) }
 
-            runCatching { getGroupUseCase(categoryId) }
-                .onSuccess { groupList ->
-                    // 최신 선택과 불일치하면 무시
-                    if (_uiState.value.selectedCategory?.id != categoryId) return@onSuccess
-                    _uiState.update {
-                        it.copy(
-                            groupList = groupList.items,
-                            groupLoading = false,
-                            groupError = null
-                        )
-                    }
+            try {
+                val groupList = getGroupUseCase(categoryId)
+                // 최신 선택과 불일치하면 무시
+                if (_uiState.value.selectedCategory?.id != categoryId) return@launch
+                _uiState.update {
+                    it.copy(
+                        groupList = groupList.items,
+                        groupLoading = false,
+                        groupError = null
+                    )
                 }
-                .onFailure { throwable ->
-                    val backendMessage = throwable.serverMessageOrNull()
-                    if (_uiState.value.selectedCategory?.id != categoryId) return@onFailure
-                    _uiState.update {
-                        it.copy(
-                            groupLoading = false,
-                            groupError = backendMessage ?: (throwable.message ?: errorLabel)
-                        )
-                    }
+            } catch (ce: CancellationException) {
+                throw ce
+            } catch (throwable: Throwable) {
+                val backendMessage = throwable.serverMessageOrNull()
+                if (_uiState.value.selectedCategory?.id != categoryId) return@launch
+                _uiState.update {
+                    it.copy(
+                        groupLoading = false,
+                        groupError = backendMessage ?: (throwable.message ?: errorLabel)
+                    )
                 }
+            }
             Log.d(TAG, "loadGroup: ${_uiState.value}")
         }
     }
