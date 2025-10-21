@@ -36,7 +36,6 @@ import com.sampoom.android.core.ui.component.ButtonVariant
 import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
-import com.sampoom.android.core.ui.component.ErrorContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
