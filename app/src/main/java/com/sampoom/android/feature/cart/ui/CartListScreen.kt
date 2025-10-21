@@ -45,6 +45,7 @@ import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.cart.domain.model.CartPart
+import com.sampoom.android.feature.order.ui.OrderResultBottomSheet
 import kotlin.collections.forEach
 
 @Composable
@@ -55,26 +56,17 @@ fun CartListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showEmptyCartDialog by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-
-    LaunchedEffect(Unit) {
-        viewModel.clearSuccess()
-    }
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)
         viewModel.onEvent(CartListUiEvent.LoadCartList)
     }
 
-    LaunchedEffect(uiState.isOrderSuccess) {
-        if (uiState.isOrderSuccess) {
-            Toast.makeText(
-                context,
-                context.getString(R.string.cart_toast_order_text),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-        viewModel.clearSuccess()
+    uiState.processedOrder?.let { orders ->
+        OrderResultBottomSheet(
+            order = orders,
+            onDismiss = { viewModel.onEvent(CartListUiEvent.DismissOrderResult)}
+        )
     }
 
     Column(Modifier.fillMaxSize()) {

@@ -1,6 +1,7 @@
 package com.sampoom.android.feature.cart.ui
 
 import com.sampoom.android.feature.cart.domain.model.Cart
+import com.sampoom.android.feature.order.domain.model.Order
 
 data class CartListUiState(
     val cartList: List<Cart> = emptyList(),
@@ -11,5 +12,7 @@ data class CartListUiState(
     val updateError: String? = null,
     val isDeleting: Boolean = false,
     val deleteError: String? = null,
-    val isOrderSuccess: Boolean = false
+    val isProcessing: Boolean = false,
+    val processError: String? = null,
+    val processedOrder: List<Order>? = null
 )

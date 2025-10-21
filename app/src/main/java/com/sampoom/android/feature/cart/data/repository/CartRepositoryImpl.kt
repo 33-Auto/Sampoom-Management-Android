@@ -21,22 +21,22 @@ class CartRepositoryImpl @Inject constructor(
         partId: Long,
         quantity: Long
     ): Result<Unit> {
-        val dto = api.addCart(AddCartRequestDto(partId, quantity))
         return runCatching {
+            val dto = api.addCart(AddCartRequestDto(partId, quantity))
             if (!dto.success) throw Exception(dto.message)
         }
     }
 
     override suspend fun deleteCart(cartItemId: Long): Result<Unit> {
-        val dto = api.deleteCart(cartItemId)
         return runCatching {
+            val dto = api.deleteCart(cartItemId)
             if (!dto.success) throw Exception(dto.message)
         }
     }
 
     override suspend fun deleteAllCart(): Result<Unit> {
-        val dto = api.deleteAllCart()
         return runCatching {
+            val dto = api.deleteAllCart()
             if (!dto.success) throw Exception(dto.message)
         }
     }
@@ -45,8 +45,8 @@ class CartRepositoryImpl @Inject constructor(
         cartItemId: Long,
         quantity: Long
     ): Result<Unit> {
-        val dto = api.updateCart(cartItemId, UpdateCartRequestDto(quantity))
         return runCatching {
+            val dto = api.updateCart(cartItemId, UpdateCartRequestDto(quantity))
             if (!dto.success) throw Exception(dto.message)
         }
     }

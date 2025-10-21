@@ -22,8 +22,8 @@ class OrderRepositoryImpl @Inject constructor(
     }
 
     override suspend fun receiveOrder(orderId: Long): Result<Unit> {
-        val dto = api.receiveOrder(orderId)
         return runCatching {
+            val dto = api.receiveOrder(orderId)
             if (!dto.success) throw Exception(dto.message)
         }
     }
@@ -35,8 +35,8 @@ class OrderRepositoryImpl @Inject constructor(
     }
 
     override suspend fun cancelOrder(orderId: Long): Result<Unit> {
-        val dto = api.cancelOrder(orderId)
         return runCatching {
+            val dto = api.cancelOrder(orderId)
             if (!dto.success) throw Exception(dto.message)
         }
     }

@@ -18,8 +18,8 @@ class OutboundRepositoryImpl @Inject constructor(
     }
 
     override suspend fun processOutbound(): Result<Unit> {
-        val dto = api.processOutbound()
         return runCatching {
+            val dto = api.processOutbound()
             if (!dto.success) throw Exception(dto.message)
         }
     }
@@ -28,22 +28,22 @@ class OutboundRepositoryImpl @Inject constructor(
         partId: Long,
         quantity: Long
     ): Result<Unit> {
-        val dto = api.addOutbound(AddOutboundRequestDto(partId, quantity))
         return runCatching {
+            val dto = api.addOutbound(AddOutboundRequestDto(partId, quantity))
             if (!dto.success) throw Exception(dto.message)
         }
     }
 
     override suspend fun deleteOutbound(outboundId: Long): Result<Unit> {
-        val dto = api.deleteOutbound(outboundId)
         return runCatching {
+            val dto = api.deleteOutbound(outboundId)
             if (!dto.success) throw Exception(dto.message)
         }
     }
 
     override suspend fun deleteAllOutbound(): Result<Unit> {
-        val dto = api.deleteAllOutbound()
         return runCatching {
+            val dto = api.deleteAllOutbound()
             if (!dto.success) throw Exception(dto.message)
         }
     }
@@ -52,8 +52,8 @@ class OutboundRepositoryImpl @Inject constructor(
         outboundId: Long,
         quantity: Long
     ): Result<Unit> {
-        val dto = api.updateOutbound(outboundId, UpdateOutboundRequestDto(quantity))
         return runCatching {
+            val dto = api.updateOutbound(outboundId, UpdateOutboundRequestDto(quantity))
             if (!dto.success) throw Exception(dto.message)
         }
     }

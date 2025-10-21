@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.cart.ui
 
+import android.R.attr.order
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,7 @@ import com.sampoom.android.feature.cart.domain.usecase.DeleteAllCartUseCase
 import com.sampoom.android.feature.cart.domain.usecase.DeleteCartUseCase
 import com.sampoom.android.feature.cart.domain.usecase.GetCartUseCase
 import com.sampoom.android.feature.cart.domain.usecase.UpdateCartQuantityUseCase
+import com.sampoom.android.feature.order.domain.usecase.CreateOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +22,8 @@ class CartListViewModel @Inject constructor(
     private val getCartListUseCase: GetCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
     private val deleteCartUseCase: DeleteCartUseCase,
-    private val deleteAllCartUseCase: DeleteAllCartUseCase
+    private val deleteAllCartUseCase: DeleteAllCartUseCase,
+    private val createOrderUseCase: CreateOrderUseCase
 ) : ViewModel() {
 
     private companion object {
@@ -50,6 +53,7 @@ class CartListViewModel @Inject constructor(
             is CartListUiEvent.DeleteAllCart -> deleteAllCart()
             is CartListUiEvent.ClearUpdateError -> _uiState.update { it.copy(updateError = null) }
             is CartListUiEvent.ClearDeleteError -> _uiState.update { it.copy(deleteError = null) }
+            is CartListUiEvent.DismissOrderResult -> _uiState.update { it.copy(processedOrder = null) }
         }
     }
 
@@ -81,25 +85,24 @@ class CartListViewModel @Inject constructor(
         }
     }
 
-    // TODO() : 주문 생성 로직
     private fun processOrder() {
         viewModelScope.launch {
-//            _uiState.update { it.copy(cartLoading = true, cartError = null) }
-//
-//            processCartUseCase()
-//                .onSuccess {
-//                    _uiState.update { it.copy(isUpdating = false, isOrderSuccess = true) }
-//                    loadCartList()
-//                }
-//                .onFailure { throwable ->
-//                    val backendMessage = throwable.serverMessageOrNull()
-//                    _uiState.update {
-//                        it.copy(
-//                            isUpdating = false,
-//                            updateError = backendMessage ?: (throwable.message ?: errorLabel)
-//                        )
-//                    }
-//                }
+            _uiState.update { it.copy(isProcessing = true, processError = null) }
+
+            runCatching { createOrderUseCase() }
+                .onSuccess { orderList ->
+                    _uiState.update { it.copy(isProcessing = false, processedOrder = orderList.items) }
+                    loadCartList()
+                }
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    _uiState.update {
+                        it.copy(
+                            isProcessing = false,
+                            processError = backendMessage ?: (throwable.message ?: errorLabel)
+                        )
+                    }
+                }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
@@ -216,9 +219,5 @@ class CartListViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(cartList = emptyList())
         }
-    }
-
-    fun clearSuccess() {
-        _uiState.update { it.copy(isOrderSuccess = false) }
     }
 }

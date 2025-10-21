@@ -73,9 +73,9 @@
     <string name="cart_empty_outbound">장바구니 목록이 없습니다.</string>
     <string name="cart_dialog_text">장바구니 목록에 추가하시겠습니까?</string>
     <string name="cart_toast_success">장바구니 목록에 추가되었습니다</string>
-    <string name="cart_dialog_order_text">장바구니에 추가하시겠습니까?</string>
+    <string name="cart_dialog_order_text">장바구니 목륵의 상품을 주문하시겠습니까?</string>
     <string name="cart_dialog_empty_text">장바구니를 비우시겠습니까?</string>
-    <string name="cart_toast_order_text">추가되었습니다</string>
+    <string name="cart_toast_order_text">주문이 완료되었습니다</string>
     <string name="cart_order_parts">부품 주문</string>
 
     <!-- 주문 관리 -->
@@ -87,6 +87,12 @@
     <string name="order_detail_order_agency">대리점</string>
     <string name="order_detail_order_status">주문상태</string>
     <string name="order_detail_order_items_title">주문상품</string>
+    <string name="order_detail_order_cancel">주문취소</string>
+    <string name="order_detail_dialog_order_cancel">주문 취소처리하시겠습니까?</string>
+    <string name="order_detail_toast_order_cancel">주문 취소처리되었습니다</string>
+    <string name="order_detail_order_receive">입고처리</string>
+    <string name="order_detail_dialog_order_receive">입고 처리하시겠습니까?</string>
+    <string name="order_detail_toast_order_receive">입고 처리되었습니다</string>
 
     <!-- 주문 상태 -->
     <string name="order_status_pending">승인대기</string>
