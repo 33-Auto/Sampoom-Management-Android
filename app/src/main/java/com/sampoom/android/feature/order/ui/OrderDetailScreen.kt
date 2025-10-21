@@ -107,7 +107,7 @@ fun OrderDetailScreen(
                 Spacer(Modifier.width(16.dp))
                 CommonButton(
                     modifier = Modifier.weight(1f),
-                    enabled = uiState.orderDetail.firstOrNull()?.status != OrderStatus.PENDING &&
+                    enabled = uiState.orderDetail.firstOrNull()?.status != OrderStatus.COMPLETED &&
                             uiState.orderDetail.firstOrNull()?.status != OrderStatus.CANCELED,
                     onClick = { showReceiveOrderDialog = true }
                 ) {
