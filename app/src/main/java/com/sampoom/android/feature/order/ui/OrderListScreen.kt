@@ -1,8 +1,11 @@
 package com.sampoom.android.feature.order.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,11 +16,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,94 +46,115 @@ import com.sampoom.android.core.util.buildOrderTitle
 import com.sampoom.android.core.util.formatDate
 import com.sampoom.android.feature.order.domain.model.Order
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OrderListScreen(
+    paddingValues: PaddingValues,
     onNavigateOrderDetail: (Order) -> Unit,
     viewModel: OrderListViewModel = hiltViewModel()
 ) {
     val errorLabel = stringResource(R.string.common_error)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val pullRefreshState = rememberPullToRefreshState()
     val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)
     }
 
-    Column(Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(vertical = 16.dp),
-                text = stringResource(R.string.order_title),
-                style = MaterialTheme.typography.titleLarge,
-                color = textColor()
+    PullToRefreshBox(
+        isRefreshing = uiState.orderLoading,
+        onRefresh = { viewModel.onEvent(OrderListUiEvent.LoadOrderList) },
+        state = pullRefreshState,
+        modifier = Modifier.fillMaxSize(),
+        indicator = {
+            Indicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                isRefreshing = uiState.orderLoading,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                state = pullRefreshState
             )
         }
-
-        when {
-            uiState.orderLoading -> {
-                Box(
+    ) {
+        Column(Modifier.fillMaxSize().padding(paddingValues)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
                     modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+                        .padding(vertical = 16.dp),
+                    text = stringResource(R.string.order_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = textColor()
+                )
             }
 
-            uiState.orderError != null -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorContent(
-                        onRetry = { viewModel.onEvent(OrderListUiEvent.RetryOrderList) },
-                        modifier = Modifier.height(200.dp)
-                    )
+            when {
+                uiState.orderLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-            }
 
-            uiState.orderList.isEmpty() -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    EmptyContent(
-                        message = stringResource(R.string.order_empty_list),
-                        modifier = Modifier.height(200.dp)
-                    )
-                }
-            }
-
-            else -> {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(uiState.orderList) { order ->
-                        OrderItem(
-                            order = order,
-                            onClick = { onNavigateOrderDetail(order) }
+                uiState.orderError != null -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorContent(
+                            onRetry = { viewModel.onEvent(OrderListUiEvent.RetryOrderList) },
+                            modifier = Modifier.height(200.dp)
                         )
                     }
-                    item { Spacer(Modifier.height(100.dp)) }
+                }
+
+                uiState.orderList.isEmpty() -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        EmptyContent(
+                            message = stringResource(R.string.order_empty_list),
+                            modifier = Modifier.height(200.dp)
+                        )
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(uiState.orderList) { order ->
+                            OrderItem(
+                                order = order,
+                                onClick = { onNavigateOrderDetail(order) }
+                            )
+                        }
+                        item { Spacer(Modifier.height(100.dp)) }
+                    }
                 }
             }
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun OrderItem(
     order: Order,

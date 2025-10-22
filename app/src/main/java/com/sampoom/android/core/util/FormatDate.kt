@@ -12,7 +12,7 @@ fun formatDate(dateString: String): String {
             dateString.endsWith("Z") || dateString.contains('+') || dateString.contains('-')
                 .and(dateString.count { it == ':' } >= 3)
         val date = if (hasOffset) {
-            val inFmt = java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
+            val inFmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
             java.time.OffsetDateTime.parse(dateString, inFmt).toLocalDate()
         } else {
             val inFmt = java.time.format.DateTimeFormatterBuilder()

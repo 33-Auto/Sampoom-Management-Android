@@ -105,12 +105,13 @@ fun OrderResultBottomSheet(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
+                val orderStatus = order.firstOrNull()?.status
                 CommonButton(
                     modifier = Modifier.weight(1f),
                     variant = ButtonVariant.Error,
-                    enabled = order.firstOrNull()?.let {
-                        it.status != OrderStatus.COMPLETED && it.status != OrderStatus.CANCELED
-                    } ?: false,
+                    enabled = orderStatus != null &&
+                            !uiState.isProcessing &&
+                            orderStatus == OrderStatus.PENDING,
                     onClick = { showCancelOrderDialog = true }
                 ) {
                     Text(stringResource(R.string.order_detail_order_cancel))

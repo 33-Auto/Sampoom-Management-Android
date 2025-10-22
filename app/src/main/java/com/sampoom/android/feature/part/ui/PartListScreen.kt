@@ -22,6 +22,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +47,7 @@ import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
+import com.sampoom.android.feature.outbound.ui.OutboundListUiEvent
 import com.sampoom.android.feature.part.domain.model.Part
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,80 +63,96 @@ fun PartListScreen(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val pullRefreshState = rememberPullToRefreshState()
 
     // ModalBottomSheet 상태 관리
     val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.part_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_back),
-                            contentDescription = stringResource(R.string.nav_back)
+    PullToRefreshBox(
+        isRefreshing = uiState.partListLoading,
+        onRefresh = { viewModel.onEvent(PartListUiEvent.LoadPartList) },
+        state = pullRefreshState,
+        modifier = Modifier.fillMaxSize(),
+        indicator = {
+            Indicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                isRefreshing = uiState.partListLoading,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                state = pullRefreshState
+            )
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.part_title)) },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_arrow_back),
+                                contentDescription = stringResource(R.string.nav_back)
+                            )
+                        }
+                    }
+                )
+            }
+        ) { innerPadding ->
+            when {
+                uiState.partListLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                uiState.partListError != null -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorContent(
+                            onRetry = { viewModel.onEvent(PartListUiEvent.RetryPartList) },
+                            modifier = Modifier.height(200.dp)
                         )
                     }
                 }
-            )
-        }
-    ) { innerPadding ->
-        when {
-            uiState.partListLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
 
-            uiState.partListError != null -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorContent(
-                        onRetry = { viewModel.onEvent(PartListUiEvent.RetryPartList) },
-                        modifier = Modifier.height(200.dp)
-                    )
-                }
-            }
-
-            uiState.partList.isEmpty() -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    EmptyContent(
-                        message = stringResource(R.string.part_empty_part),
-                        modifier = Modifier.height(200.dp)
-                    )
-                }
-            }
-
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(uiState.partList) { part ->
-                        PartListItemCard(
-                            part = part,
-                            onClick = {
-                                viewModel.onEvent(PartListUiEvent.ShowBottomSheet(part))
-                                showBottomSheet = true
-                            }
+                uiState.partList.isEmpty() -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        EmptyContent(
+                            message = stringResource(R.string.part_empty_part),
+                            modifier = Modifier.height(200.dp)
                         )
+                    }
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(uiState.partList) { part ->
+                            PartListItemCard(
+                                part = part,
+                                onClick = {
+                                    viewModel.onEvent(PartListUiEvent.ShowBottomSheet(part))
+                                    showBottomSheet = true
+                                }
+                            )
+                        }
                     }
                 }
             }

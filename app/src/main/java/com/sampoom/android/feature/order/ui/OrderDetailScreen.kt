@@ -1,9 +1,11 @@
 package com.sampoom.android.feature.order.ui
 
+import android.R.attr.order
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,10 +15,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +43,7 @@ import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.feature.order.domain.model.OrderStatus
+import com.sampoom.android.feature.outbound.ui.OutboundListUiEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +52,7 @@ fun OrderDetailScreen(
     viewModel: OrderDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val pullRefreshState = rememberPullToRefreshState()
     var showCancelOrderDialog by remember { mutableStateOf(false) }
     var showReceiveOrderDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -75,82 +83,101 @@ fun OrderDetailScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.order_detail_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_back),
-                            contentDescription = stringResource(R.string.nav_back)
-                        )
+    PullToRefreshBox(
+        isRefreshing = uiState.orderDetailLoading,
+        onRefresh = { viewModel.onEvent(OrderDetailUiEvent.LoadOrder) },
+        state = pullRefreshState,
+        modifier = Modifier.fillMaxSize(),
+        indicator = {
+            Indicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                isRefreshing = uiState.orderDetailLoading,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                state = pullRefreshState
+            )
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(stringResource(R.string.order_detail_title)) },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_arrow_back),
+                                contentDescription = stringResource(R.string.nav_back)
+                            )
+                        }
+                    }
+                )
+            },
+            bottomBar = {
+                val orderStatus = uiState.orderDetail.firstOrNull()?.status
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    CommonButton(
+                        modifier = Modifier.weight(1f),
+                        variant = ButtonVariant.Error,
+                        enabled = orderStatus != null &&
+                                !uiState.isProcessing &&
+                                orderStatus == OrderStatus.PENDING,
+                        onClick = { showCancelOrderDialog = true }
+                    ) {
+                        Text(stringResource(R.string.order_detail_order_cancel))
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    CommonButton(
+                        modifier = Modifier.weight(1f),
+                        enabled = orderStatus != null &&
+                                !uiState.isProcessing &&
+                                orderStatus == OrderStatus.PENDING,
+                        onClick = { showReceiveOrderDialog = true }
+                    ) {
+                        Text(stringResource(R.string.order_detail_order_receive))
                     }
                 }
-            )
-        },
-        bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                CommonButton(
-                    modifier = Modifier.weight(1f),
-                    variant = ButtonVariant.Error,
-                    enabled = uiState.orderDetail.firstOrNull()?.status != OrderStatus.COMPLETED &&
-                            uiState.orderDetail.firstOrNull()?.status != OrderStatus.CANCELED,
-                    onClick = { showCancelOrderDialog = true }
-                ) {
-                    Text(stringResource(R.string.order_detail_order_cancel))
+            }
+        ) { innerPadding ->
+            when {
+                uiState.orderDetailLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-                Spacer(Modifier.width(16.dp))
-                CommonButton(
-                    modifier = Modifier.weight(1f),
-                    enabled = uiState.orderDetail.firstOrNull()?.status != OrderStatus.COMPLETED &&
-                            uiState.orderDetail.firstOrNull()?.status != OrderStatus.CANCELED,
-                    onClick = { showReceiveOrderDialog = true }
-                ) {
-                    Text(stringResource(R.string.order_detail_order_receive))
+
+                uiState.orderDetailError != null -> {
+                    ErrorContent(
+                        onRetry = { viewModel.onEvent(OrderDetailUiEvent.RetryOrder) },
+                        modifier = Modifier
+                            .height(200.dp)
+                            .fillMaxWidth()
+                    )
                 }
-            }
-        }
-    ) { innerPadding ->
-        when {
-            uiState.orderDetailLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+
+                uiState.orderDetail.isEmpty() -> {
+                    EmptyContent(
+                        message = stringResource(R.string.order_empty_list),
+                        modifier = Modifier
+                            .height(200.dp)
+                            .fillMaxWidth()
+                    )
                 }
-            }
 
-            uiState.orderDetailError != null -> {
-                ErrorContent(
-                    onRetry = { viewModel.onEvent(OrderDetailUiEvent.RetryOrder) },
-                    modifier = Modifier
-                        .height(200.dp)
-                        .fillMaxWidth()
-                )
-            }
-
-            uiState.orderDetail.isEmpty() -> {
-                EmptyContent(
-                    message = stringResource(R.string.order_empty_list),
-                    modifier = Modifier
-                        .height(200.dp)
-                        .fillMaxWidth()
-                )
-            }
-
-            else -> {
-                OrderDetailContent(
-                    order = uiState.orderDetail,
-                    modifier = Modifier.padding(innerPadding)
-                )
+                else -> {
+                    OrderDetailContent(
+                        order = uiState.orderDetail,
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
             }
         }
     }

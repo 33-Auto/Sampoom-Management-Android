@@ -1,5 +1,8 @@
 package com.sampoom.android.app.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -59,6 +62,7 @@ sealed class BottomNavItem(
     object Orders : BottomNavItem(ROUTE_ORDERS, R.string.nav_order, R.drawable.orders)
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
@@ -134,6 +138,7 @@ fun AppNavHost() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(
     parentNavController: NavHostController
@@ -146,14 +151,26 @@ fun MainScreen(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = ROUTE_DASHBOARD,
-            modifier = Modifier.padding(innerPadding)
+            startDestination = ROUTE_DASHBOARD
         ) {
-            composable(ROUTE_DASHBOARD) { DashboardScreen() }
-            composable(ROUTE_OUTBOUND) { OutboundListScreen() }
-            composable(ROUTE_CART) { CartListScreen() }
+            composable(ROUTE_DASHBOARD) {
+                DashboardScreen(
+                    paddingValues = innerPadding
+                )
+            }
+            composable(ROUTE_OUTBOUND) {
+                OutboundListScreen(
+                    paddingValues = innerPadding
+                )
+            }
+            composable(ROUTE_CART) {
+                CartListScreen(
+                    paddingValues = innerPadding
+                )
+            }
             composable(ROUTE_ORDERS) {
                 OrderListScreen(
+                    paddingValues = innerPadding,
                     onNavigateOrderDetail = { order ->
                         // TODO: 실제 사용자의 agencyId 사용
                         parentNavController.navigate(routeOrderDetail(1, order.orderId))
@@ -223,7 +240,9 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 // 임시 화면들 (실제로는 각각의 feature 모듈에서 구현)
 @Composable
-private fun DashboardScreen() {
+private fun DashboardScreen(
+    paddingValues: PaddingValues
+) {
     // 홈 화면 구현
-    Text("대시보드 화면")
+    Text("대시보드 화면", modifier = Modifier.padding(paddingValues))
 }
