@@ -9,4 +9,5 @@ sealed interface CartListUiEvent {
     object DeleteAllCart : CartListUiEvent
     object ClearUpdateError : CartListUiEvent
     object ClearDeleteError : CartListUiEvent
+    object DismissOrderResult : CartListUiEvent
 }

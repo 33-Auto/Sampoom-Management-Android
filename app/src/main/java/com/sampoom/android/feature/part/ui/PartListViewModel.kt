@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.feature.part.domain.usecase.GetPartUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -54,25 +55,26 @@ class PartListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(partListLoading = true, partListError = null) }
 
-            runCatching { getPartListUseCase(groupId) }
-                .onSuccess { partList ->
-                    _uiState.update {
-                        it.copy(
-                            partList = partList.items,
-                            partListLoading = false,
-                            partListError = null
-                        )
-                    }
+            try {
+                val partList = getPartListUseCase(groupId)
+                _uiState.update {
+                    it.copy(
+                        partList = partList.items,
+                        partListLoading = false,
+                        partListError = null
+                    )
                 }
-                .onFailure { throwable ->
-                    val backendMessage = throwable.serverMessageOrNull()
-                    _uiState.update {
-                        it.copy(
-                            partListLoading = false,
-                            partListError = backendMessage ?: (throwable.message ?: errorLabel)
-                        )
-                    }
+            } catch (ce: CancellationException) {
+                throw ce
+            } catch (throwable: Throwable) {
+                val backendMessage = throwable.serverMessageOrNull()
+                _uiState.update {
+                    it.copy(
+                        partListLoading = false,
+                        partListError = backendMessage ?: (throwable.message ?: errorLabel)
+                    )
                 }
+            }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }

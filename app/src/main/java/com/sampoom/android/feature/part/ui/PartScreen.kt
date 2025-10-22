@@ -116,14 +116,14 @@ fun PartScreen(
                 uiState.categoryError != null -> {
                     ErrorContent(
                         onRetry = { viewModel.onEvent(PartUiEvent.RetryCategories) },
-                        modifier = Modifier.height(200.dp)
+                        modifier = Modifier.height(200.dp).fillMaxWidth()
                     )
                 }
 
                 uiState.categoryList.isEmpty() -> {
                     EmptyContent(
                         message = stringResource(R.string.part_empty_category),
-                        modifier = Modifier.height(200.dp)
+                        modifier = Modifier.height(200.dp).fillMaxWidth()
                     )
                 }
 

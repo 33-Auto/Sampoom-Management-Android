@@ -1,5 +1,8 @@
 package com.sampoom.android.app.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -23,6 +26,8 @@ import com.sampoom.android.R
 import com.sampoom.android.feature.auth.ui.LoginScreen
 import com.sampoom.android.feature.auth.ui.SignUpScreen
 import com.sampoom.android.feature.cart.ui.CartListScreen
+import com.sampoom.android.feature.order.ui.OrderDetailScreen
+import com.sampoom.android.feature.order.ui.OrderListScreen
 import com.sampoom.android.feature.outbound.ui.OutboundListScreen
 import com.sampoom.android.feature.part.ui.PartListScreen
 import com.sampoom.android.feature.part.ui.PartScreen
@@ -41,6 +46,8 @@ const val ROUTE_ORDERS = "orders"
 const val ROUTE_PARTS = "parts"
 const val ROUTE_PART_LIST = "parts/{agencyId}/group/{groupId}"
 fun routePartList(agencyId: Long, groupId: Long): String = "parts/$agencyId/group/$groupId"
+const val ROUTE_ORDER_DETAIL = "orders/{agencyId}/orders/{orderId}"
+fun routeOrderDetail(agencyId: Long, orderId: Long): String = "orders/$agencyId/orders/$orderId"
 const val ROUTE_EMPLOYEE = "employee"
 const val ROUTE_SETTINGS = "settings"
 
@@ -55,6 +62,7 @@ sealed class BottomNavItem(
     object Orders : BottomNavItem(ROUTE_ORDERS, R.string.nav_order, R.drawable.orders)
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
@@ -96,6 +104,7 @@ fun AppNavHost() {
                     navController.navigateUp()
                 },
                 onNavigatePartList = { group ->
+                    // TODO: 실제 사용자의 agencyId 사용
                     navController.navigate(routePartList(1, group.id))
                 }
             )
@@ -113,9 +122,23 @@ fun AppNavHost() {
                 }
             )
         }
+        composable(
+            ROUTE_ORDER_DETAIL,
+            arguments = listOf(
+                navArgument("agencyId") { type = NavType.LongType },
+                navArgument("orderId") { type = NavType.LongType }
+            )
+        ) {
+            OrderDetailScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(
     parentNavController: NavHostController
@@ -128,13 +151,32 @@ fun MainScreen(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = ROUTE_DASHBOARD,
-            modifier = Modifier.padding(innerPadding)
+            startDestination = ROUTE_DASHBOARD
         ) {
-            composable(ROUTE_DASHBOARD) { DashboardScreen() }
-            composable(ROUTE_OUTBOUND) { OutboundListScreen() }
-            composable(ROUTE_CART) { CartListScreen() }
-            composable(ROUTE_ORDERS) { OrderScreen() }
+            composable(ROUTE_DASHBOARD) {
+                DashboardScreen(
+                    paddingValues = innerPadding
+                )
+            }
+            composable(ROUTE_OUTBOUND) {
+                OutboundListScreen(
+                    paddingValues = innerPadding
+                )
+            }
+            composable(ROUTE_CART) {
+                CartListScreen(
+                    paddingValues = innerPadding
+                )
+            }
+            composable(ROUTE_ORDERS) {
+                OrderListScreen(
+                    paddingValues = innerPadding,
+                    onNavigateOrderDetail = { order ->
+                        // TODO: 실제 사용자의 agencyId 사용
+                        parentNavController.navigate(routeOrderDetail(1, order.orderId))
+                    }
+                )
+            }
         }
     }
 }
@@ -198,13 +240,9 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 // 임시 화면들 (실제로는 각각의 feature 모듈에서 구현)
 @Composable
-private fun DashboardScreen() {
+private fun DashboardScreen(
+    paddingValues: PaddingValues
+) {
     // 홈 화면 구현
-    Text("대시보드 화면")
-}
-
-@Composable
-private fun OrderScreen() {
-    // 프로필 화면 구현
-    Text("Order 화면")
+    Text("대시보드 화면", modifier = Modifier.padding(paddingValues))
 }

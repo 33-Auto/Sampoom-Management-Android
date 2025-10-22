@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,15 +49,18 @@ import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
+import com.sampoom.android.feature.order.ui.OrderListUiEvent
 import com.sampoom.android.feature.outbound.domain.model.OutboundPart
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutboundListScreen(
+    paddingValues: PaddingValues,
     viewModel: OutboundListViewModel = hiltViewModel()
 ) {
     val errorLabel = stringResource(R.string.common_error)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val pullRefreshState = rememberPullToRefreshState()
     var showEmptyOutboundDialog by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -70,116 +77,131 @@ fun OutboundListScreen(
     LaunchedEffect(uiState.isOrderSuccess) {
         if (uiState.isOrderSuccess) {
             Toast.makeText(context, context.getString(R.string.outbound_toast_order_text), Toast.LENGTH_SHORT).show()
+            viewModel.clearSuccess()
         }
-        viewModel.clearSuccess()
     }
-
-    Column(Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(vertical = 16.dp),
-                text = stringResource(R.string.outbound_title),
-                style = MaterialTheme.typography.titleLarge,
-                color = textColor()
+    PullToRefreshBox(
+        isRefreshing = uiState.outboundLoading,
+        onRefresh = { viewModel.onEvent(OutboundListUiEvent.LoadOutboundList) },
+        state = pullRefreshState,
+        modifier = Modifier.fillMaxSize(),
+        indicator = {
+            Indicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                isRefreshing = uiState.outboundLoading,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                state = pullRefreshState
             )
+        }
+    ) {
+        Column(Modifier.fillMaxSize().padding(paddingValues)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(vertical = 16.dp),
+                    text = stringResource(R.string.outbound_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = textColor()
+                )
+
+                when {
+                    uiState.outboundLoading -> {}
+                    uiState.outboundError != null -> {}
+                    uiState.outboundList.isEmpty() -> {}
+                    else -> {
+                        TextButton(
+                            onClick = { showEmptyOutboundDialog = true }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.outbound_empty_list),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = FailRed
+                            )
+                        }
+                    }
+                }
+            }
 
             when {
-                uiState.outboundLoading -> {}
-                uiState.outboundError != null -> {}
-                uiState.outboundList.isEmpty() -> {}
-                else -> {
-                    TextButton(
-                        onClick = { showEmptyOutboundDialog = true }
+                uiState.outboundLoading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = stringResource(R.string.outbound_empty_list),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = FailRed
+                        CircularProgressIndicator()
+                    }
+                }
+
+                uiState.outboundError != null -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorContent(
+                            onRetry = { viewModel.onEvent(OutboundListUiEvent.RetryOutboundList) },
+                            modifier = Modifier.height(200.dp)
                         )
                     }
                 }
-            }
-        }
 
-        when {
-            uiState.outboundLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-
-            uiState.outboundError != null -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorContent(
-                        onRetry = { viewModel.onEvent(OutboundListUiEvent.RetryOutboundList) },
-                        modifier = Modifier.height(200.dp)
-                    )
-                }
-            }
-
-            uiState.outboundList.isEmpty() -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    EmptyContent(
-                        message = stringResource(R.string.outbound_empty_outbound),
-                        modifier = Modifier.height(200.dp)
-                    )
-                }
-            }
-
-            else -> {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    LazyColumn(
+                uiState.outboundList.isEmpty() -> {
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        uiState.outboundList.forEach { category ->
-                            category.groups.forEach { group ->
-                                item {
-                                    OutboundSection(
-                                        categoryName = category.categoryName,
-                                        groupName = group.groupName,
-                                        parts = group.parts,
-                                        isUpdating = uiState.isUpdating,
-                                        isDeleting = uiState.isDeleting,
-                                        onEvent = { viewModel.onEvent(it) }
-                                    )
+                        EmptyContent(
+                            message = stringResource(R.string.outbound_empty_outbound),
+                            modifier = Modifier.height(200.dp)
+                        )
+                    }
+                }
+
+                else -> {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            uiState.outboundList.forEach { category ->
+                                category.groups.forEach { group ->
+                                    item {
+                                        OutboundSection(
+                                            categoryName = category.categoryName,
+                                            groupName = group.groupName,
+                                            parts = group.parts,
+                                            isUpdating = uiState.isUpdating,
+                                            isDeleting = uiState.isDeleting,
+                                            onEvent = { viewModel.onEvent(it) }
+                                        )
+                                    }
                                 }
                             }
+                            item { Spacer(Modifier.height(100.dp)) }
                         }
-                        item { Spacer(Modifier.height(100.dp)) }
-                    }
 
-                    CommonButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.BottomEnd)
-                            .padding(16.dp)
-                            .padding(end = 72.dp),
-                        variant = ButtonVariant.Error,
-                        size = ButtonSize.Large,
-                        onClick = { showConfirmDialog = true }
-                    ) { Text(stringResource(R.string.outbound_order_parts)) }
+                        CommonButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomEnd)
+                                .padding(16.dp)
+                                .padding(end = 72.dp),
+                            variant = ButtonVariant.Error,
+                            size = ButtonSize.Large,
+                            onClick = { showConfirmDialog = true }
+                        ) { Text(stringResource(R.string.outbound_order_parts)) }
+                    }
                 }
             }
         }

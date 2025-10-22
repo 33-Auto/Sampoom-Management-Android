@@ -12,6 +12,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
+// TODO: AgencyId 동적 주입
 interface OutboundApi {
     // 출고 목록 조회
     @GET("agency/1/outbound")

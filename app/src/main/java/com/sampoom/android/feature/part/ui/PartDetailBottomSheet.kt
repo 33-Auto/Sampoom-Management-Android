@@ -31,7 +31,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,7 +41,6 @@ import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.part.domain.model.Part
-import kotlinx.coroutines.delay
 
 @Composable
 fun PartDetailBottomSheet(
@@ -72,16 +70,16 @@ fun PartDetailBottomSheet(
     LaunchedEffect(uiState.isOutboundSuccess) {
         if (uiState.isOutboundSuccess) {
             Toast.makeText(context, context.getString(R.string.outbound_toast_success), Toast.LENGTH_SHORT).show()
+            viewModel.clearSuccess()
         }
-        viewModel.clearSuccess()
     }
 
     // 성공 시 Toast 표시 후 다이얼로그 닫기
     LaunchedEffect(uiState.isCartSuccess) {
         if (uiState.isCartSuccess) {
             Toast.makeText(context, context.getString(R.string.cart_toast_success), Toast.LENGTH_SHORT).show()
+            viewModel.clearSuccess()
         }
-        viewModel.clearSuccess()
     }
 
     // 실패 시 Toast 표시
