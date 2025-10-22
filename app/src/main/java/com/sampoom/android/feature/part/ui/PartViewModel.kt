@@ -7,6 +7,7 @@ import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.usecase.GetCategoryUseCase
 import com.sampoom.android.feature.part.domain.usecase.GetGroupUseCase
+import com.sampoom.android.feature.part.domain.usecase.SearchPartsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PartViewModel @Inject constructor(
     private val getCategoryUseCase: GetCategoryUseCase,
-    private val getGroupUseCase: GetGroupUseCase
+    private val getGroupUseCase: GetGroupUseCase,
+    private val searchPartsUseCase: SearchPartsUseCase
 ) : ViewModel() {
 
     private companion object {
@@ -46,6 +48,9 @@ class PartViewModel @Inject constructor(
             is PartUiEvent.CategorySelected -> selectCategory(event.category)
             is PartUiEvent.RetryCategories -> loadCategory()
             is PartUiEvent.RetryGroups -> loadGroup()
+            is PartUiEvent.Search -> searchParts(event.keyword)
+            is PartUiEvent.SetKeyword -> _uiState.update { it.copy(keyword = event.keyword) }
+            is PartUiEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
 
@@ -121,6 +126,34 @@ class PartViewModel @Inject constructor(
         val selectedCategory = _uiState.value.selectedCategory
         if (selectedCategory != null) {
             loadGroup(selectedCategory.id)
+        }
+    }
+
+    private fun searchParts(keyword: String) {
+        viewModelScope.launch {
+            if (keyword.isBlank()) return@launch
+
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+            try {
+                val searchResult = searchPartsUseCase(keyword)
+                _uiState.update {
+                    it.copy(
+                        searchResults = searchResult,
+                        isLoading = false
+                    )
+                }
+            } catch (ce: kotlin.coroutines.cancellation.CancellationException) {
+                throw ce
+            } catch (throwable: Throwable) {
+                val backendMessage = throwable.serverMessageOrNull()
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error =  backendMessage ?: (throwable.message ?: errorLabel)
+                    )
+                }
+            }
         }
     }
 }

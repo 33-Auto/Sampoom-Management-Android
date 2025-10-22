@@ -2,6 +2,7 @@ package com.sampoom.android.feature.part.ui
 
 import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.model.Group
+import com.sampoom.android.feature.part.domain.model.SearchResult
 
 data class PartUiState(
     // Part
@@ -15,5 +16,11 @@ data class PartUiState(
     // Category
     val categoryList: List<Category> = emptyList(),
     val categoryLoading: Boolean = false,
-    val categoryError: String? = null
+    val categoryError: String? = null,
+
+    // Search
+    val searchResults: SearchResult? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val keyword: String = ""
 )
