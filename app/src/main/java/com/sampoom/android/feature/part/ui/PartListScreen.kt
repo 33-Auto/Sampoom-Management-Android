@@ -103,7 +103,7 @@ fun PartListScreen(
                 uiState.partListLoading -> {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize(),
+                            .fillMaxSize().padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
@@ -113,7 +113,7 @@ fun PartListScreen(
                 uiState.partListError != null -> {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize(),
+                            .fillMaxSize().padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorContent(
@@ -126,7 +126,7 @@ fun PartListScreen(
                 uiState.partList.isEmpty() -> {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize(),
+                            .fillMaxSize().padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
                         EmptyContent(

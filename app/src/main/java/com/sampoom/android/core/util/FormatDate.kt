@@ -9,8 +9,9 @@ fun formatDate(dateString: String): String {
     return runCatching {
         val out = DateTimeFormatter.ISO_LOCAL_DATE
         val hasOffset =
-            dateString.endsWith("Z") || dateString.contains('+') || dateString.contains('-')
-                .and(dateString.count { it == ':' } >= 3)
+            dateString.contains("Z") || dateString.lastIndexOf('+') > dateString.indexOf('T') || (dateString.lastIndexOf(
+                '-'
+            ) > dateString.indexOf('T') && dateString.count { it == ':' } >= 3)
         val date = if (hasOffset) {
             val inFmt = DateTimeFormatter.ISO_OFFSET_DATE_TIME
             java.time.OffsetDateTime.parse(dateString, inFmt).toLocalDate()
