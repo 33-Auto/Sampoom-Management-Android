@@ -85,6 +85,9 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore.preferences)
 
+    // Paging
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.material)
     implementation(libs.androidx.material.icons.core)

@@ -3,16 +3,27 @@ package com.sampoom.android.feature.part.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.feature.part.domain.model.Category
+import com.sampoom.android.feature.part.domain.model.SearchResult
 import com.sampoom.android.feature.part.domain.usecase.GetCategoryUseCase
 import com.sampoom.android.feature.part.domain.usecase.GetGroupUseCase
 import com.sampoom.android.feature.part.domain.usecase.SearchPartsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,13 +53,33 @@ class PartViewModel @Inject constructor(
         loadCategory()
     }
 
+    private val _searchKeyword = MutableStateFlow<String?>(null)
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val searchResult: Flow<PagingData<SearchResult>> = _searchKeyword
+        .debounce(300)
+        .distinctUntilChanged()
+        .flatMapLatest { keyword ->
+            if (keyword.isNullOrBlank()) {
+                flowOf(PagingData.empty())
+            } else {
+                searchPartsUseCase(keyword)
+            }
+        }
+        .cachedIn(viewModelScope)
+
     fun onEvent(event: PartUiEvent) {
         when (event) {
             is PartUiEvent.LoadCategories -> loadCategory()
             is PartUiEvent.CategorySelected -> selectCategory(event.category)
             is PartUiEvent.RetryCategories -> loadCategory()
             is PartUiEvent.RetryGroups -> loadGroup()
-            is PartUiEvent.Search -> searchParts(event.keyword)
+            is PartUiEvent.Search -> {
+                _searchKeyword.value = event.keyword
+                _uiState.update {
+                    it.copy(keyword = event.keyword)
+                }
+            }
             is PartUiEvent.SetKeyword -> _uiState.update { it.copy(keyword = event.keyword) }
             is PartUiEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
@@ -126,34 +157,6 @@ class PartViewModel @Inject constructor(
         val selectedCategory = _uiState.value.selectedCategory
         if (selectedCategory != null) {
             loadGroup(selectedCategory.id)
-        }
-    }
-
-    private fun searchParts(keyword: String) {
-        viewModelScope.launch {
-            if (keyword.isBlank()) return@launch
-
-            _uiState.update { it.copy(isLoading = true, error = null) }
-
-            try {
-                val searchResult = searchPartsUseCase(keyword)
-                _uiState.update {
-                    it.copy(
-                        searchResults = searchResult,
-                        isLoading = false
-                    )
-                }
-            } catch (ce: kotlin.coroutines.cancellation.CancellationException) {
-                throw ce
-            } catch (throwable: Throwable) {
-                val backendMessage = throwable.serverMessageOrNull()
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error =  backendMessage ?: (throwable.message ?: errorLabel)
-                    )
-                }
-            }
         }
     }
 }

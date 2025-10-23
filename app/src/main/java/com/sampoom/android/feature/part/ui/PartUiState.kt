@@ -22,5 +22,5 @@ data class PartUiState(
     val searchResults: SearchResult? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
-    val keyword: String = ""
+    val keyword: String? = null
 )

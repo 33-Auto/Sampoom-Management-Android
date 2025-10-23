@@ -1,13 +1,17 @@
 package com.sampoom.android.feature.part.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.sampoom.android.feature.part.data.mapper.toModel
+import com.sampoom.android.feature.part.data.paging.PartPagingSource
 import com.sampoom.android.feature.part.data.remote.api.PartApi
 import com.sampoom.android.feature.part.domain.model.CategoryList
 import com.sampoom.android.feature.part.domain.model.GroupList
 import com.sampoom.android.feature.part.domain.model.PartList
 import com.sampoom.android.feature.part.domain.model.SearchResult
 import com.sampoom.android.feature.part.domain.repository.PartRepository
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class PartRepositoryImpl @Inject constructor(
@@ -31,17 +35,10 @@ class PartRepositoryImpl @Inject constructor(
         return PartList(items = partItems)
     }
 
-    override suspend fun searchParts(
-        keyword: String,
-        page: Int,
-        size: Int
-    ): SearchResult {
-        val response = api.searchParts(keyword, page, size)
-        val searchItems = response.data.content.map { it.toModel() }
-        val totalElements = response.data.totalElements
-        val totalPages = response.data.totalPages
-        val currentPage = response.data.currentPage
-
-        return SearchResult(searchItems, totalElements, totalPages, currentPage)
+    override fun searchParts(keyword: String): Flow<PagingData<SearchResult>> {
+        return Pager(
+            config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = { PartPagingSource(api, keyword) }
+        ).flow
     }
 }

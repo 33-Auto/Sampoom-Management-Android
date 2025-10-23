@@ -45,6 +45,7 @@ import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.theme.backgroundCardColor
+import com.sampoom.android.core.ui.theme.disableColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.outbound.ui.OutboundListUiEvent
@@ -222,7 +223,7 @@ private fun PartListItemCard(
             Icon(
                 painterResource(R.drawable.chevron_right),
                 contentDescription = stringResource(R.string.common_detail),
-                tint = textSecondaryColor()
+                tint = disableColor()
             )
         }
     }

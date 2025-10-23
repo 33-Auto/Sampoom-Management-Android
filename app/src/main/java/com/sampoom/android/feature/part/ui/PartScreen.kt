@@ -4,6 +4,7 @@ import android.R.attr.fontWeight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -29,6 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
@@ -69,7 +73,9 @@ fun PartScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(backgroundColor())
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundColor())
     ) {
         SearchBar(
             modifier = Modifier.align(Alignment.TopCenter),
@@ -81,7 +87,6 @@ fun PartScreen(
                     },
                     onSearch = {
                         viewModel.onEvent(PartUiEvent.Search(textFieldState.text))
-//                                expanded = false
                     },
                     expanded = expanded,
                     onExpandedChange = { expanded = it },
@@ -134,7 +139,7 @@ fun PartScreen(
                     )
                 }
 
-                uiState.searchResults?.content?.isEmpty() == true -> {
+                viewModel.searchResult.collectAsLazyPagingItems().itemCount == 0 && textFieldState.text.isNotBlank() -> {
                     Box(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -148,7 +153,7 @@ fun PartScreen(
 
                 else -> {
                     SearchResultsList(
-                        searchResults = uiState.searchResults,
+                        searchResults = viewModel.searchResult.collectAsLazyPagingItems(),
                         onPartClick = { part ->
                             searchViewModel.onEvent(PartListUiEvent.ShowBottomSheet(part))
                             showBottomSheet = true
@@ -310,7 +315,8 @@ fun PartScreen(
                                 PartItemCard(
                                     group = group,
                                     onClick = {
-                                        onNavigatePartList(group) }
+                                        onNavigatePartList(group)
+                                    }
                                 )
                             }
                         }
@@ -426,50 +432,28 @@ private fun PartItemCard(
 
 @Composable
 fun SearchResultsList(
-    searchResults: SearchResult?,
-    onPartClick: (Part) -> Unit
+    searchResults: LazyPagingItems<SearchResult>,
+    onPartClick: (Part) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(16.dp)
     ) {
-        searchResults?.content?.forEach { category ->
-            category.groups.forEach { group ->
-                item {
-                    SearchSection(
-                        categoryName = category.categoryName,
-                        groupName = group.groupName,
-                        parts = group.parts,
-                        onPartClick = onPartClick
-                    )
-                }
+
+        items(
+            count = searchResults.itemCount,
+            key = searchResults.itemKey { it.part.partId }
+        ) { index ->
+            val partWithContext = searchResults[index]
+            if (partWithContext != null) {
+                SearchPartItem(
+                    part = partWithContext.part,
+                    categoryName = partWithContext.categoryName,
+                    groupName = partWithContext.groupName,
+                    onClick = { onPartClick(partWithContext.part) }
+                )
             }
-        }
-    }
-}
-
-@Composable
-private fun SearchSection(
-    categoryName: String,
-    groupName: String,
-    parts: List<Part>,
-    onPartClick: (Part) -> Unit
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "$categoryName > $groupName",
-            style = MaterialTheme.typography.titleMedium,
-            color = textColor()
-        )
-
-        parts.forEach { part ->
-            SearchPartItem(
-                part = part,
-                onClick = { onPartClick(part) }
-            )
         }
     }
 }
@@ -477,6 +461,8 @@ private fun SearchSection(
 @Composable
 private fun SearchPartItem(
     part: Part,
+    categoryName: String,
+    groupName: String,
     onClick: () -> Unit
 ) {
     Card(
@@ -488,15 +474,19 @@ private fun SearchPartItem(
         )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
                 modifier = Modifier.weight(1f)
             ) {
+                Text(
+                    text = "$categoryName > $groupName",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = textSecondaryColor()
+                )
+
                 Text(
                     text = part.name,
                     style = MaterialTheme.typography.titleMedium,
@@ -511,9 +501,15 @@ private fun SearchPartItem(
             }
 
             Text(
-                text = "${part.quantity}개",
+                text = "${part.quantity}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = textColor()
+            )
+
+            Icon(
+                painterResource(R.drawable.chevron_right),
+                contentDescription = stringResource(R.string.common_detail),
+                tint = disableColor()
             )
         }
     }

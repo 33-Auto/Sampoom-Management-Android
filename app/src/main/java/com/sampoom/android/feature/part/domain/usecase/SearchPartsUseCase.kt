@@ -1,13 +1,15 @@
 package com.sampoom.android.feature.part.domain.usecase
 
+import androidx.paging.PagingData
 import com.sampoom.android.feature.part.domain.model.SearchResult
 import com.sampoom.android.feature.part.domain.repository.PartRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class SearchPartsUseCase @Inject constructor(
     private val repository: PartRepository
 ) {
-    suspend operator fun invoke(keyword: String, page: Int = 0, size: Int = 20): SearchResult {
-        return repository.searchParts(keyword, page, size)
+    operator fun invoke(keyword: String): Flow<PagingData<SearchResult>> {
+        return repository.searchParts(keyword)
     }
 }
