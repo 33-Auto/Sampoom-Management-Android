@@ -29,7 +29,7 @@ class PartPagingSource @AssistedInject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchResult> {
         return try {
             val page = params.key ?: 0
-            val response = api.searchParts(keyword, page, params.loadSize)
+            val response = api.searchParts(keyword, page, 20)
 
             val flatParts = response.data.toModel()
 

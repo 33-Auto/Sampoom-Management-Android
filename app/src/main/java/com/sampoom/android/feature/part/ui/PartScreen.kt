@@ -22,7 +22,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -30,6 +29,7 @@ import androidx.paging.compose.itemKey
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
+import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.White
 import com.sampoom.android.core.ui.theme.backgroundCardColor
@@ -41,8 +41,6 @@ import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.model.Group
 import com.sampoom.android.feature.part.domain.model.Part
 import com.sampoom.android.feature.part.domain.model.SearchResult
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -139,7 +137,7 @@ fun PartScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Clear,
-                                    contentDescription = "검색어 지우기"
+                                    contentDescription = stringResource(R.string.part_search_clear)
                                 )
                             }
                         }
@@ -338,7 +336,9 @@ fun PartScreen(
                 when {
                     uiState.groupLoading -> {
                         Box(
-                            modifier = Modifier.height(200.dp).fillMaxWidth(),
+                            modifier = Modifier
+                                .height(200.dp)
+                                .fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator()
@@ -348,14 +348,18 @@ fun PartScreen(
                     uiState.groupError != null -> {
                         ErrorContent(
                             onRetry = { viewModel.onEvent(PartUiEvent.RetryGroups) },
-                            modifier = Modifier.height(200.dp).fillMaxWidth()
+                            modifier = Modifier
+                                .height(200.dp)
+                                .fillMaxWidth()
                         )
                     }
 
                     uiState.groupList.isEmpty() -> {
                         EmptyContent(
                             message = stringResource(R.string.part_empty_group),
-                            modifier = Modifier.height(200.dp).fillMaxWidth()
+                            modifier = Modifier
+                                .height(200.dp)
+                                .fillMaxWidth()
                         )
                     }
 
@@ -493,7 +497,6 @@ fun SearchResultsList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(16.dp)
     ) {
-
         items(
             count = searchResults.itemCount,
             key = searchResults.itemKey { it.part.partId }
@@ -506,6 +509,35 @@ fun SearchResultsList(
                     groupName = partWithContext.groupName,
                     onClick = { onPartClick(partWithContext.part) }
                 )
+            }
+        }
+
+        item {
+            when (searchResults.loadState.append) {
+                is LoadState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                is LoadState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.common_error),
+                            color = FailRed
+                        )
+                    }
+                }
+                else -> {}
             }
         }
     }
@@ -527,7 +559,9 @@ private fun SearchPartItem(
         )
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
