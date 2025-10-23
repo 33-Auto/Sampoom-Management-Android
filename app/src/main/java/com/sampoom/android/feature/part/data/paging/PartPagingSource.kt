@@ -5,12 +5,19 @@ import androidx.paging.PagingState
 import com.sampoom.android.feature.part.data.mapper.toModel
 import com.sampoom.android.feature.part.data.remote.api.PartApi
 import com.sampoom.android.feature.part.domain.model.SearchResult
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 
-class PartPagingSource @Inject constructor(
+class PartPagingSource @AssistedInject constructor(
     private val api: PartApi,
-    private val keyword: String
+    @Assisted private val keyword: String
 ) : PagingSource<Int, SearchResult>() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(keyword: String): PartPagingSource
+    }
 
     override fun getRefreshKey(state: PagingState<Int, SearchResult>): Int? {
         return state.anchorPosition?.let { anchorPosition ->

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -69,6 +70,7 @@ fun PartScreen(
 
     // 자동 검색을 위한 LaunchedEffect
     var searchJob by remember { mutableStateOf<Job?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     // ModalBottomSheet 상태 관리
     val sheetState = rememberModalBottomSheetState()
@@ -91,7 +93,7 @@ fun PartScreen(
 
                         if (newText.isNotBlank()) {
                             // 500ms 지연 후 검색 실행
-                            searchJob = CoroutineScope(Dispatchers.Main).launch {
+                            searchJob = coroutineScope.launch {
                                 delay(500)
                                 if (newText.isNotBlank()) {
                                     viewModel.onEvent(PartUiEvent.Search(newText))
@@ -334,7 +336,7 @@ fun PartScreen(
                 when {
                     uiState.groupLoading -> {
                         Box(
-                            modifier = Modifier.height(200.dp).fillMaxSize(),
+                            modifier = Modifier.height(200.dp).fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator()

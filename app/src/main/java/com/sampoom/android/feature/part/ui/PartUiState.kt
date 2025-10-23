@@ -19,6 +19,5 @@ data class PartUiState(
     val categoryError: String? = null,
 
     // Search
-    val searchResults: SearchResult? = null,
     val keyword: String? = null
 )

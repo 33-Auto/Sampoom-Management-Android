@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class PartRepositoryImpl @Inject constructor(
-    private val api: PartApi
+    private val api: PartApi,
+    private val pagingSourceFactory: PartPagingSource.Factory
 ) : PartRepository {
     override suspend fun getCategoryList(): CategoryList {
         val dto = api.getCategoryList()
@@ -38,7 +39,7 @@ class PartRepositoryImpl @Inject constructor(
     override fun searchParts(keyword: String): Flow<PagingData<SearchResult>> {
         return Pager(
             config = PagingConfig(pageSize = 20),
-            pagingSourceFactory = { PartPagingSource(api, keyword) }
+            pagingSourceFactory = { pagingSourceFactory.create(keyword) }
         ).flow
     }
 }

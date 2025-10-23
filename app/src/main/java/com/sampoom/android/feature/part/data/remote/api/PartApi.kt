@@ -24,6 +24,6 @@ interface PartApi {
     suspend fun searchParts(
         @Query("keyword") keyword: String,
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 10
+        @Query("size") size: Int = 20
     ): ApiResponse<SearchDataDto>
 }
