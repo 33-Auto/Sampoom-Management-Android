@@ -105,6 +105,7 @@ fun PartScreen(
                         }
                     },
                     onSearch = {
+                        searchJob?.cancel()
                         viewModel.onEvent(PartUiEvent.Search(textFieldState.text))
                     },
                     expanded = expanded,
@@ -131,6 +132,7 @@ fun PartScreen(
                         if (textFieldState.text.isNotEmpty()) {
                             IconButton(
                                 onClick = {
+                                    searchJob?.cancel()
                                     textFieldState = textFieldState.copy("")
                                     viewModel.onEvent(PartUiEvent.Search(""))
                                 }
