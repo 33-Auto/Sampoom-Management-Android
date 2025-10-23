@@ -2,6 +2,7 @@ package com.sampoom.android.app.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FloatingActionButton
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
@@ -23,6 +25,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.sampoom.android.R
+import com.sampoom.android.core.ui.theme.backgroundColor
 import com.sampoom.android.feature.auth.ui.LoginScreen
 import com.sampoom.android.feature.auth.ui.SignUpScreen
 import com.sampoom.android.feature.cart.ui.CartListScreen
@@ -73,7 +76,8 @@ fun AppNavHost() {
 
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn) ROUTE_HOME else ROUTE_LOGIN
+        startDestination = if (isLoggedIn) ROUTE_HOME else ROUTE_LOGIN,
+        modifier = Modifier.background(backgroundColor())
     ) {
         composable(ROUTE_LOGIN) {
             LoginScreen(
@@ -106,6 +110,7 @@ fun AppNavHost() {
                 },
                 onNavigatePartList = { group ->
                     // TODO: 실제 사용자의 agencyId 사용
+                    navController.currentBackStackEntry?.savedStateHandle?.set("groupName", group.name)
                     navController.navigate(routePartList(1, group.id))
                 }
             )
@@ -120,7 +125,8 @@ fun AppNavHost() {
             PartListScreen(
                 onNavigateBack = {
                     navController.navigateUp()
-                }
+                },
+                navController = navController
             )
         }
         composable(
@@ -197,7 +203,8 @@ fun PartsFab(navController: NavHostController) {
     ) {
         Icon(
             painterResource(R.drawable.parts),
-            contentDescription = stringResource(R.string.part_title)
+            contentDescription = stringResource(R.string.part_title),
+            tint = Color.White
         )
     }
 }

@@ -9,5 +9,4 @@ sealed interface PartUiEvent {
     object RetryGroups : PartUiEvent
     data class Search(val keyword: String) : PartUiEvent
     data class SetKeyword(val keyword: String) : PartUiEvent
-    object ClearError : PartUiEvent
 }

@@ -64,7 +64,7 @@ fun OrderListScreen(
     }
 
     PullToRefreshBox(
-        isRefreshing = uiState.orderLoading,
+        isRefreshing = false,
         onRefresh = { viewModel.onEvent(OrderListUiEvent.LoadOrderList) },
         state = pullRefreshState,
         modifier = Modifier.fillMaxSize(),

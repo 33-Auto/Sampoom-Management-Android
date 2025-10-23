@@ -1,15 +1,10 @@
 package com.sampoom.android.feature.part.ui
 
-import android.R.attr.fontWeight
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -17,19 +12,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.isTraversalGroup
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -47,6 +38,11 @@ import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.model.Group
 import com.sampoom.android.feature.part.domain.model.Part
 import com.sampoom.android.feature.part.domain.model.SearchResult
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.collections.forEach
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,8 +61,12 @@ fun PartScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchUiState by searchViewModel.uiState.collectAsStateWithLifecycle()
+    val searchResultsPaged = viewModel.searchResult.collectAsLazyPagingItems()
     var textFieldState by remember { mutableStateOf(TextFieldValue("")) }
     var expanded by rememberSaveable { mutableStateOf(false) }
+
+    // 자동 검색을 위한 LaunchedEffect
+    var searchJob by remember { mutableStateOf<Job?>(null) }
 
     // ModalBottomSheet 상태 관리
     val sheetState = rememberModalBottomSheetState()
@@ -75,15 +75,30 @@ fun PartScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor())
     ) {
         SearchBar(
             modifier = Modifier.align(Alignment.TopCenter),
             inputField = {
                 SearchBarDefaults.InputField(
                     query = textFieldState.text,
-                    onQueryChange = {
-                        textFieldState = textFieldState.copy(it)
+                    onQueryChange = { newText ->
+                        textFieldState = textFieldState.copy(newText)
+
+                        // 기존 검색 작업 취소
+                        searchJob?.cancel()
+
+                        if (newText.isNotBlank()) {
+                            // 500ms 지연 후 검색 실행
+                            searchJob = CoroutineScope(Dispatchers.Main).launch {
+                                delay(500)
+                                if (newText.isNotBlank()) {
+                                    viewModel.onEvent(PartUiEvent.Search(newText))
+                                }
+                            }
+                        } else {
+                            // 검색어가 비어있으면 검색 결과 초기화
+                            viewModel.onEvent(PartUiEvent.Search(""))
+                        }
                     },
                     onSearch = {
                         viewModel.onEvent(PartUiEvent.Search(textFieldState.text))
@@ -119,27 +134,42 @@ fun PartScreen(
             expanded = expanded,
             onExpandedChange = { expanded = it },
             colors = SearchBarDefaults.colors(
-                containerColor = backgroundColor()
+                containerColor = backgroundColor(),
+                dividerColor = Color.Transparent
             )
         ) {
             when {
-                uiState.isLoading -> {
+                textFieldState.text.isBlank() -> {
                     Box(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.part_search_description),
+                            color = textSecondaryColor(),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+
+                searchResultsPaged.loadState.refresh is LoadState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
                     }
                 }
 
-                uiState.error != null -> {
+                searchResultsPaged.loadState.refresh is LoadState.Error -> {
                     ErrorContent(
                         onRetry = { viewModel.onEvent(PartUiEvent.Search(textFieldState.text)) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
 
-                viewModel.searchResult.collectAsLazyPagingItems().itemCount == 0 && textFieldState.text.isNotBlank() -> {
+                searchResultsPaged.itemCount == 0 && textFieldState.text.isNotBlank() -> {
                     Box(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -153,7 +183,7 @@ fun PartScreen(
 
                 else -> {
                     SearchResultsList(
-                        searchResults = viewModel.searchResult.collectAsLazyPagingItems(),
+                        searchResults = searchResultsPaged,
                         onPartClick = { part ->
                             searchViewModel.onEvent(PartListUiEvent.ShowBottomSheet(part))
                             showBottomSheet = true
@@ -285,7 +315,7 @@ fun PartScreen(
                 when {
                     uiState.groupLoading -> {
                         Box(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.height(200.dp).fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator()
@@ -295,14 +325,14 @@ fun PartScreen(
                     uiState.groupError != null -> {
                         ErrorContent(
                             onRetry = { viewModel.onEvent(PartUiEvent.RetryGroups) },
-                            modifier = Modifier.height(200.dp)
+                            modifier = Modifier.height(200.dp).fillMaxWidth()
                         )
                     }
 
                     uiState.groupList.isEmpty() -> {
                         EmptyContent(
                             message = stringResource(R.string.part_empty_group),
-                            modifier = Modifier.height(200.dp)
+                            modifier = Modifier.height(200.dp).fillMaxWidth()
                         )
                     }
 
@@ -438,7 +468,7 @@ fun SearchResultsList(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(16.dp)
+        contentPadding = PaddingValues(8.dp)
     ) {
 
         items(
@@ -496,7 +526,8 @@ private fun SearchPartItem(
                 Text(
                     text = part.code,
                     style = MaterialTheme.typography.bodySmall,
-                    color = textSecondaryColor()
+                    color = textSecondaryColor(),
+                    fontWeight = FontWeight.Light
                 )
             }
 

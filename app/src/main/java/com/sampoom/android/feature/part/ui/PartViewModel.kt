@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -81,7 +80,6 @@ class PartViewModel @Inject constructor(
                 }
             }
             is PartUiEvent.SetKeyword -> _uiState.update { it.copy(keyword = event.keyword) }
-            is PartUiEvent.ClearError -> _uiState.update { it.copy(error = null) }
         }
     }
 
