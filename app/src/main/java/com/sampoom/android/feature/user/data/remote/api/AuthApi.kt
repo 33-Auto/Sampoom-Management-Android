@@ -10,6 +10,7 @@ import com.sampoom.android.feature.user.data.remote.dto.RefreshRequestDto
 import com.sampoom.android.feature.user.data.remote.dto.RefreshResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.UpdateRequestDto
 import com.sampoom.android.feature.user.data.remote.dto.UpdateResponseDto
+import com.sampoom.android.feature.user.data.remote.dto.VerifyRequestDto
 import com.sampoom.android.feature.user.data.remote.dto.VerifyResponseDto
 import retrofit2.http.Body
 import retrofit2.http.PATCH
@@ -29,7 +30,7 @@ interface AuthApi {
     suspend fun signUp(@Body body: SignUpRequestDto): ApiResponse<SignUpResponseDto>
 
     @POST("user/verify")
-    suspend fun verify(@Body body: LoginRequestDto): ApiResponse<VerifyResponseDto>
+    suspend fun verify(@Body body: VerifyRequestDto): ApiResponse<VerifyResponseDto>
 
     @PATCH("user/update")
     suspend fun update(@Body body: UpdateRequestDto): ApiResponse<UpdateResponseDto>
