@@ -36,31 +36,26 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideTokenRefreshInterceptor(
-        authPreferences: AuthPreferences,
-        tokenRefreshService: TokenRefreshService
-    ): TokenRefreshInterceptor {
-        return TokenRefreshInterceptor(authPreferences, tokenRefreshService)
-    }
-
-    @Provides
-    @Singleton
     fun provideOkHttpClient(
         tokenInterceptor: TokenInterceptor,
-        tokenRefreshInterceptor: TokenRefreshInterceptor
+        tokenAuthenticator: TokenAuthenticator
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = if (BuildConfig.DEBUG)
-                    HttpLoggingInterceptor.Level.BODY
-                else
-                    HttpLoggingInterceptor.Level.NONE
-            })
+            .addInterceptor(
+                HttpLoggingInterceptor().apply {
+                    level = if (BuildConfig.DEBUG)
+                        HttpLoggingInterceptor.Level.BODY
+                    else
+                        HttpLoggingInterceptor.Level.NONE
+                    redactHeader("Authorization") // 토큰 비식별화
+                    redactHeader("Cookie") // 쿠키 비식별화
+                }
+            )
             .addInterceptor(tokenInterceptor) // 토큰 자동 삽입
-            .addInterceptor(tokenRefreshInterceptor) // 토큰 갱신
+            .authenticator(tokenAuthenticator) // 토큰 갱신 (Interceptor 대신)
             .build()
     }
 

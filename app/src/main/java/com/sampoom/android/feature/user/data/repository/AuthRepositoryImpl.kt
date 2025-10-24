@@ -44,7 +44,8 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signOut() {
-        api.logout()
+        runCatching { api.logout() }
+            .onFailure { throw Exception("Failed logout") }
         preferences.clear()
     }
 

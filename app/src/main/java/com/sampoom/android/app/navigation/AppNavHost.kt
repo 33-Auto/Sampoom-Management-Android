@@ -79,14 +79,6 @@ fun AppNavHost() {
     val authViewModel: AuthViewModel = hiltViewModel()
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
-    LaunchedEffect(Unit) {
-        authViewModel.logoutEvent.collect {
-            navController.navigate(ROUTE_LOGIN) {
-                popUpTo(0) { inclusive = true }
-            }
-        }
-    }
-
     NavHost(
         navController = navController,
         startDestination = if (isLoggedIn) ROUTE_HOME else ROUTE_LOGIN,
