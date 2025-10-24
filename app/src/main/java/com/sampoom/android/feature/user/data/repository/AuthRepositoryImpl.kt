@@ -69,5 +69,5 @@ class AuthRepositoryImpl @Inject constructor(
         preferences.clear()
     }
 
-    override fun isSignedIn(): Boolean = preferences.hasToken()
+    override suspend fun isSignedIn(): Boolean = preferences.hasToken()
 }

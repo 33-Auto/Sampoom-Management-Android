@@ -110,9 +110,9 @@ class AuthPreferences @Inject constructor(
         dataStore.edit { it.clear() }
     }
 
-    fun hasToken(): Boolean = runBlocking {
+    suspend fun hasToken(): Boolean {
         val accessToken = getAccessToken()
         val refreshToken = getRefreshToken()
-        !accessToken.isNullOrEmpty() && !refreshToken.isNullOrEmpty()
+        return !accessToken.isNullOrEmpty() && !refreshToken.isNullOrEmpty()
     }
 }

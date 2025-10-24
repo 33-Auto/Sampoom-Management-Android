@@ -16,5 +16,5 @@ interface AuthRepository {
     suspend fun signOut()
     suspend fun refreshToken(): Result<User>
     suspend fun clearTokens()
-    fun isSignedIn(): Boolean
+    suspend fun isSignedIn(): Boolean
 }

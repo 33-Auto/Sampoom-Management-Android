@@ -21,7 +21,7 @@ class AuthViewModel @Inject constructor(
     private val signOutUseCase: SignOutUseCase,
     private val clearTokensUseCase: ClearTokensUseCase
 ) : ViewModel() {
-    private val _isLoggedIn = MutableStateFlow(checkLoginStateUseCase())
+    private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
     private val _logoutEvent = MutableSharedFlow<Unit>(
@@ -30,7 +30,13 @@ class AuthViewModel @Inject constructor(
     )
     val logoutEvent: SharedFlow<Unit> = _logoutEvent.asSharedFlow()
 
-    fun updateLoginState() {
+    init {
+        viewModelScope.launch {
+            _isLoggedIn.value = checkLoginStateUseCase()
+        }
+    }
+
+    fun updateLoginState() = viewModelScope.launch {
         _isLoggedIn.value = checkLoginStateUseCase()
     }
 
