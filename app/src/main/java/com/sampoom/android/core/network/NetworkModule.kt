@@ -11,26 +11,61 @@ import javax.inject.Singleton
 import com.google.gson.GsonBuilder
 import com.google.gson.FieldNamingPolicy
 import com.sampoom.android.BuildConfig
+import com.sampoom.android.core.datastore.AuthPreferences
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    @Provides @Singleton fun provideOkHttp(): OkHttpClient = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .addInterceptor(HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG)
-                HttpLoggingInterceptor.Level.BODY
-            else
-                HttpLoggingInterceptor.Level.NONE
-        })
-        // TODO: 로그인 기능 연동 후 인증 인터셉터 추가 필요
-        .build()
+    @Provides
+    @Singleton
+    fun provideTokenInterceptor(
+        authPreferences: AuthPreferences
+    ): TokenInterceptor {
+        return TokenInterceptor(authPreferences)
+    }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
+    fun provideTokenRefreshService(
+        authPreferences: AuthPreferences
+    ): TokenRefreshService {
+        return TokenRefreshService(authPreferences)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTokenRefreshInterceptor(
+        authPreferences: AuthPreferences,
+        tokenRefreshService: TokenRefreshService
+    ): TokenRefreshInterceptor {
+        return TokenRefreshInterceptor(authPreferences, tokenRefreshService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(
+        tokenInterceptor: TokenInterceptor,
+        tokenRefreshInterceptor: TokenRefreshInterceptor
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = if (BuildConfig.DEBUG)
+                    HttpLoggingInterceptor.Level.BODY
+                else
+                    HttpLoggingInterceptor.Level.NONE
+            })
+            .addInterceptor(tokenInterceptor) // 토큰 자동 삽입
+            .addInterceptor(tokenRefreshInterceptor) // 토큰 갱신
+            .build()
+    }
+
+    @Provides
+    @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         val gson = GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)

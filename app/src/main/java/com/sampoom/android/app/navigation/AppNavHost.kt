@@ -3,8 +3,10 @@ package com.sampoom.android.app.navigation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -12,11 +14,14 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -26,8 +31,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.theme.backgroundColor
-import com.sampoom.android.feature.auth.ui.LoginScreen
-import com.sampoom.android.feature.auth.ui.SignUpScreen
+import com.sampoom.android.feature.user.ui.AuthViewModel
+import com.sampoom.android.feature.user.ui.LoginScreen
+import com.sampoom.android.feature.user.ui.SignUpScreen
 import com.sampoom.android.feature.cart.ui.CartListScreen
 import com.sampoom.android.feature.order.ui.OrderDetailScreen
 import com.sampoom.android.feature.order.ui.OrderListScreen
@@ -70,9 +76,16 @@ sealed class BottomNavItem(
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
+    val authViewModel: AuthViewModel = hiltViewModel()
+    val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
-    // TODO: 임시 로그인 상태 확인 -> AuthRepository에서 확인하도록 변경
-    val isLoggedIn = true
+    LaunchedEffect(Unit) {
+        authViewModel.logoutEvent.collect {
+            navController.navigate(ROUTE_LOGIN) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -82,6 +95,7 @@ fun AppNavHost() {
         composable(ROUTE_LOGIN) {
             LoginScreen(
                 onSuccess = {
+                    authViewModel.updateLoginState()
                     navController.navigate(ROUTE_HOME) {
                         popUpTo(ROUTE_LOGIN) { inclusive = true } // 로그인 화면 스택 제거
                     }
@@ -163,7 +177,11 @@ fun MainScreen(
             composable(ROUTE_DASHBOARD) {
                 DashboardScreen(
                     paddingValues = innerPadding
-                )
+                ) {
+                    parentNavController.navigate(ROUTE_LOGIN) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
             }
             composable(ROUTE_OUTBOUND) {
                 OutboundListScreen(
@@ -249,8 +267,20 @@ fun BottomNavigationBar(navController: NavHostController) {
 // 임시 화면들 (실제로는 각각의 feature 모듈에서 구현)
 @Composable
 private fun DashboardScreen(
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    onClick: () -> Unit
 ) {
+    val authViewModel: AuthViewModel = hiltViewModel()
     // 홈 화면 구현
-    Text("대시보드 화면", modifier = Modifier.padding(paddingValues))
+    Column(Modifier.padding(paddingValues)) {
+        Text("대시보드 화면", modifier = Modifier.padding(paddingValues))
+
+        Button(onClick = {
+            authViewModel.signOut()
+            onClick()
+        }) {
+            Text("로그아웃")
+        }
+    }
+
 }
