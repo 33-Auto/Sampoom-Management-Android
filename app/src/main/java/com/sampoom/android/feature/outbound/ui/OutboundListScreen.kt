@@ -49,7 +49,6 @@ import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
-import com.sampoom.android.feature.order.ui.OrderListUiEvent
 import com.sampoom.android.feature.outbound.domain.model.OutboundPart
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,7 +80,7 @@ fun OutboundListScreen(
         }
     }
     PullToRefreshBox(
-        isRefreshing = uiState.outboundLoading,
+        isRefreshing = false,
         onRefresh = { viewModel.onEvent(OutboundListUiEvent.LoadOutboundList) },
         state = pullRefreshState,
         modifier = Modifier.fillMaxSize(),

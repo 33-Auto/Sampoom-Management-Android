@@ -1,6 +1,5 @@
 package com.sampoom.android.feature.order.ui
 
-import android.R.attr.order
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -43,7 +42,6 @@ import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.feature.order.domain.model.OrderStatus
-import com.sampoom.android.feature.outbound.ui.OutboundListUiEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,7 +82,7 @@ fun OrderDetailScreen(
     }
 
     PullToRefreshBox(
-        isRefreshing = uiState.orderDetailLoading,
+        isRefreshing = false,
         onRefresh = { viewModel.onEvent(OrderDetailUiEvent.LoadOrder) },
         state = pullRefreshState,
         modifier = Modifier.fillMaxSize(),

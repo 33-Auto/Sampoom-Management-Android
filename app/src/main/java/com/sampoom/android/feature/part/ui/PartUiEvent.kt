@@ -7,4 +7,6 @@ sealed interface PartUiEvent {
     data class CategorySelected(val category: Category) : PartUiEvent
     object RetryCategories : PartUiEvent
     object RetryGroups : PartUiEvent
+    data class Search(val keyword: String) : PartUiEvent
+    data class SetKeyword(val keyword: String) : PartUiEvent
 }

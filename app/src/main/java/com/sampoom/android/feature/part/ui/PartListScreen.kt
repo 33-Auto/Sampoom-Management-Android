@@ -28,10 +28,10 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,21 +41,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.theme.backgroundCardColor
+import com.sampoom.android.core.ui.theme.disableColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
-import com.sampoom.android.feature.outbound.ui.OutboundListUiEvent
 import com.sampoom.android.feature.part.domain.model.Part
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartListScreen(
     onNavigateBack: () -> Unit = {},
+    navController: NavHostController = rememberNavController(),
     viewModel: PartListViewModel = hiltViewModel()
 ) {
+    val groupName by navController.previousBackStackEntry?.savedStateHandle?.getStateFlow<String?>(
+        "groupName",
+        null
+    )?.collectAsState() ?: remember { mutableStateOf(null) }
+
     val errorLabel = stringResource(R.string.common_error)
 
     LaunchedEffect(errorLabel) {
@@ -70,7 +78,7 @@ fun PartListScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
 
     PullToRefreshBox(
-        isRefreshing = uiState.partListLoading,
+        isRefreshing = false,
         onRefresh = { viewModel.onEvent(PartListUiEvent.LoadPartList) },
         state = pullRefreshState,
         modifier = Modifier.fillMaxSize(),
@@ -87,7 +95,7 @@ fun PartListScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(stringResource(R.string.part_title)) },
+                    title = { Text(groupName ?: stringResource(R.string.part_title)) },
                     navigationIcon = {
                         IconButton(onClick = onNavigateBack) {
                             Icon(
@@ -103,7 +111,8 @@ fun PartListScreen(
                 uiState.partListLoading -> {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize().padding(innerPadding),
+                            .fillMaxSize()
+                            .padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
@@ -113,7 +122,8 @@ fun PartListScreen(
                 uiState.partListError != null -> {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize().padding(innerPadding),
+                            .fillMaxSize()
+                            .padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorContent(
@@ -126,7 +136,8 @@ fun PartListScreen(
                 uiState.partList.isEmpty() -> {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize().padding(innerPadding),
+                            .fillMaxSize()
+                            .padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
                         EmptyContent(
@@ -222,7 +233,7 @@ private fun PartListItemCard(
             Icon(
                 painterResource(R.drawable.chevron_right),
                 contentDescription = stringResource(R.string.common_detail),
-                tint = textSecondaryColor()
+                tint = disableColor()
             )
         }
     }

@@ -47,7 +47,6 @@ import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.cart.domain.model.CartPart
-import com.sampoom.android.feature.order.ui.OrderListUiEvent
 import com.sampoom.android.feature.order.ui.OrderResultBottomSheet
 import kotlin.collections.forEach
 
@@ -75,7 +74,7 @@ fun CartListScreen(
     }
 
     PullToRefreshBox(
-        isRefreshing = uiState.cartLoading,
+        isRefreshing = false,
         onRefresh = { viewModel.onEvent(CartListUiEvent.LoadCartList) },
         state = pullRefreshState,
         modifier = Modifier.fillMaxSize(),

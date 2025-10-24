@@ -3,15 +3,26 @@ package com.sampoom.android.feature.part.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.feature.part.domain.model.Category
+import com.sampoom.android.feature.part.domain.model.SearchResult
 import com.sampoom.android.feature.part.domain.usecase.GetCategoryUseCase
 import com.sampoom.android.feature.part.domain.usecase.GetGroupUseCase
+import com.sampoom.android.feature.part.domain.usecase.SearchPartsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PartViewModel @Inject constructor(
     private val getCategoryUseCase: GetCategoryUseCase,
-    private val getGroupUseCase: GetGroupUseCase
+    private val getGroupUseCase: GetGroupUseCase,
+    private val searchPartsUseCase: SearchPartsUseCase
 ) : ViewModel() {
 
     private companion object {
@@ -40,12 +52,34 @@ class PartViewModel @Inject constructor(
         loadCategory()
     }
 
+    private val _searchKeyword = MutableStateFlow<String?>(null)
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val searchResult: Flow<PagingData<SearchResult>> = _searchKeyword
+        .debounce(300)
+        .distinctUntilChanged()
+        .flatMapLatest { keyword ->
+            if (keyword.isNullOrBlank()) {
+                flowOf(PagingData.empty())
+            } else {
+                searchPartsUseCase(keyword)
+            }
+        }
+        .cachedIn(viewModelScope)
+
     fun onEvent(event: PartUiEvent) {
         when (event) {
             is PartUiEvent.LoadCategories -> loadCategory()
             is PartUiEvent.CategorySelected -> selectCategory(event.category)
             is PartUiEvent.RetryCategories -> loadCategory()
             is PartUiEvent.RetryGroups -> loadGroup()
+            is PartUiEvent.Search -> {
+                _searchKeyword.value = event.keyword
+                _uiState.update {
+                    it.copy(keyword = event.keyword)
+                }
+            }
+            is PartUiEvent.SetKeyword -> _uiState.update { it.copy(keyword = event.keyword) }
         }
     }
 

@@ -1,15 +1,22 @@
 package com.sampoom.android.feature.part.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.sampoom.android.feature.part.data.mapper.toModel
+import com.sampoom.android.feature.part.data.paging.PartPagingSource
 import com.sampoom.android.feature.part.data.remote.api.PartApi
 import com.sampoom.android.feature.part.domain.model.CategoryList
 import com.sampoom.android.feature.part.domain.model.GroupList
 import com.sampoom.android.feature.part.domain.model.PartList
+import com.sampoom.android.feature.part.domain.model.SearchResult
 import com.sampoom.android.feature.part.domain.repository.PartRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class PartRepositoryImpl @Inject constructor(
-    private val api: PartApi
+    private val api: PartApi,
+    private val pagingSourceFactory: PartPagingSource.Factory
 ) : PartRepository {
     override suspend fun getCategoryList(): CategoryList {
         val dto = api.getCategoryList()
@@ -27,5 +34,12 @@ class PartRepositoryImpl @Inject constructor(
         val response = api.getPartList(groupId)
         val partItems = response.data.map { it.toModel() }
         return PartList(items = partItems)
+    }
+
+    override fun searchParts(keyword: String): Flow<PagingData<SearchResult>> {
+        return Pager(
+            config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = { pagingSourceFactory.create(keyword) }
+        ).flow
     }
 }
