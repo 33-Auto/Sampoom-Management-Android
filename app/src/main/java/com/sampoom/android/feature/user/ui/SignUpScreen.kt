@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -84,7 +86,7 @@ fun SignUpScreen(
                 }
             )
         },
-        contentWindowInsets = WindowInsets.ime,
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
 //        snackbarHost = { CommonSnackBarHost(snackBarHostState) }
     ) { innerPadding ->
         val focusManager = LocalFocusManager.current
@@ -195,7 +197,7 @@ fun SignUpScreen(
                 CommonButton(
                     onClick = { viewModel.onEvent(SignUpUiEvent.Submit) },
                     enabled = state.isValid && !state.loading,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
                 ) {
                     Text(
                         if (state.loading) stringResource(R.string.signup_button_signup_loading)

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,7 +68,7 @@ fun LoginScreen(
         onConsumed = { viewModel.consumeError() }
     )
     Scaffold(
-//        contentWindowInsets = WindowInsets.ime,
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
 //        snackbarHost = { CommonSnackBarHost(snackBarHostState) }
     ) { innerPadding ->
         val focusManager = LocalFocusManager.current
