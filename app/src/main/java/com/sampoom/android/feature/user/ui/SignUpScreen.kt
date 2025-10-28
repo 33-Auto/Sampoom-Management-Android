@@ -12,9 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,9 +33,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -54,6 +60,14 @@ fun SignUpScreen(
     val branchLabel = stringResource(R.string.signup_title_branch)
     val positionLabel = stringResource(R.string.signup_title_position)
     val errorLabel = stringResource(R.string.common_error)
+
+    val focusManager = LocalFocusManager.current
+    val nameFocus = remember { FocusRequester() }
+    val branchFocus = remember { FocusRequester() }
+    val positionFocus = remember { FocusRequester() }
+    val emailFocus = remember { FocusRequester() }
+    val passwordFocus = remember { FocusRequester() }
+    val passwordCheckFocus = remember { FocusRequester() }
 
     LaunchedEffect(nameLabel, branchLabel, positionLabel, errorLabel) {
         viewModel.bindLabels(nameLabel, branchLabel, positionLabel, errorLabel)
@@ -119,12 +133,14 @@ fun SignUpScreen(
                     fontSize = labelTextSize
                 )
                 CommonTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(nameFocus),
                     value = state.name,
                     onValueChange = { viewModel.onEvent(SignUpUiEvent.NameChanged(it)) },
                     placeholder = stringResource(R.string.signup_placeholder_name),
                     isError = state.nameError != null,
-                    errorMessage = state.nameError
+                    errorMessage = state.nameError,
+                    imeAction = ImeAction.Next,
+                    keyboardActions = KeyboardActions(onNext = { branchFocus.requestFocus() })
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -132,12 +148,14 @@ fun SignUpScreen(
                     fontSize = labelTextSize
                 )
                 CommonTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(branchFocus),
                     value = state.branch,
                     onValueChange = { viewModel.onEvent(SignUpUiEvent.BranchChanged(it)) },
                     placeholder = stringResource(R.string.signup_placeholder_branch),
                     isError = state.branchError != null,
-                    errorMessage = state.branchError
+                    errorMessage = state.branchError,
+                    imeAction = ImeAction.Next,
+                    keyboardActions = KeyboardActions(onNext = { positionFocus.requestFocus() })
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -145,12 +163,14 @@ fun SignUpScreen(
                     fontSize = labelTextSize
                 )
                 CommonTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(positionFocus),
                     value = state.position,
                     onValueChange = { viewModel.onEvent(SignUpUiEvent.PositionChanged(it)) },
                     placeholder = stringResource(R.string.signup_placeholder_position),
                     isError = state.positionError != null,
-                    errorMessage = state.positionError
+                    errorMessage = state.positionError,
+                    imeAction = ImeAction.Next,
+                    keyboardActions = KeyboardActions(onNext = { emailFocus.requestFocus() })
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -158,12 +178,14 @@ fun SignUpScreen(
                     fontSize = labelTextSize
                 )
                 CommonTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(emailFocus),
                     value = state.email,
                     onValueChange = { viewModel.onEvent(SignUpUiEvent.EmailChanged(it)) },
                     placeholder = stringResource(R.string.signup_placeholder_email),
                     isError = state.emailError != null,
-                    errorMessage = state.emailError
+                    errorMessage = state.emailError,
+                    imeAction = ImeAction.Next,
+                    keyboardActions = KeyboardActions(onNext = { passwordFocus.requestFocus() })
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -171,13 +193,15 @@ fun SignUpScreen(
                     fontSize = labelTextSize
                 )
                 CommonTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(passwordFocus),
                     value = state.password,
                     onValueChange = { viewModel.onEvent(SignUpUiEvent.PasswordChanged(it)) },
                     placeholder = stringResource(R.string.signup_placeholder_password),
                     isPassword = true,
                     isError = state.passwordError != null,
-                    errorMessage = state.passwordError
+                    errorMessage = state.passwordError,
+                    imeAction = ImeAction.Next,
+                    keyboardActions = KeyboardActions(onNext = { passwordCheckFocus.requestFocus() })
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -185,13 +209,15 @@ fun SignUpScreen(
                     fontSize = labelTextSize
                 )
                 CommonTextField(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().focusRequester(passwordCheckFocus)   ,
                     value = state.passwordCheck,
                     onValueChange = { viewModel.onEvent(SignUpUiEvent.PasswordCheckChanged(it)) },
                     placeholder = stringResource(R.string.signup_placeholder_password_check),
                     isPassword = true,
                     isError = state.passwordCheckError != null,
-                    errorMessage = state.passwordCheckError
+                    errorMessage = state.passwordCheckError,
+                    imeAction = ImeAction.Done,
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
                 )
                 Spacer(Modifier.height(48.dp))
                 CommonButton(
@@ -204,10 +230,8 @@ fun SignUpScreen(
                         else stringResource(R.string.signup_button_signup)
                     )
                 }
-
-                // per-screen inline error removed in favor of snackbar
             }
         }
-        TopSnackBarHost(snackBarHostState, extraTopPadding = 16.dp)
     }
+    TopSnackBarHost(snackBarHostState, extraTopPadding = 16.dp)
 }

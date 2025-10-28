@@ -8,6 +8,7 @@ import com.sampoom.android.feature.user.data.remote.dto.RefreshRequestDto
 import com.sampoom.android.feature.user.data.remote.dto.SignUpRequestDto
 import com.sampoom.android.feature.user.domain.model.User
 import com.sampoom.android.feature.user.domain.repository.AuthRepository
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -43,10 +44,16 @@ class AuthRepositoryImpl @Inject constructor(
         return user
     }
 
-    override suspend fun signOut() {
-        runCatching { api.logout() }
-            .onFailure { throw Exception("Failed logout") }
-        preferences.clear()
+    override suspend fun signOut() : Result<Unit> {
+        return try {
+            val dto = api.logout()
+            if (!dto.success) throw Exception(dto.message)
+            Result.success(Unit)
+        } catch (ce: CancellationException) {
+            throw ce
+        } catch (t: Throwable) {
+            Result.failure(t)
+        }
     }
 
     override suspend fun refreshToken(): Result<User> {
@@ -65,8 +72,15 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun clearTokens() {
-        preferences.clear()
+    override suspend fun clearTokens(): Result<Unit> {
+        return try {
+            preferences.clear()
+            Result.success(Unit)
+        } catch (ce: CancellationException) {
+            throw ce
+        } catch (t: Throwable) {
+            Result.failure(t)
+        }
     }
 
     override suspend fun isSignedIn(): Boolean = preferences.hasToken()

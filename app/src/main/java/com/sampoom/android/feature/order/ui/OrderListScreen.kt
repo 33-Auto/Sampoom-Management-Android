@@ -38,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
+import com.sampoom.android.core.ui.component.OrderItem
 import com.sampoom.android.core.ui.component.StatusChip
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
@@ -149,55 +150,6 @@ fun OrderListScreen(
                         item { Spacer(Modifier.height(100.dp)) }
                     }
                 }
-            }
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-private fun OrderItem(
-    order: Order,
-    onClick: () -> Unit
-) {
-    Card(
-        onClick = { onClick() },
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = backgroundCardColor())
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                Text(
-                    text = buildOrderTitle(order),
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = order.agencyName ?: stringResource(R.string.common_slash),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = textSecondaryColor()
-                )
-            }
-
-            Spacer(Modifier.width(12.dp))
-
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = order.createdAt?.let { formatDate(it) } ?: stringResource(R.string.common_slash),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = textSecondaryColor()
-                )
-                Spacer(Modifier.height(6.dp))
-                StatusChip(status = order.status)
             }
         }
     }

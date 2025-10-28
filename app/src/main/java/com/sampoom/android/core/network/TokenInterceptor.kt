@@ -12,6 +12,14 @@ class TokenInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
 
+        // 스킵 플래그가 있으면 토큰 주입 없이 진행
+        if (originalRequest.header("X-No-Auth") == "true") {
+            val requestWithoutFlag = originalRequest.newBuilder()
+                .removeHeader("X-No-Auth")
+                .build()
+            return chain.proceed(requestWithoutFlag)
+        }
+
         val existingAuth = originalRequest.header("Authorization")
         if (existingAuth.isNullOrBlank()) {
             val accessToken = runBlocking {

@@ -13,8 +13,8 @@ interface AuthRepository {
     ): User
 
     suspend fun signIn(email: String, password: String): User
-    suspend fun signOut()
+    suspend fun signOut(): Result<Unit>
     suspend fun refreshToken(): Result<User>
-    suspend fun clearTokens()
+    suspend fun clearTokens(): Result<Unit>
     suspend fun isSignedIn(): Boolean
 }

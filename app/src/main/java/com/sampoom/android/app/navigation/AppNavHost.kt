@@ -1,5 +1,6 @@
 package com.sampoom.android.app.navigation
 
+import android.R.attr.order
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.activity.ComponentActivity
@@ -47,6 +48,7 @@ import com.sampoom.android.feature.user.ui.AuthViewModel
 import com.sampoom.android.feature.user.ui.LoginScreen
 import com.sampoom.android.feature.user.ui.SignUpScreen
 import com.sampoom.android.feature.cart.ui.CartListScreen
+import com.sampoom.android.feature.dashboard.ui.DashboardScreen
 import com.sampoom.android.feature.order.ui.OrderDetailScreen
 import com.sampoom.android.feature.order.ui.OrderListScreen
 import com.sampoom.android.feature.outbound.ui.OutboundListScreen
@@ -91,6 +93,7 @@ fun AppNavHost() {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = hiltViewModel()
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+    val isLoading by authViewModel.isLoading.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -113,10 +116,12 @@ fun AppNavHost() {
         }
     }
 
+    if (isLoading) { return }
+
     NavHost(
         navController = navController,
-        startDestination = ROUTE_HOME,
-//        startDestination = if (isLoggedIn) ROUTE_HOME else ROUTE_LOGIN,
+//        startDestination = ROUTE_HOME,
+        startDestination = if (isLoggedIn) ROUTE_HOME else ROUTE_LOGIN,
         modifier = Modifier.background(backgroundColor())
     ) {
         composable(ROUTE_LOGIN) {
@@ -143,7 +148,7 @@ fun AppNavHost() {
                 }
             )
         }
-        composable(ROUTE_HOME) { MainScreen(navController) }
+        composable(ROUTE_HOME) { MainScreen(navController, authViewModel) }
         composable(ROUTE_PARTS) {
             PartScreen(
                 onNavigateBack = {
@@ -189,7 +194,8 @@ fun AppNavHost() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(
-    parentNavController: NavHostController
+    parentNavController: NavHostController,
+    authViewModel: AuthViewModel
 ) {
     val navController = rememberNavController()
 
@@ -203,12 +209,24 @@ fun MainScreen(
         ) {
             composable(ROUTE_DASHBOARD) {
                 DashboardScreen(
-                    paddingValues = innerPadding
-                ) {
-                    parentNavController.navigate(ROUTE_LOGIN) {
-                        popUpTo(0) { inclusive = true }
+                    paddingValues = innerPadding,
+                    onNavigateOrderDetail = { order ->
+                        parentNavController.navigate(routeOrderDetail(1, order.orderId))
+                    },
+                    onNavigationOrder = {
+                        navController.navigate(ROUTE_ORDERS) {
+                            popUpTo(ROUTE_DASHBOARD) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onLogoutClick = {
+                        authViewModel.signOut()
+                        parentNavController.navigate(ROUTE_LOGIN) {
+                            popUpTo(0) { inclusive = true }
+                        }
                     }
-                }
+                )
             }
             composable(ROUTE_OUTBOUND) {
                 OutboundListScreen(
@@ -300,25 +318,4 @@ fun BottomNavigationBar(navController: NavHostController) {
             )
         }
     }
-}
-
-// 임시 화면들 (실제로는 각각의 feature 모듈에서 구현)
-@Composable
-private fun DashboardScreen(
-    paddingValues: PaddingValues,
-    onClick: () -> Unit
-) {
-    val authViewModel: AuthViewModel = hiltViewModel()
-    // 홈 화면 구현
-    Column(Modifier.padding(paddingValues)) {
-        Text("대시보드 화면", modifier = Modifier.padding(paddingValues))
-
-        Button(onClick = {
-            authViewModel.signOut()
-            onClick()
-        }) {
-            Text("로그아웃")
-        }
-    }
-
 }
