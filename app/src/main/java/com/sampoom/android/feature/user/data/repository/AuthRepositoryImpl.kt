@@ -48,7 +48,10 @@ class AuthRepositoryImpl @Inject constructor(
     ): Result<User> {
         return runCatching {
             val loginDto = api.login(LoginRequestDto(email, password))
+            if (!loginDto.success) throw Exception(loginDto.message)
             val loginUser = loginDto.data.toModel()
+
+            preferences.saveUser(loginUser)
 
             val profileDto = getProfile()
             val profileUser = profileDto.getOrThrow()
@@ -102,6 +105,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun getProfile(): Result<User> {
         return runCatching {
             val dto = api.getProfile()
+            if (!dto.success) throw Exception(dto.message)
             dto.data.toModel()
         }.onFailure { exception ->
             if (exception is CancellationException) throw exception

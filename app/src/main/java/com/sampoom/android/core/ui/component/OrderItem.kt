@@ -1,7 +1,5 @@
 package com.sampoom.android.core.ui.component
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,7 +23,6 @@ import com.sampoom.android.core.util.buildOrderTitle
 import com.sampoom.android.core.util.formatDate
 import com.sampoom.android.feature.order.domain.model.Order
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OrderItem(
     order: Order,

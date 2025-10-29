@@ -1,19 +1,19 @@
 package com.sampoom.android.core.network
 
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.GsonBuilder
+import com.sampoom.android.BuildConfig
+import com.sampoom.android.core.datastore.AuthPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Singleton
-import com.google.gson.GsonBuilder
-import com.google.gson.FieldNamingPolicy
-import com.sampoom.android.BuildConfig
-import com.sampoom.android.core.datastore.AuthPreferences
-import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)

@@ -1,10 +1,7 @@
 package com.sampoom.android.core.util
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun formatDate(dateString: String): String {
     return runCatching {
         val out = DateTimeFormatter.ISO_LOCAL_DATE

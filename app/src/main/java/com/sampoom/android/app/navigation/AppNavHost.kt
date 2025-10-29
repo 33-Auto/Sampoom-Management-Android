@@ -196,7 +196,6 @@ fun AppNavHost() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(
     parentNavController: NavHostController,

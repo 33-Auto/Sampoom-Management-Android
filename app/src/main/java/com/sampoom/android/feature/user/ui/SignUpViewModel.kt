@@ -4,10 +4,10 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.feature.user.domain.AuthValidator
 import com.sampoom.android.feature.user.domain.ValidationResult
 import com.sampoom.android.feature.user.domain.usecase.SignUpUseCase
-import com.sampoom.android.core.network.serverMessageOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
