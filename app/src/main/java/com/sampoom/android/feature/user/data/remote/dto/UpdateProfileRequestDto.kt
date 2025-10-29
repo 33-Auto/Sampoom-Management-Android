@@ -1,8 +1,6 @@
 package com.sampoom.android.feature.user.data.remote.dto
 
-data class UpdateResponseDto(
-    val userId: Long,
-    val email: String,
+data class UpdateProfileRequestDto(
     val userName: String,
     val position: String,
     val workspace: String,

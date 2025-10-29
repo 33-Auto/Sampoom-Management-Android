@@ -11,7 +11,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 
 // Per official guidance, DataStore instance should be single and at top-level.
 private val Context.authDataStore by preferencesDataStore(name = "auth_prefs")
@@ -20,7 +19,7 @@ private val Context.authDataStore by preferencesDataStore(name = "auth_prefs")
 class AuthPreferences @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val cryptoManager: CryptoManager
-){
+) {
     private val dataStore = context.authDataStore
 
     private object Keys {
@@ -30,6 +29,9 @@ class AuthPreferences @Inject constructor(
         val USER_ID: Preferences.Key<String> = stringPreferencesKey("user_id")
         val USER_NAME: Preferences.Key<String> = stringPreferencesKey("user_name")
         val USER_ROLE: Preferences.Key<String> = stringPreferencesKey("user_role")
+        val USER_POSITION: Preferences.Key<String> = stringPreferencesKey("user_position")
+        val USER_WORKSPACE: Preferences.Key<String> = stringPreferencesKey("user_workspace")
+        val USER_BRANCH: Preferences.Key<String> = stringPreferencesKey("user_branch")
     }
 
     suspend fun saveUser(user: User) {
@@ -41,6 +43,9 @@ class AuthPreferences @Inject constructor(
             prefs[Keys.USER_ID] = cryptoManager.encrypt(user.userId.toString())
             prefs[Keys.USER_NAME] = cryptoManager.encrypt(user.userName)
             prefs[Keys.USER_ROLE] = cryptoManager.encrypt(user.role)
+            prefs[Keys.USER_POSITION] = cryptoManager.encrypt(user.position)
+            prefs[Keys.USER_WORKSPACE] = cryptoManager.encrypt(user.workspace)
+            prefs[Keys.USER_BRANCH] = cryptoManager.encrypt(user.branch)
         }
     }
 
@@ -61,9 +66,13 @@ class AuthPreferences @Inject constructor(
         val accessToken = prefs[Keys.ACCESS_TOKEN]
         val refreshToken = prefs[Keys.REFRESH_TOKEN]
         val expiresAt = prefs[Keys.TOKEN_EXPIRES_AT]
+        val userPosition = prefs[Keys.USER_POSITION]
+        val userWorkspace = prefs[Keys.USER_WORKSPACE]
+        val userBranch = prefs[Keys.USER_BRANCH]
 
         if (userId != null && userName != null && userRole != null &&
-            accessToken != null && refreshToken != null) {
+            accessToken != null && refreshToken != null && userPosition != null && userWorkspace != null && userBranch != null
+        ) {
             try {
                 val remaining = expiresAt?.let {
                     kotlin.math.max(0L, (it - System.currentTimeMillis()) / 1000)
@@ -75,7 +84,10 @@ class AuthPreferences @Inject constructor(
                     cryptoManager.decrypt(userRole),
                     cryptoManager.decrypt(accessToken),
                     cryptoManager.decrypt(refreshToken),
-                    remaining
+                    remaining,
+                    cryptoManager.decrypt(userPosition),
+                    cryptoManager.decrypt(userWorkspace),
+                    cryptoManager.decrypt(userBranch),
                 )
             } catch (e: Exception) {
                 return null

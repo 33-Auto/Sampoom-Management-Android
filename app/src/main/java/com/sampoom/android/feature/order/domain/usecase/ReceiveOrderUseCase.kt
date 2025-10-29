@@ -6,5 +6,5 @@ import javax.inject.Inject
 class ReceiveOrderUseCase @Inject constructor(
     private val repository: OrderRepository
 ) {
-    suspend operator fun invoke(orderId: Long) = repository.receiveOrder(orderId)
+    suspend operator fun invoke(orderId: Long): Result<Unit> = repository.receiveOrder(orderId)
 }

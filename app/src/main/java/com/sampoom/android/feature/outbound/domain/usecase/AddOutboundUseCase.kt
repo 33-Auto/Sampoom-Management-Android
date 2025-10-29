@@ -6,5 +6,5 @@ import javax.inject.Inject
 class AddOutboundUseCase @Inject constructor(
     private val repository: OutboundRepository
 ) {
-    suspend operator fun invoke(partId: Long, quantity: Long) = repository.addOutbound(partId, quantity)
+    suspend operator fun invoke(partId: Long, quantity: Long): Result<Unit> = repository.addOutbound(partId, quantity)
 }

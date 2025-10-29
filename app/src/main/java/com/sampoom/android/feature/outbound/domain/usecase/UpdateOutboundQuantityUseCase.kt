@@ -6,5 +6,5 @@ import javax.inject.Inject
 class UpdateOutboundQuantityUseCase @Inject constructor(
     private val repository: OutboundRepository
 ) {
-    suspend operator fun invoke(outboundId: Long, quantity: Long) = repository.updateOutboundQuantity(outboundId, quantity)
+    suspend operator fun invoke(outboundId: Long, quantity: Long): Result<Unit> = repository.updateOutboundQuantity(outboundId, quantity)
 }

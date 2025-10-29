@@ -6,5 +6,5 @@ import javax.inject.Inject
 class CancelOrderUseCase @Inject constructor(
     private val repository: OrderRepository
 ){
-    suspend operator fun invoke(orderId: Long) = repository.cancelOrder(orderId)
+    suspend operator fun invoke(orderId: Long): Result<Unit> = repository.cancelOrder(orderId)
 }

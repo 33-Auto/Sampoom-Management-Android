@@ -87,26 +87,25 @@ class PartViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(categoryLoading = true, categoryError = null) }
 
-            try {
-                val categoryList = getCategoryUseCase()
-                _uiState.update {
-                    it.copy(
-                        categoryList = categoryList.items,
-                        categoryLoading = false,
-                        categoryError = null
-                    )
+            getCategoryUseCase()
+                .onSuccess { categoryList ->
+                    _uiState.update {
+                        it.copy(
+                            categoryList = categoryList.items,
+                            categoryLoading = false,
+                            categoryError = null
+                        )
+                    }
                 }
-            } catch (ce: CancellationException) {
-                throw ce
-            } catch (throwable: Throwable) {
-                val backendMessage = throwable.serverMessageOrNull()
-                _uiState.update {
-                    it.copy(
-                        categoryLoading = false,
-                        categoryError = backendMessage ?: (throwable.message ?: errorLabel)
-                    )
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    _uiState.update {
+                        it.copy(
+                            categoryLoading = false,
+                            categoryError = backendMessage ?: (throwable.message ?: errorLabel)
+                        )
+                    }
                 }
-            }
             Log.d(TAG, "loadCategory: ${_uiState.value}")
         }
     }
@@ -124,29 +123,26 @@ class PartViewModel @Inject constructor(
         groupLoadJob = viewModelScope.launch {
             _uiState.update { it.copy(groupLoading = true, groupError = null) }
 
-            try {
-                val groupList = getGroupUseCase(categoryId)
-                // 최신 선택과 불일치하면 무시
-                if (_uiState.value.selectedCategory?.id != categoryId) return@launch
-                _uiState.update {
-                    it.copy(
-                        groupList = groupList.items,
-                        groupLoading = false,
-                        groupError = null
-                    )
+            getGroupUseCase(categoryId)
+                .onSuccess { groupList ->
+                    _uiState.update {
+                        it.copy(
+                            groupList = groupList.items,
+                            groupLoading = false,
+                            groupError = null
+                        )
+                    }
                 }
-            } catch (ce: CancellationException) {
-                throw ce
-            } catch (throwable: Throwable) {
-                val backendMessage = throwable.serverMessageOrNull()
-                if (_uiState.value.selectedCategory?.id != categoryId) return@launch
-                _uiState.update {
-                    it.copy(
-                        groupLoading = false,
-                        groupError = backendMessage ?: (throwable.message ?: errorLabel)
-                    )
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    if (_uiState.value.selectedCategory?.id != categoryId) return@launch
+                    _uiState.update {
+                        it.copy(
+                            groupLoading = false,
+                            groupError = backendMessage ?: (throwable.message ?: errorLabel)
+                        )
+                    }
                 }
-            }
             Log.d(TAG, "loadGroup: ${_uiState.value}")
         }
     }

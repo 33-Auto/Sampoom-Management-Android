@@ -14,7 +14,7 @@ class SignUpUseCase @Inject constructor(
         branch: String,
         userName: String,
         position: String
-    ): User = repository.signUp(
+    ): Result<User> = repository.signUp(
         email = email,
         password = password,
         workspace = workspace,

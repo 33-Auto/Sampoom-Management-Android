@@ -12,10 +12,12 @@ import kotlin.coroutines.cancellation.CancellationException
 class OutboundRepositoryImpl @Inject constructor(
     private val api: OutboundApi
 ) : OutboundRepository {
-    override suspend fun getOutboundList(): OutboundList {
-        val dto = api.getOutboundList()
-        val outboundItems = dto.data.map { it.toModel() }
-        return OutboundList(items = outboundItems)
+    override suspend fun getOutboundList(): Result<OutboundList> {
+        return runCatching {
+            val dto = api.getOutboundList()
+            val outboundItems = dto.data.map { it.toModel() }
+            OutboundList(items = outboundItems)
+        }
     }
 
     override suspend fun processOutbound(): Result<Unit> {
@@ -23,9 +25,9 @@ class OutboundRepositoryImpl @Inject constructor(
             val dto = api.processOutbound()
             if (!dto.success) throw Exception(dto.message)
             Result.success(Unit)
-        } catch (ce : CancellationException) {
+        } catch (ce: CancellationException) {
             throw ce
-        } catch (t : Throwable) {
+        } catch (t: Throwable) {
             Result.failure(t)
         }
     }
@@ -38,9 +40,9 @@ class OutboundRepositoryImpl @Inject constructor(
             val dto = api.addOutbound(AddOutboundRequestDto(partId, quantity))
             if (!dto.success) throw Exception(dto.message)
             Result.success(Unit)
-        } catch (ce : CancellationException) {
+        } catch (ce: CancellationException) {
             throw ce
-        } catch (t : Throwable) {
+        } catch (t: Throwable) {
             Result.failure(t)
         }
     }
@@ -50,9 +52,9 @@ class OutboundRepositoryImpl @Inject constructor(
             val dto = api.deleteOutbound(outboundId)
             if (!dto.success) throw Exception(dto.message)
             Result.success(Unit)
-        } catch (ce : CancellationException) {
+        } catch (ce: CancellationException) {
             throw ce
-        } catch (t : Throwable) {
+        } catch (t: Throwable) {
             Result.failure(t)
         }
     }
@@ -62,9 +64,9 @@ class OutboundRepositoryImpl @Inject constructor(
             val dto = api.deleteAllOutbound()
             if (!dto.success) throw Exception(dto.message)
             Result.success(Unit)
-        } catch (ce : CancellationException) {
+        } catch (ce: CancellationException) {
             throw ce
-        } catch (t : Throwable) {
+        } catch (t: Throwable) {
             Result.failure(t)
         }
     }
@@ -77,9 +79,9 @@ class OutboundRepositoryImpl @Inject constructor(
             val dto = api.updateOutbound(outboundId, UpdateOutboundRequestDto(quantity))
             if (!dto.success) throw Exception(dto.message)
             Result.success(Unit)
-        } catch (ce : CancellationException) {
+        } catch (ce: CancellationException) {
             throw ce
-        } catch (t : Throwable) {
+        } catch (t: Throwable) {
             Result.failure(t)
         }
     }

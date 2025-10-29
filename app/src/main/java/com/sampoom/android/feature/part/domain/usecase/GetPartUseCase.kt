@@ -7,5 +7,5 @@ import javax.inject.Inject
 class GetPartUseCase @Inject constructor(
     private val repository: PartRepository
 ) {
-    suspend operator fun invoke(groupId: Long): PartList = repository.getPartList(groupId)
+    suspend operator fun invoke(groupId: Long): Result<PartList> = repository.getPartList(groupId)
 }

@@ -10,11 +10,12 @@ interface AuthRepository {
         branch: String,
         userName: String,
         position: String
-    ): User
+    ): Result<User>
 
-    suspend fun signIn(email: String, password: String): User
+    suspend fun signIn(email: String, password: String): Result<User>
     suspend fun signOut(): Result<Unit>
     suspend fun refreshToken(): Result<User>
     suspend fun clearTokens(): Result<Unit>
     suspend fun isSignedIn(): Boolean
+    suspend fun getProfile(): Result<User>
 }

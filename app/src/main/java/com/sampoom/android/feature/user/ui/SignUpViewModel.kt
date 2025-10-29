@@ -145,7 +145,11 @@ class SignUpViewModel @Inject constructor(
                 position = s.position
             )
         }
-            .onSuccess { _state.update { it.copy(loading = false, success = true) } }
+            .onSuccess {
+                _state.update {
+                    it.copy(loading = false, success = true)
+                }
+            }
             .onFailure { throwable ->
                 val backendMessage = throwable.serverMessageOrNull()
                 _state.update {

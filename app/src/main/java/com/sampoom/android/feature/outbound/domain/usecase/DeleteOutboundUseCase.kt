@@ -6,5 +6,5 @@ import javax.inject.Inject
 class DeleteOutboundUseCase @Inject constructor(
     private val repository: OutboundRepository
 ){
-    suspend operator fun invoke(outboundId: Long) = repository.deleteOutbound(outboundId)
+    suspend operator fun invoke(outboundId: Long): Result<Unit> = repository.deleteOutbound(outboundId)
 }

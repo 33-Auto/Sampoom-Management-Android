@@ -6,5 +6,8 @@ data class User(
     val role: String,
     val accessToken: String,
     val refreshToken: String,
-    val expiresIn: Long
+    val expiresIn: Long,
+    val position: String,
+    val workspace: String,
+    val branch: String
 )

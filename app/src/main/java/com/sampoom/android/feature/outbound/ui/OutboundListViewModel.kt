@@ -60,26 +60,25 @@ class OutboundListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(outboundLoading = true, outboundError = null) }
 
-            try {
-                val outboundList = getOutboundUseCase()
-                _uiState.update {
-                    it.copy(
-                        outboundList = outboundList.items,
-                        outboundLoading = false,
-                        outboundError = null
-                    )
+            getOutboundUseCase()
+                .onSuccess { outboundList ->
+                    _uiState.update {
+                        it.copy(
+                            outboundList = outboundList.items,
+                            outboundLoading = false,
+                            outboundError = null
+                        )
+                    }
                 }
-            } catch (ce: CancellationException) {
-                throw ce
-            } catch (throwable: Throwable) {
-                val backendMessage = throwable.serverMessageOrNull()
-                _uiState.update {
-                    it.copy(
-                        outboundLoading = false,
-                        outboundError = backendMessage ?: (throwable.message ?: errorLabel)
-                    )
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    _uiState.update {
+                        it.copy(
+                            outboundLoading = false,
+                            outboundError = backendMessage ?: (throwable.message ?: errorLabel)
+                        )
+                    }
                 }
-            }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }

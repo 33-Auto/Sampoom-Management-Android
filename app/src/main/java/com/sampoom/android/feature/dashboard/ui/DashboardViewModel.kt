@@ -51,26 +51,25 @@ class DashboardViewModel @Inject constructor(
         loadJob = viewModelScope.launch {
             _uiState.update { it.copy(dashboardLoading = true, dashboardError = null) }
 
-            try {
-                val orderList = withContext(Dispatchers.IO) { getOrderListUseCase() }
-                _uiState.update {
-                    it.copy(
-                        orderList = orderList.items.take(5),
-                        dashboardLoading = false,
-                        dashboardError = null
-                    )
+            getOrderListUseCase()
+                .onSuccess { orderList ->
+                    _uiState.update {
+                        it.copy(
+                            orderList = orderList.items.take(5),
+                            dashboardLoading = false,
+                            dashboardError = null
+                        )
+                    }
                 }
-            } catch (ce: CancellationException) {
-                throw ce
-            } catch (throwable: Throwable) {
-                val backendMessage = throwable.serverMessageOrNull()
-                _uiState.update {
-                    it.copy(
-                        dashboardLoading = false,
-                        dashboardError = backendMessage ?: (throwable.message ?: errorLabel )
-                    )
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    _uiState.update {
+                        it.copy(
+                            dashboardLoading = false,
+                            dashboardError = backendMessage ?: (throwable.message ?: errorLabel)
+                        )
+                    }
                 }
-            }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }

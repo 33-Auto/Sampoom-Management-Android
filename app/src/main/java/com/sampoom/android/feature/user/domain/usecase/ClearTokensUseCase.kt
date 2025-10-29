@@ -6,5 +6,5 @@ import javax.inject.Inject
 class ClearTokensUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
-    suspend operator fun invoke() = repository.clearTokens()
+    suspend operator fun invoke(): Result<Unit> = repository.clearTokens()
 }

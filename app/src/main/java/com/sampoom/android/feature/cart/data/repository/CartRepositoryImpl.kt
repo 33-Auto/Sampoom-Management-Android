@@ -13,10 +13,12 @@ import kotlin.Result
 class CartRepositoryImpl @Inject constructor(
     private val api: CartApi
 ) : CartRepository {
-    override suspend fun getCartList(): CartList {
-        val dto = api.getCartList()
-        val cartItems = dto.data.map { it.toModel() }
-        return CartList(items = cartItems)
+    override suspend fun getCartList(): Result<CartList> {
+        return runCatching {
+            val dto = api.getCartList()
+            val cartItems = dto.data.map { it.toModel() }
+            CartList(items = cartItems)
+        }
     }
 
     override suspend fun addCart(
@@ -29,7 +31,7 @@ class CartRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (ce: CancellationException) {
             throw ce
-        } catch (t : Throwable) {
+        } catch (t: Throwable) {
             Result.failure(t)
         }
     }
@@ -41,7 +43,7 @@ class CartRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (ce: CancellationException) {
             throw ce
-        } catch (t : Throwable) {
+        } catch (t: Throwable) {
             Result.failure(t)
         }
     }
@@ -53,7 +55,7 @@ class CartRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (ce: CancellationException) {
             throw ce
-        } catch (t : Throwable) {
+        } catch (t: Throwable) {
             Result.failure(t)
         }
     }
@@ -68,7 +70,7 @@ class CartRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (ce: CancellationException) {
             throw ce
-        } catch (t : Throwable) {
+        } catch (t: Throwable) {
             Result.failure(t)
         }
     }

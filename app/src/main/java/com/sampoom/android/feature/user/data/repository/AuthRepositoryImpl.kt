@@ -1,6 +1,8 @@
 package com.sampoom.android.feature.user.data.repository
 
+import android.R.attr.password
 import com.sampoom.android.core.datastore.AuthPreferences
+import com.sampoom.android.feature.user.data.mapper.mergeWith
 import com.sampoom.android.feature.user.data.mapper.toModel
 import com.sampoom.android.feature.user.data.remote.api.AuthApi
 import com.sampoom.android.feature.user.data.remote.dto.LoginRequestDto
@@ -10,6 +12,7 @@ import com.sampoom.android.feature.user.domain.model.User
 import com.sampoom.android.feature.user.domain.repository.AuthRepository
 import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
+import kotlin.math.log
 
 class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
@@ -22,37 +25,44 @@ class AuthRepositoryImpl @Inject constructor(
         branch: String,
         userName: String,
         position: String
-    ): User {
-        api.signUp(SignUpRequestDto(
-            email = email,
-            password = password,
-            workspace = workspace,
-            branch = branch,
-            userName = userName,
-            position = position
-        ))
-        return signIn(email, password)
+    ): Result<User> {
+        return runCatching {
+            api.signUp(SignUpRequestDto(
+                email = email,
+                password = password,
+                workspace = workspace,
+                branch = branch,
+                userName = userName,
+                position = position
+            ))
+            signIn(email, password).getOrThrow()
+        }
     }
 
     override suspend fun signIn(
         email: String,
         password: String
-    ): User {
-        val dto = api.login(LoginRequestDto(email, password))
-        val user = dto.data.toModel()
-        preferences.saveUser(user)
-        return user
+    ): Result<User> {
+        return runCatching {
+            val loginDto = api.login(LoginRequestDto(email, password))
+            val loginUser = loginDto.data.toModel()
+            preferences.saveUser(loginUser)
+
+            val profileDto = getProfile()
+            val profileUser = profileDto.getOrThrow()
+
+            val user = loginUser.mergeWith(profileUser)
+
+            preferences.saveUser(user)
+            user
+        }
     }
 
     override suspend fun signOut() : Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.logout()
             if (!dto.success) throw Exception(dto.message)
             Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
         }
     }
 
@@ -73,15 +83,18 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun clearTokens(): Result<Unit> {
-        return try {
+        return runCatching {
             preferences.clear()
             Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
         }
     }
 
     override suspend fun isSignedIn(): Boolean = preferences.hasToken()
+
+    override suspend fun getProfile(): Result<User> {
+        return runCatching {
+            val dto = api.getProfile()
+            dto.data.toModel()
+        }
+    }
 }

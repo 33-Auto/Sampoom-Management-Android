@@ -61,26 +61,25 @@ class CartListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(cartLoading = true, cartError = null) }
 
-            try {
-                val cartList = getCartListUseCase()
-                _uiState.update {
-                    it.copy(
-                        cartList = cartList.items,
-                        cartLoading = false,
-                        cartError = null
-                    )
+            getCartListUseCase()
+                .onSuccess { cartList ->
+                    _uiState.update {
+                        it.copy(
+                            cartList = cartList.items,
+                            cartLoading = false,
+                            cartError = null
+                        )
+                    }
                 }
-            } catch (ce: CancellationException) {
-                throw ce
-            } catch (throwable: Throwable) {
-                val backendMessage = throwable.serverMessageOrNull()
-                _uiState.update {
-                    it.copy(
-                        cartLoading = false,
-                        cartError = backendMessage ?: (throwable.message ?: errorLabel)
-                    )
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    _uiState.update {
+                        it.copy(
+                            cartLoading = false,
+                            cartError = backendMessage ?: (throwable.message ?: errorLabel)
+                        )
+                    }
                 }
-            }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
@@ -89,7 +88,7 @@ class CartListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isProcessing = true, processError = null) }
 
-            runCatching { createOrderUseCase() }
+            createOrderUseCase()
                 .onSuccess { orderList ->
                     _uiState.update { it.copy(isProcessing = false, processedOrder = orderList.items) }
                     loadCartList()
