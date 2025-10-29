@@ -6,9 +6,9 @@ import com.sampoom.android.feature.cart.data.remote.dto.AddCartRequestDto
 import com.sampoom.android.feature.cart.data.remote.dto.UpdateCartRequestDto
 import com.sampoom.android.feature.cart.domain.model.CartList
 import com.sampoom.android.feature.cart.domain.repository.CartRepository
-import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 import kotlin.Result
+import kotlin.coroutines.cancellation.CancellationException
 
 class CartRepositoryImpl @Inject constructor(
     private val api: CartApi
@@ -18,6 +18,8 @@ class CartRepositoryImpl @Inject constructor(
             val dto = api.getCartList()
             val cartItems = dto.data.map { it.toModel() }
             CartList(items = cartItems)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
@@ -25,38 +27,29 @@ class CartRepositoryImpl @Inject constructor(
         partId: Long,
         quantity: Long
     ): Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.addCart(AddCartRequestDto(partId, quantity))
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
     override suspend fun deleteCart(cartItemId: Long): Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.deleteCart(cartItemId)
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
     override suspend fun deleteAllCart(): Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.deleteAllCart()
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
@@ -64,14 +57,11 @@ class CartRepositoryImpl @Inject constructor(
         cartItemId: Long,
         quantity: Long
     ): Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.updateCart(cartItemId, UpdateCartRequestDto(quantity))
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 }

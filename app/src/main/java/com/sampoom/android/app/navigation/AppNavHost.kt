@@ -1,15 +1,10 @@
 package com.sampoom.android.app.navigation
 
-import android.R.attr.order
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -39,7 +34,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.theme.Main100
-import com.sampoom.android.core.ui.theme.Main300
 import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.backgroundColor
@@ -97,19 +91,18 @@ fun AppNavHost() {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val activity = LocalContext.current as ComponentActivity
+    val activity = LocalContext.current as? ComponentActivity
     val homeNavColor = backgroundCardColor()
     val elseNavColor = backgroundColor()
     val lightIcons = !isSystemInDarkTheme()
 
     LaunchedEffect(currentRoute, homeNavColor, lightIcons) {
+        val window = activity?.window ?: return@LaunchedEffect
         if (currentRoute == ROUTE_HOME) {
-            val window = activity.window
             window.navigationBarColor = homeNavColor.toArgb()
             WindowInsetsControllerCompat(window, window.decorView)
                 .isAppearanceLightNavigationBars = lightIcons
         } else {
-            val window = activity.window
             window.navigationBarColor = elseNavColor.toArgb()
             WindowInsetsControllerCompat(window, window.decorView)
                 .isAppearanceLightNavigationBars = lightIcons
@@ -223,7 +216,8 @@ fun MainScreen(
                     onLogoutClick = {
                         authViewModel.signOut()
                         parentNavController.navigate(ROUTE_LOGIN) {
-                            popUpTo(0) { inclusive = true }
+                            popUpTo(parentNavController.graph.startDestinationId) { inclusive = true }
+                            launchSingleTop = true
                         }
                     }
                 )

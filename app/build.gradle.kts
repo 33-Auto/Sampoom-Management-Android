@@ -51,6 +51,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
     buildFeatures {
         compose = true
@@ -88,6 +89,9 @@ dependencies {
     // Paging
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.material)
     implementation(libs.androidx.material.icons.core)

@@ -125,6 +125,7 @@ class PartViewModel @Inject constructor(
 
             getGroupUseCase(categoryId)
                 .onSuccess { groupList ->
+                    if (_uiState.value.selectedCategory?.id != categoryId) return@launch
                     _uiState.update {
                         it.copy(
                             groupList = groupList.items,

@@ -27,7 +27,7 @@ class AuthRepositoryImpl @Inject constructor(
         position: String
     ): Result<User> {
         return runCatching {
-            api.signUp(SignUpRequestDto(
+            val signUpRes = api.signUp(SignUpRequestDto(
                 email = email,
                 password = password,
                 workspace = workspace,
@@ -35,7 +35,10 @@ class AuthRepositoryImpl @Inject constructor(
                 userName = userName,
                 position = position
             ))
+            if (!signUpRes.success) throw Exception(signUpRes.message)
             signIn(email, password).getOrThrow()
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
@@ -55,6 +58,8 @@ class AuthRepositoryImpl @Inject constructor(
 
             preferences.saveUser(user)
             user
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
@@ -62,7 +67,8 @@ class AuthRepositoryImpl @Inject constructor(
         return runCatching {
             val dto = api.logout()
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
@@ -79,13 +85,16 @@ class AuthRepositoryImpl @Inject constructor(
             )
             preferences.saveUser(updatedUser)
             updatedUser
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
     override suspend fun clearTokens(): Result<Unit> {
         return runCatching {
             preferences.clear()
-            Result.success(Unit)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
@@ -95,6 +104,8 @@ class AuthRepositoryImpl @Inject constructor(
         return runCatching {
             val dto = api.getProfile()
             dto.data.toModel()
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 }

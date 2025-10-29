@@ -17,18 +17,17 @@ class OutboundRepositoryImpl @Inject constructor(
             val dto = api.getOutboundList()
             val outboundItems = dto.data.map { it.toModel() }
             OutboundList(items = outboundItems)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
     override suspend fun processOutbound(): Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.processOutbound()
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
@@ -36,38 +35,29 @@ class OutboundRepositoryImpl @Inject constructor(
         partId: Long,
         quantity: Long
     ): Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.addOutbound(AddOutboundRequestDto(partId, quantity))
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
     override suspend fun deleteOutbound(outboundId: Long): Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.deleteOutbound(outboundId)
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
     override suspend fun deleteAllOutbound(): Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.deleteAllOutbound()
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
@@ -75,14 +65,11 @@ class OutboundRepositoryImpl @Inject constructor(
         outboundId: Long,
         quantity: Long
     ): Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.updateOutbound(outboundId, UpdateOutboundRequestDto(quantity))
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce: CancellationException) {
-            throw ce
-        } catch (t: Throwable) {
-            Result.failure(t)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 }
