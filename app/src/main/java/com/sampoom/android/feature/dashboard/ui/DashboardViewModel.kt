@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.feature.order.domain.usecase.GetOrderUseCase
+import com.sampoom.android.feature.user.domain.model.User
+import com.sampoom.android.feature.user.domain.usecase.GetStoredUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
-    private val getOrderListUseCase: GetOrderUseCase
+    private val getOrderListUseCase: GetOrderUseCase,
+    private val getStoredUserUseCase: GetStoredUserUseCase
 ): ViewModel() {
 
     private companion object {
@@ -25,6 +28,9 @@ class DashboardViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState : StateFlow<DashboardUiState> = _uiState
 
+    private val _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> = _user
+
     private var errorLabel: String = ""
     private var loadJob: Job? = null
 
@@ -33,6 +39,9 @@ class DashboardViewModel @Inject constructor(
     }
 
     init {
+        viewModelScope.launch {
+            _user.value = getStoredUserUseCase()
+        }
         loadOrderList()
     }
 

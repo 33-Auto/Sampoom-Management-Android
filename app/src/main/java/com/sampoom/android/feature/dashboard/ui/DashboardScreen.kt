@@ -56,6 +56,7 @@ import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.order.domain.model.Order
+import com.sampoom.android.feature.user.domain.model.User
 
 @Composable
 fun DashboardScreen(
@@ -69,6 +70,7 @@ fun DashboardScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullToRefreshState()
     val isManager = true // TODO: Role 검증
+    val user by viewModel.user.collectAsStateWithLifecycle()
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)
@@ -144,7 +146,7 @@ fun DashboardScreen(
                     }
                 }
 
-                item { TitleSection() }
+                item { TitleSection(user) }
 
                 item { ButtonSection(isManager) }
 
@@ -166,7 +168,9 @@ fun DashboardScreen(
 }
 
 @Composable
-fun TitleSection() {
+fun TitleSection(
+    user: User?
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -174,7 +178,7 @@ fun TitleSection() {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "가산디지털단지점", // TODO: Agency Id 받아오기
+            text = user?.branch ?: "", // TODO: Agency Id 받아오기
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = textColor()
@@ -185,7 +189,7 @@ fun TitleSection() {
 
             pushStringAnnotation(tag = "NAME", annotation = "name")
             withStyle(style = SpanStyle(color = Main500)) {
-                append("홍길동")   // TODO : 이름 받아오기
+                append(user?.userName ?: "")   // TODO : 이름 받아오기
             }
             append(stringResource(R.string.dashboard_title_hello_sir))
             pop()
