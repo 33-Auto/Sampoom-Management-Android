@@ -369,7 +369,8 @@ fun OrderListSection(
             uiState.dashboardLoading -> {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -379,7 +380,8 @@ fun OrderListSection(
             uiState.dashboardError != null -> {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     ErrorContent(
@@ -392,7 +394,8 @@ fun OrderListSection(
             uiState.orderList.isEmpty() -> {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize(),
+                        .fillMaxWidth()
+                        .padding(vertical = 32.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     EmptyContent(
@@ -405,7 +408,7 @@ fun OrderListSection(
             else -> {
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {

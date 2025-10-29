@@ -49,7 +49,6 @@ class AuthRepositoryImpl @Inject constructor(
         return runCatching {
             val loginDto = api.login(LoginRequestDto(email, password))
             val loginUser = loginDto.data.toModel()
-            preferences.saveUser(loginUser)
 
             val profileDto = getProfile()
             val profileUser = profileDto.getOrThrow()
