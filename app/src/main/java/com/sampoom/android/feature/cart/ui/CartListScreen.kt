@@ -48,7 +48,6 @@ import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.cart.domain.model.CartPart
 import com.sampoom.android.feature.order.ui.OrderResultBottomSheet
-import kotlin.collections.forEach
 
 @Composable
 fun CartListScreen(

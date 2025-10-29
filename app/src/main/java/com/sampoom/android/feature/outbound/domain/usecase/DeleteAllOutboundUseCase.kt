@@ -6,5 +6,5 @@ import javax.inject.Inject
 class DeleteAllOutboundUseCase @Inject constructor(
     private val repository: OutboundRepository
 ){
-    suspend operator fun invoke() = repository.deleteAllOutbound()
+    suspend operator fun invoke(): Result<Unit> = repository.deleteAllOutbound()
 }

@@ -51,26 +51,25 @@ class OrderListViewModel @Inject constructor(
         loadJob = viewModelScope.launch {
             _uiState.update { it.copy(orderLoading = true, orderError = null) }
 
-            try {
-                val orderList = withContext(Dispatchers.IO) { getOrderListUseCase() }
-                _uiState.update {
-                    it.copy(
-                        orderList = orderList.items,
-                        orderLoading = false,
-                        orderError = null
-                    )
+            getOrderListUseCase()
+                .onSuccess { orderList ->
+                    _uiState.update {
+                        it.copy(
+                            orderList = orderList.items,
+                            orderLoading = false,
+                            orderError = null
+                        )
+                    }
                 }
-            } catch (ce: CancellationException) {
-                throw ce
-            } catch (throwable: Throwable) {
-                val backendMessage = throwable.serverMessageOrNull()
-                _uiState.update {
-                    it.copy(
-                        orderLoading = false,
-                        orderError = backendMessage ?: (throwable.message ?: errorLabel )
-                    )
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    _uiState.update {
+                        it.copy(
+                            orderLoading = false,
+                            orderError = backendMessage ?: (throwable.message ?: errorLabel )
+                        )
+                    }
                 }
-            }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }

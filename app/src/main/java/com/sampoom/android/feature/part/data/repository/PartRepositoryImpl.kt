@@ -13,27 +13,40 @@ import com.sampoom.android.feature.part.domain.model.SearchResult
 import com.sampoom.android.feature.part.domain.repository.PartRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 class PartRepositoryImpl @Inject constructor(
     private val api: PartApi,
     private val pagingSourceFactory: PartPagingSource.Factory
 ) : PartRepository {
-    override suspend fun getCategoryList(): CategoryList {
-        val dto = api.getCategoryList()
-        val categoryItems = dto.data.map { it.toModel() }
-        return CategoryList(items = categoryItems)
+    override suspend fun getCategoryList(): Result<CategoryList> {
+        return runCatching {
+            val dto = api.getCategoryList()
+            val categoryItems = dto.data.map { it.toModel() }
+            CategoryList(items = categoryItems)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
+        }
     }
 
-    override suspend fun getGroupList(categoryId: Long): GroupList {
-        val response = api.getGroupList(categoryId)
-        val groupItems = response.data.map { it.toModel() }
-        return GroupList(items = groupItems)
+    override suspend fun getGroupList(categoryId: Long): Result<GroupList> {
+        return runCatching {
+            val response = api.getGroupList(categoryId)
+            val groupItems = response.data.map { it.toModel() }
+            GroupList(items = groupItems)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
+        }
     }
 
-    override suspend fun getPartList(groupId: Long): PartList {
-        val response = api.getPartList(groupId)
-        val partItems = response.data.map { it.toModel() }
-        return PartList(items = partItems)
+    override suspend fun getPartList(groupId: Long): Result<PartList> {
+        return runCatching {
+            val response = api.getPartList(groupId)
+            val partItems = response.data.map { it.toModel() }
+            PartList(items = partItems)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
+        }
     }
 
     override fun searchParts(keyword: String): Flow<PagingData<SearchResult>> {

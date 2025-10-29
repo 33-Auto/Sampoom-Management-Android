@@ -4,10 +4,10 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.feature.user.domain.AuthValidator
 import com.sampoom.android.feature.user.domain.ValidationResult
 import com.sampoom.android.feature.user.domain.usecase.LoginUseCase
-import com.sampoom.android.core.network.serverMessageOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,10 +43,12 @@ class LoginViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(email = e.email)
             validateEmail()
         }
+
         is LoginUiEvent.PasswordChanged -> {
             _uiState.value = _uiState.value.copy(password = e.password)
             validatePassword()
         }
+
         LoginUiEvent.Submit -> submit()
     }
 
@@ -81,11 +83,18 @@ class LoginViewModel @Inject constructor(
         val s = _uiState.value
         _uiState.update { it.copy(loading = true, error = null) }
         runCatching { singIn(s.email, s.password) }
-            .onSuccess { _uiState.update { it.copy(loading = false, success = true) } }
+            .onSuccess {
+                _uiState.update {
+                    it.copy(loading = false, success = true)
+                }
+            }
             .onFailure { throwable ->
                 val backendMessage = throwable.serverMessageOrNull()
                 _uiState.update {
-                    it.copy(loading = false, error = backendMessage ?: (throwable.message ?: errorLabel))
+                    it.copy(
+                        loading = false,
+                        error = backendMessage ?: (throwable.message ?: errorLabel)
+                    )
                 }
             }
         Log.d(TAG, "submit: ${_uiState.value}")

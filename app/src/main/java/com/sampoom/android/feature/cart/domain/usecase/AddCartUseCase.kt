@@ -6,5 +6,5 @@ import javax.inject.Inject
 class AddCartUseCase @Inject constructor(
     private val repository: CartRepository
 ) {
-    suspend operator fun invoke(partId: Long, quantity: Long) = repository.addCart(partId, quantity)
+    suspend operator fun invoke(partId: Long, quantity: Long): Result<Unit> = repository.addCart(partId, quantity)
 }

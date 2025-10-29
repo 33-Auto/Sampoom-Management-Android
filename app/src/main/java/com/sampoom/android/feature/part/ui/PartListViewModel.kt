@@ -55,26 +55,25 @@ class PartListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(partListLoading = true, partListError = null) }
 
-            try {
-                val partList = getPartListUseCase(groupId)
-                _uiState.update {
-                    it.copy(
-                        partList = partList.items,
-                        partListLoading = false,
-                        partListError = null
-                    )
+            getPartListUseCase(groupId)
+                .onSuccess { partList ->
+                    _uiState.update {
+                        it.copy(
+                            partList = partList.items,
+                            partListLoading = false,
+                            partListError = null
+                        )
+                    }
                 }
-            } catch (ce: CancellationException) {
-                throw ce
-            } catch (throwable: Throwable) {
-                val backendMessage = throwable.serverMessageOrNull()
-                _uiState.update {
-                    it.copy(
-                        partListLoading = false,
-                        partListError = backendMessage ?: (throwable.message ?: errorLabel)
-                    )
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    _uiState.update {
+                        it.copy(
+                            partListLoading = false,
+                            partListError = backendMessage ?: (throwable.message ?: errorLabel)
+                        )
+                    }
                 }
-            }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }

@@ -6,5 +6,5 @@ import javax.inject.Inject
 class ProcessOutboundUseCase @Inject constructor(
     private val repository: OutboundRepository
 ){
-    suspend operator fun invoke() = repository.processOutbound()
+    suspend operator fun invoke(): Result<Unit> = repository.processOutbound()
 }

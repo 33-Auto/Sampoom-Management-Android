@@ -9,7 +9,6 @@ import javax.inject.Inject
 class SearchPartsUseCase @Inject constructor(
     private val repository: PartRepository
 ) {
-    operator fun invoke(keyword: String): Flow<PagingData<SearchResult>> {
-        return repository.searchParts(keyword)
-    }
+    operator fun invoke(keyword: String): Flow<PagingData<SearchResult>> = repository.searchParts(keyword)
+
 }

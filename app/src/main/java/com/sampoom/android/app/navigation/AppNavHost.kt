@@ -1,16 +1,15 @@
 package com.sampoom.android.app.navigation
 
+import android.annotation.SuppressLint
 import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,8 +18,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.Alignment
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -30,11 +37,16 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.sampoom.android.R
+import com.sampoom.android.core.ui.theme.Main100
+import com.sampoom.android.core.ui.theme.Main500
+import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.backgroundColor
+import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.feature.user.ui.AuthViewModel
 import com.sampoom.android.feature.user.ui.LoginScreen
 import com.sampoom.android.feature.user.ui.SignUpScreen
 import com.sampoom.android.feature.cart.ui.CartListScreen
+import com.sampoom.android.feature.dashboard.ui.DashboardScreen
 import com.sampoom.android.feature.order.ui.OrderDetailScreen
 import com.sampoom.android.feature.order.ui.OrderListScreen
 import com.sampoom.android.feature.outbound.ui.OutboundListScreen
@@ -72,15 +84,48 @@ sealed class BottomNavItem(
     object Orders : BottomNavItem(ROUTE_ORDERS, R.string.nav_order, R.drawable.orders)
 }
 
+@SuppressLint("ContextCastToActivity")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost() {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = hiltViewModel()
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
+    val isLoading by authViewModel.isLoading.collectAsState()
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val activity = LocalContext.current as? ComponentActivity
+    val homeNavColor = backgroundCardColor()
+    val elseNavColor = backgroundColor()
+    val lightIcons = !isSystemInDarkTheme()
+
+    LaunchedEffect(currentRoute, homeNavColor, lightIcons) {
+        val window = activity?.window ?: return@LaunchedEffect
+        if (currentRoute == ROUTE_HOME) {
+            window.navigationBarColor = homeNavColor.toArgb()
+            WindowInsetsControllerCompat(window, window.decorView)
+                .isAppearanceLightNavigationBars = lightIcons
+        } else {
+            window.navigationBarColor = elseNavColor.toArgb()
+            WindowInsetsControllerCompat(window, window.decorView)
+                .isAppearanceLightNavigationBars = lightIcons
+        }
+    }
+
+    if (isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
     NavHost(
         navController = navController,
+//        startDestination = ROUTE_HOME,
         startDestination = if (isLoggedIn) ROUTE_HOME else ROUTE_LOGIN,
         modifier = Modifier.background(backgroundColor())
     ) {
@@ -108,7 +153,7 @@ fun AppNavHost() {
                 }
             )
         }
-        composable(ROUTE_HOME) { MainScreen(navController) }
+        composable(ROUTE_HOME) { MainScreen(navController, authViewModel) }
         composable(ROUTE_PARTS) {
             PartScreen(
                 onNavigateBack = {
@@ -151,10 +196,10 @@ fun AppNavHost() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(
-    parentNavController: NavHostController
+    parentNavController: NavHostController,
+    authViewModel: AuthViewModel
 ) {
     val navController = rememberNavController()
 
@@ -168,12 +213,25 @@ fun MainScreen(
         ) {
             composable(ROUTE_DASHBOARD) {
                 DashboardScreen(
-                    paddingValues = innerPadding
-                ) {
-                    parentNavController.navigate(ROUTE_LOGIN) {
-                        popUpTo(0) { inclusive = true }
+                    paddingValues = innerPadding,
+                    onNavigateOrderDetail = { order ->
+                        parentNavController.navigate(routeOrderDetail(1, order.orderId))
+                    },
+                    onNavigationOrder = {
+                        navController.navigate(ROUTE_ORDERS) {
+                            popUpTo(ROUTE_DASHBOARD) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onLogoutClick = {
+                        authViewModel.signOut()
+                        parentNavController.navigate(ROUTE_LOGIN) {
+                            popUpTo(parentNavController.graph.startDestinationId) { inclusive = true }
+                            launchSingleTop = true
+                        }
                     }
-                }
+                )
             }
             composable(ROUTE_OUTBOUND) {
                 OutboundListScreen(
@@ -201,6 +259,7 @@ fun MainScreen(
 @Composable
 fun PartsFab(navController: NavHostController) {
     FloatingActionButton(
+        containerColor = Main500,
         onClick = {
             navController.navigate(ROUTE_PARTS) {
                 popUpTo(navController.graph.startDestinationId) {
@@ -228,12 +287,22 @@ fun BottomNavigationBar(navController: NavHostController) {
         BottomNavItem.Orders,
     )
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = backgroundCardColor(),
+        contentColor = Main500,
+    ) {
         bottomNavItems.forEach { item ->
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
 
             NavigationBarItem(
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Main500,
+                    unselectedIconColor = textColor(),
+                    selectedTextColor = Main500,
+                    unselectedTextColor = textColor(),
+                    indicatorColor = Main100
+                ),
                 icon = {
                     Icon(
                         painterResource(id = item.icon),
@@ -254,25 +323,4 @@ fun BottomNavigationBar(navController: NavHostController) {
             )
         }
     }
-}
-
-// 임시 화면들 (실제로는 각각의 feature 모듈에서 구현)
-@Composable
-private fun DashboardScreen(
-    paddingValues: PaddingValues,
-    onClick: () -> Unit
-) {
-    val authViewModel: AuthViewModel = hiltViewModel()
-    // 홈 화면 구현
-    Column(Modifier.padding(paddingValues)) {
-        Text("대시보드 화면", modifier = Modifier.padding(paddingValues))
-
-        Button(onClick = {
-            authViewModel.signOut()
-            onClick()
-        }) {
-            Text("로그아웃")
-        }
-    }
-
 }

@@ -1,13 +1,11 @@
 package com.sampoom.android.core.ui.component
 
-import android.R.attr.singleLine
-import android.R.attr.text
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.InputTransformation.Companion.keyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -15,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -37,7 +36,9 @@ fun CommonTextField(
     isPassword: Boolean = false,
     variant: TextFieldVariant = TextFieldVariant.Outlined,
     isError: Boolean = false,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    imeAction: ImeAction = ImeAction.Next,
+    keyboardActions: KeyboardActions = KeyboardActions()
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -89,7 +90,8 @@ fun CommonTextField(
                 trailingIcon = trailingIconView,
                 supportingText = supportingTextView,
                 visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
-                keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text),
+                keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else KeyboardType.Text, imeAction = imeAction),
+                keyboardActions = keyboardActions,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = focusedBorderColor,
                     unfocusedBorderColor = unfocusedBorderColor,

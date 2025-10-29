@@ -10,45 +10,51 @@ import kotlin.coroutines.cancellation.CancellationException
 class OrderRepositoryImpl @Inject constructor(
     private val api: OrderApi
 ) : OrderRepository {
-    override suspend fun getOrderList(): OrderList {
-        val dto = api.getOrderList()
-        val orderItems = dto.data.map { it.toModel() }
-        return OrderList(items = orderItems)
-    }
-
-    override suspend fun createOrder(): OrderList {
-        val dto = api.createOrder()
-        val orderItems = dto.data.map { it.toModel() }
-        return OrderList(items = orderItems)
-    }
-
-    override suspend fun receiveOrder(orderId: Long): Result<Unit> {
-        return try {
-            val dto = api.receiveOrder(orderId)
-            if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce : CancellationException) {
-            throw ce
-        } catch (t : Throwable) {
-            Result.failure(t)
+    override suspend fun getOrderList(): Result<OrderList> {
+        return runCatching {
+            val dto = api.getOrderList()
+            val orderItems = dto.data.map { it.toModel() }
+            OrderList(items = orderItems)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 
-    override suspend fun getOrderDetail(orderId: Long): OrderList {
-        val dto = api.getOrderDetail(orderId)
-        val orderItems = dto.data.map { it.toModel() }
-        return OrderList(items = orderItems)
+    override suspend fun createOrder(): Result<OrderList> {
+        return runCatching {
+            val dto = api.createOrder()
+            val orderItems = dto.data.map { it.toModel() }
+            OrderList(items = orderItems)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
+        }
+    }
+
+    override suspend fun receiveOrder(orderId: Long): Result<Unit> {
+        return runCatching {
+            val dto = api.receiveOrder(orderId)
+            if (!dto.success) throw Exception(dto.message)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
+        }
+    }
+
+    override suspend fun getOrderDetail(orderId: Long): Result<OrderList> {
+        return runCatching {
+            val dto = api.getOrderDetail(orderId)
+            val orderItems = dto.data.map { it.toModel() }
+            OrderList(items = orderItems)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
+        }
     }
 
     override suspend fun cancelOrder(orderId: Long): Result<Unit> {
-        return try {
+        return runCatching {
             val dto = api.cancelOrder(orderId)
             if (!dto.success) throw Exception(dto.message)
-            Result.success(Unit)
-        } catch (ce : CancellationException) {
-            throw ce
-        } catch (t : Throwable) {
-            Result.failure(t)
+        }.onFailure { exception ->
+            if (exception is CancellationException) throw exception
         }
     }
 }

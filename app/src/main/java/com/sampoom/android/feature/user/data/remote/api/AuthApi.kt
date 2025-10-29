@@ -8,30 +8,33 @@ import com.sampoom.android.feature.user.data.remote.dto.SignUpResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.LoginResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.RefreshRequestDto
 import com.sampoom.android.feature.user.data.remote.dto.RefreshResponseDto
-import com.sampoom.android.feature.user.data.remote.dto.UpdateRequestDto
-import com.sampoom.android.feature.user.data.remote.dto.UpdateResponseDto
-import com.sampoom.android.feature.user.data.remote.dto.VerifyRequestDto
-import com.sampoom.android.feature.user.data.remote.dto.VerifyResponseDto
+import com.sampoom.android.feature.user.data.remote.dto.UpdateProfileRequestDto
+import com.sampoom.android.feature.user.data.remote.dto.UpdateProfileResponseDto
+import com.sampoom.android.feature.user.data.remote.dto.GetProfileResponseDto
 import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 
 interface AuthApi {
-    @POST("auth/login")
-    suspend fun login(@Body body: LoginRequestDto): ApiResponse<LoginResponseDto>
-
-    @POST("auth/logout")
-    suspend fun logout(): ApiSuccessResponse
+    @POST("auth/signup")
+    @Headers("X-No-Auth: true")
+    suspend fun signUp(@Body body: SignUpRequestDto): ApiResponse<SignUpResponseDto>
 
     @POST("auth/refresh")
     suspend fun refresh(@Body body: RefreshRequestDto): ApiResponse<RefreshResponseDto>
 
-    @POST("user/signup")
-    suspend fun signUp(@Body body: SignUpRequestDto): ApiResponse<SignUpResponseDto>
+    @POST("auth/logout")
+    suspend fun logout(): ApiSuccessResponse
 
-    @POST("user/verify")
-    suspend fun verify(@Body body: VerifyRequestDto): ApiResponse<VerifyResponseDto>
+    @POST("auth/login")
+    @Headers("X-No-Auth: true")
+    suspend fun login(@Body body: LoginRequestDto): ApiResponse<LoginResponseDto>
 
-    @PATCH("user/update")
-    suspend fun update(@Body body: UpdateRequestDto): ApiResponse<UpdateResponseDto>
+    @GET("user/profile")
+    suspend fun getProfile(): ApiResponse<GetProfileResponseDto>
+
+    @PATCH("user/profile")
+    suspend fun updateProfile(@Body body: UpdateProfileRequestDto): ApiResponse<UpdateProfileResponseDto>
 }

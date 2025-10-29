@@ -7,5 +7,5 @@ import javax.inject.Inject
 class GetGroupUseCase @Inject constructor(
     private val repository: PartRepository
 ) {
-    suspend operator fun invoke(categoryId: Long): GroupList = repository.getGroupList(categoryId)
+    suspend operator fun invoke(categoryId: Long): Result<GroupList> = repository.getGroupList(categoryId)
 }
