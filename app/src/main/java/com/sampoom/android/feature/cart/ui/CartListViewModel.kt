@@ -4,13 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
+import com.sampoom.android.feature.cart.domain.model.CartList
 import com.sampoom.android.feature.cart.domain.usecase.DeleteAllCartUseCase
 import com.sampoom.android.feature.cart.domain.usecase.DeleteCartUseCase
 import com.sampoom.android.feature.cart.domain.usecase.GetCartUseCase
 import com.sampoom.android.feature.cart.domain.usecase.UpdateCartQuantityUseCase
 import com.sampoom.android.feature.order.domain.usecase.CreateOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -88,7 +88,8 @@ class CartListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isProcessing = true, processError = null) }
 
-            createOrderUseCase()
+            val cartList = CartList(items = _uiState.value.cartList)
+            createOrderUseCase(cartList)
                 .onSuccess { orderList ->
                     _uiState.update { it.copy(isProcessing = false, processedOrder = orderList.items) }
                     loadCartList()

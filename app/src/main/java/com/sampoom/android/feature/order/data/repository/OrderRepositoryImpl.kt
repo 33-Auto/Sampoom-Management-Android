@@ -1,14 +1,19 @@
 package com.sampoom.android.feature.order.data.repository
 
+import com.sampoom.android.core.datastore.AuthPreferences
+import com.sampoom.android.feature.cart.domain.model.CartList
 import com.sampoom.android.feature.order.data.mapper.toModel
 import com.sampoom.android.feature.order.data.remote.api.OrderApi
+import com.sampoom.android.feature.order.data.remote.dto.OrderItems
+import com.sampoom.android.feature.order.data.remote.dto.OrderRequestDto
 import com.sampoom.android.feature.order.domain.model.OrderList
 import com.sampoom.android.feature.order.domain.repository.OrderRepository
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
 class OrderRepositoryImpl @Inject constructor(
-    private val api: OrderApi
+    private val api: OrderApi,
+    private val preferences: AuthPreferences
 ) : OrderRepository {
     override suspend fun getOrderList(): Result<OrderList> {
         return runCatching {
@@ -20,9 +25,19 @@ class OrderRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createOrder(): Result<OrderList> {
+    override suspend fun createOrder(cartList: CartList): Result<OrderList> {
         return runCatching {
-            val dto = api.createOrder()
+            val user = preferences.getStoredUser() ?: throw Exception("No user information available")
+            val items = cartList.items
+                .flatMap { it.groups }
+                .flatMap { it.parts }
+                .map { part -> OrderItems(code = part.code, quantity = part.quantity) }
+            val request = OrderRequestDto(
+                requester = "대리점",
+                branch = user.branch,
+                items = items
+            )
+            val dto = api.createOrder(request)
             val orderItems = dto.data.map { it.toModel() }
             OrderList(items = orderItems)
         }.onFailure { exception ->

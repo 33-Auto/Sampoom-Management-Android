@@ -3,6 +3,8 @@ package com.sampoom.android.feature.order.data.remote.api
 import com.sampoom.android.core.network.ApiResponse
 import com.sampoom.android.core.network.ApiSuccessResponse
 import com.sampoom.android.feature.order.data.remote.dto.OrderDto
+import com.sampoom.android.feature.order.data.remote.dto.OrderRequestDto
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -15,9 +17,13 @@ interface OrderApi {
     @GET("agency/1/orders")
     suspend fun getOrderList(): ApiResponse<List<OrderDto>>
 
-    // 주문 생성
+    // 주문 생성 TODO: Deprecated API
     @POST("agency/1/orders")
     suspend fun createOrder(): ApiResponse<List<OrderDto>>
+
+    // 주문 생성
+    @POST("order/")
+    suspend fun createOrder(@Body orderRequestDto: OrderRequestDto): ApiResponse<List<OrderDto>>
 
     // 주문 입고 처리
     @PATCH("agency/1/orders/{orderId}/receive")
