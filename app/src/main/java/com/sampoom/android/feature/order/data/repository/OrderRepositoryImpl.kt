@@ -33,7 +33,6 @@ class OrderRepositoryImpl @Inject constructor(
                 .flatMap { it.parts }
                 .map { part -> OrderItems(code = part.code, quantity = part.quantity) }
             val request = OrderRequestDto(
-                requester = "대리점",
                 branch = user.branch,
                 items = items
             )

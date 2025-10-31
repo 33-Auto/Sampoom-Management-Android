@@ -17,10 +17,6 @@ interface OrderApi {
     @GET("agency/1/orders")
     suspend fun getOrderList(): ApiResponse<List<OrderDto>>
 
-    // 주문 생성 TODO: Deprecated API
-    @POST("agency/1/orders")
-    suspend fun createOrder(): ApiResponse<List<OrderDto>>
-
     // 주문 생성
     @POST("order/")
     suspend fun createOrder(@Body orderRequestDto: OrderRequestDto): ApiResponse<List<OrderDto>>
