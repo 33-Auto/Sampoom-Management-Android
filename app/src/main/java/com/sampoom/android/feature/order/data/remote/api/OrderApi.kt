@@ -1,33 +1,40 @@
 package com.sampoom.android.feature.order.data.remote.api
 
-import com.sampoom.android.core.network.ApiResponse
-import com.sampoom.android.core.network.ApiSuccessResponse
+import com.sampoom.android.core.model.ApiResponse
+import com.sampoom.android.core.model.ApiSuccessResponse
 import com.sampoom.android.feature.order.data.remote.dto.OrderDto
-import retrofit2.http.DELETE
+import com.sampoom.android.feature.order.data.remote.dto.OrderListDto
+import com.sampoom.android.feature.order.data.remote.dto.OrderRequestDto
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 // TODO: AgencyId 동적 주입
 interface OrderApi {
     // 주문 목록 조회
-    @GET("agency/1/orders")
-    suspend fun getOrderList(): ApiResponse<List<OrderDto>>
+    @GET("order/requested")
+    suspend fun getOrderList(
+        @Query("from") agencyName: String,
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 20
+    ): ApiResponse<OrderListDto>
 
     // 주문 생성
-    @POST("agency/1/orders")
-    suspend fun createOrder(): ApiResponse<List<OrderDto>>
+    @POST("order/")
+    suspend fun createOrder(@Body orderRequestDto: OrderRequestDto): ApiResponse<OrderDto>
 
     // 주문 입고 처리
     @PATCH("agency/1/orders/{orderId}/receive")
     suspend fun receiveOrder(@Path("orderId") orderId: Long): ApiSuccessResponse
 
     // 주문 상세 조회
-    @GET("agency/1/orders/{orderId}")
-    suspend fun getOrderDetail(@Path("orderId") orderId: Long): ApiResponse<List<OrderDto>>
+    @GET("order/{orderId}")
+    suspend fun getOrderDetail(@Path("orderId") orderId: Long): ApiResponse<OrderDto>
 
     // 주문 취소
-    @DELETE("agency/1/orders/{orderId}")
+    @PATCH("order/cancel/{orderId}")
     suspend fun cancelOrder(@Path("orderId") orderId: Long): ApiSuccessResponse
 }

@@ -4,13 +4,14 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
+import com.sampoom.android.core.util.GlobalMessageHandler
+import com.sampoom.android.feature.cart.domain.model.CartList
 import com.sampoom.android.feature.cart.domain.usecase.DeleteAllCartUseCase
 import com.sampoom.android.feature.cart.domain.usecase.DeleteCartUseCase
 import com.sampoom.android.feature.cart.domain.usecase.GetCartUseCase
 import com.sampoom.android.feature.cart.domain.usecase.UpdateCartQuantityUseCase
 import com.sampoom.android.feature.order.domain.usecase.CreateOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -19,6 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CartListViewModel @Inject constructor(
+    private val messageHandler: GlobalMessageHandler,
     private val getCartListUseCase: GetCartUseCase,
     private val updateCartQuantityUseCase: UpdateCartQuantityUseCase,
     private val deleteCartUseCase: DeleteCartUseCase,
@@ -51,8 +53,6 @@ class CartListViewModel @Inject constructor(
             is CartListUiEvent.UpdateQuantity -> updateQuantity(event.cartItemId, event.quantity)
             is CartListUiEvent.DeleteCart -> deleteCart(event.cartItemId)
             is CartListUiEvent.DeleteAllCart -> deleteAllCart()
-            is CartListUiEvent.ClearUpdateError -> _uiState.update { it.copy(updateError = null) }
-            is CartListUiEvent.ClearDeleteError -> _uiState.update { it.copy(deleteError = null) }
             is CartListUiEvent.DismissOrderResult -> _uiState.update { it.copy(processedOrder = null) }
         }
     }
@@ -73,10 +73,13 @@ class CartListViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
                         it.copy(
                             cartLoading = false,
-                            cartError = backendMessage ?: (throwable.message ?: errorLabel)
+                            cartError = error
                         )
                     }
                 }
@@ -88,17 +91,22 @@ class CartListViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isProcessing = true, processError = null) }
 
-            createOrderUseCase()
-                .onSuccess { orderList ->
-                    _uiState.update { it.copy(isProcessing = false, processedOrder = orderList.items) }
+            val cartList = CartList(items = _uiState.value.cartList)
+            createOrderUseCase(cartList)
+                .onSuccess { order ->
+                    _uiState.update { it.copy(isProcessing = false, processedOrder = order) }
+                    deleteAllCart()
                     loadCartList()
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
                         it.copy(
                             isProcessing = false,
-                            processError = backendMessage ?: (throwable.message ?: errorLabel)
+                            processError = error
                         )
                     }
                 }
@@ -117,10 +125,13 @@ class CartListViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
                         it.copy(
                             isUpdating = false,
-                            updateError = backendMessage ?: (throwable.message ?: errorLabel)
+                            updateError = error
                         )
                     }
                 }
@@ -160,10 +171,13 @@ class CartListViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
                         it.copy(
                             isDeleting = false,
-                            deleteError = backendMessage ?: (throwable.message ?: errorLabel)
+                            deleteError = error
                         )
                     }
                 }
@@ -182,10 +196,13 @@ class CartListViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
                         it.copy(
                             isDeleting = false,
-                            deleteError = backendMessage ?: (throwable.message ?: errorLabel)
+                            deleteError = error
                         )
                     }
                 }

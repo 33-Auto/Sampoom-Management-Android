@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
+import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.feature.cart.domain.usecase.AddCartUseCase
 import com.sampoom.android.feature.outbound.domain.usecase.AddOutboundUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PartDetailViewModel @Inject constructor(
+    private val messageHandler: GlobalMessageHandler,
     private val addOutboundUseCase: AddOutboundUseCase,
     private val addCartUseCase: AddCartUseCase
 ) : ViewModel() {
@@ -27,9 +29,13 @@ class PartDetailViewModel @Inject constructor(
     val uiState: StateFlow<PartDetailUiState> = _uiState
 
     private var errorLabel: String = ""
+    private var addOutboundLabel: String = ""
+    private var addCartLabel: String = ""
 
-    fun bindLabel(error: String) {
+    fun bindLabel(error: String, outbound: String, cart: String) {
         errorLabel = error
+        addOutboundLabel = outbound
+        addCartLabel = cart
     }
 
     fun onEvent(event: PartDetailUiEvent) {
@@ -40,7 +46,6 @@ class PartDetailViewModel @Inject constructor(
                         part = event.part,
                         quantity = 1,
                         isUpdating = false,
-                        updateError = null,
                         isOutboundSuccess = false,
                         isCartSuccess = false
                     )
@@ -73,13 +78,11 @@ class PartDetailViewModel @Inject constructor(
                     addToCart(part.partId, quantity)
                 }
             }
-            is PartDetailUiEvent.ClearError -> _uiState.update { it.copy(updateError = null) }
             is PartDetailUiEvent.Dismiss -> {
                 _uiState.update {
                     it.copy(
                         part = null,
-                        quantity = 1,
-                        updateError = null
+                        quantity = 1
                     )
                 }
             }
@@ -92,15 +95,16 @@ class PartDetailViewModel @Inject constructor(
 
             addOutboundUseCase(partId, quantity)
                 .onSuccess {
+                    messageHandler.showMessage(message= addOutboundLabel, isError = false)
                     _uiState.update { it.copy(isUpdating = false, isOutboundSuccess = true) }
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
-                        it.copy(
-                            isUpdating = false,
-                            updateError = backendMessage ?: (throwable.message ?: errorLabel)
-                        )
+                        it.copy(isUpdating = false, updateError = error)
                     }
                 }
             Log.d(TAG, "submit: ${_uiState.value}")
@@ -113,22 +117,23 @@ class PartDetailViewModel @Inject constructor(
 
             addCartUseCase(partId, quantity)
                 .onSuccess {
+                    messageHandler.showMessage(message= addCartLabel, isError = false)
                     _uiState.update { it.copy(isUpdating = false, isCartSuccess = true) }
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
-                        it.copy(
-                            isUpdating = false,
-                            updateError = backendMessage ?: (throwable.message ?: errorLabel)
-                        )
+                        it.copy(isUpdating = false, updateError = error)
                     }
                 }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }
 
-    fun clearSuccess() {
-        _uiState.update { it.copy(isOutboundSuccess = false, isCartSuccess = false) }
+    fun clearStatus() {
+        _uiState.update { it.copy(isOutboundSuccess = false, isCartSuccess = false, updateError = null) }
     }
 }

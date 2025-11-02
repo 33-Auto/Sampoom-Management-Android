@@ -97,7 +97,16 @@ fun PartScreen(
 
     // ModalBottomSheet 상태 관리
     val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    val selectedPart = searchUiState.selectedPart
+
+    // selectedPart가 변경되면 시트 표시/숨김
+    LaunchedEffect(selectedPart) {
+        if (selectedPart != null && !sheetState.isVisible) {
+            sheetState.show()
+        } else if (selectedPart == null && sheetState.isVisible) {
+            sheetState.hide()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -232,7 +241,6 @@ fun PartScreen(
                         searchResults = searchResultsPaged,
                         onPartClick = { part ->
                             searchViewModel.onEvent(PartListUiEvent.ShowBottomSheet(part))
-                            showBottomSheet = true
                         }
                     )
                 }
@@ -410,20 +418,24 @@ fun PartScreen(
         }
     }
 
-    if (showBottomSheet) {
+    if (selectedPart != null) {
         searchUiState.selectedPart?.let { selectedPart ->
             ModalBottomSheet(
                 onDismissRequest = {
-                    showBottomSheet = false
-                    searchViewModel.onEvent(PartListUiEvent.DismissBottomSheet)
+                    coroutineScope.launch {
+                        sheetState.hide()
+                        searchViewModel.onEvent(PartListUiEvent.DismissBottomSheet)
+                    }
                 },
                 sheetState = sheetState
             ) {
                 PartDetailBottomSheet(
                     part = selectedPart,
                     onDismiss = {
-                        showBottomSheet = false
-                        searchViewModel.onEvent(PartListUiEvent.DismissBottomSheet)
+                        coroutineScope.launch {
+                            sheetState.hide()
+                            searchViewModel.onEvent(PartListUiEvent.DismissBottomSheet)
+                        }
                     }
                 )
             }
@@ -549,6 +561,7 @@ fun SearchResultsList(
                         CircularProgressIndicator()
                     }
                 }
+
                 is LoadState.Error -> {
                     Box(
                         modifier = Modifier
@@ -562,6 +575,7 @@ fun SearchResultsList(
                         )
                     }
                 }
+
                 else -> {}
             }
         }

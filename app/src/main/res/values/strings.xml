@@ -74,7 +74,7 @@
 
     <!-- 출고 목록 -->
     <string name="outbound_title">출고목록</string>
-    <string name="outbound_empty_list">출고목록 비우기</string>
+    <string name="outbound_empty_list">비우기</string>
     <string name="outbound_empty_outbound">출고목록이 없습니다.</string>
     <string name="outbound_dialog_text">출고 목록에 추가하시겠습니까?</string>
     <string name="outbound_toast_success">출고 목록에 추가되었습니다</string>
@@ -85,7 +85,7 @@
 
     <!-- 장바구니 목록 -->
     <string name="cart_title">장바구니</string>
-    <string name="cart_empty_list">장바구니 비우기</string>
+    <string name="cart_empty_list">비우기</string>
     <string name="cart_empty_outbound">장바구니 목록이 없습니다.</string>
     <string name="cart_dialog_text">장바구니 목록에 추가하시겠습니까?</string>
     <string name="cart_toast_success">장바구니 목록에 추가되었습니다</string>

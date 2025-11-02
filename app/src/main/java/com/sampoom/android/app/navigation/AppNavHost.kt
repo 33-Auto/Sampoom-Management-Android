@@ -1,21 +1,28 @@
 package com.sampoom.android.app.navigation
 
 import android.annotation.SuppressLint
-import android.os.Build
 import androidx.activity.ComponentActivity
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -23,11 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.ui.Alignment
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -36,15 +38,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.sampoom.android.MainActivityViewModel
 import com.sampoom.android.R
+import com.sampoom.android.core.model.SnackBarMessage
+import com.sampoom.android.core.ui.component.TopSnackBarHost
+import com.sampoom.android.core.ui.component.rememberCommonSnackBarHostState
 import com.sampoom.android.core.ui.theme.Main100
 import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.backgroundColor
 import com.sampoom.android.core.ui.theme.textColor
-import com.sampoom.android.feature.user.ui.AuthViewModel
-import com.sampoom.android.feature.user.ui.LoginScreen
-import com.sampoom.android.feature.user.ui.SignUpScreen
+import com.sampoom.android.feature.auth.ui.AuthViewModel
+import com.sampoom.android.feature.auth.ui.LoginScreen
+import com.sampoom.android.feature.auth.ui.SignUpScreen
 import com.sampoom.android.feature.cart.ui.CartListScreen
 import com.sampoom.android.feature.dashboard.ui.DashboardScreen
 import com.sampoom.android.feature.order.ui.OrderDetailScreen
@@ -52,7 +58,9 @@ import com.sampoom.android.feature.order.ui.OrderListScreen
 import com.sampoom.android.feature.outbound.ui.OutboundListScreen
 import com.sampoom.android.feature.part.ui.PartListScreen
 import com.sampoom.android.feature.part.ui.PartScreen
+import kotlinx.coroutines.flow.filterNotNull
 
+// Auth Screen
 const val ROUTE_LOGIN = "login"
 const val ROUTE_SIGNUP = "signup"
 const val ROUTE_HOME = "home"
@@ -69,7 +77,6 @@ const val ROUTE_PART_LIST = "parts/{agencyId}/group/{groupId}"
 fun routePartList(agencyId: Long, groupId: Long): String = "parts/$agencyId/group/$groupId"
 const val ROUTE_ORDER_DETAIL = "orders/{agencyId}/orders/{orderId}"
 fun routeOrderDetail(agencyId: Long, orderId: Long): String = "orders/$agencyId/orders/$orderId"
-const val ROUTE_SEARCH = "search"
 const val ROUTE_EMPLOYEE = "employee"
 const val ROUTE_SETTINGS = "settings"
 
@@ -85,9 +92,10 @@ sealed class BottomNavItem(
 }
 
 @SuppressLint("ContextCastToActivity")
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavHost() {
+fun AppNavHost(
+    viewModel: MainActivityViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = hiltViewModel()
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
@@ -99,6 +107,22 @@ fun AppNavHost() {
     val homeNavColor = backgroundCardColor()
     val elseNavColor = backgroundColor()
     val lightIcons = !isSystemInDarkTheme()
+
+    val snackBarHostState = rememberCommonSnackBarHostState()
+    var currentMessage by remember { mutableStateOf<SnackBarMessage?>(null) }
+
+    // 전역 에러 수집
+    LaunchedEffect(viewModel.messageHandler) {
+        viewModel.messageHandler.message
+            .filterNotNull()
+            .collect { message ->
+                currentMessage = message
+                snackBarHostState.showSnackbar(
+                    message = message.message,
+                    duration = SnackbarDuration.Short
+                )
+            }
+    }
 
     LaunchedEffect(currentRoute, homeNavColor, lightIcons) {
         val window = activity?.window ?: return@LaunchedEffect
@@ -125,7 +149,7 @@ fun AppNavHost() {
 
     NavHost(
         navController = navController,
-//        startDestination = ROUTE_HOME,
+//            startDestination = ROUTE_HOME,
         startDestination = if (isLoggedIn) ROUTE_HOME else ROUTE_LOGIN,
         modifier = Modifier.background(backgroundColor())
     ) {
@@ -194,6 +218,7 @@ fun AppNavHost() {
             )
         }
     }
+    TopSnackBarHost(hostState = snackBarHostState, isError = currentMessage?.isError ?: false)
 }
 
 @Composable

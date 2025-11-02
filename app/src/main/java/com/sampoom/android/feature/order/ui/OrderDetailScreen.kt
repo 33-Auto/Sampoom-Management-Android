@@ -1,12 +1,12 @@
 package com.sampoom.android.feature.order.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
@@ -30,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -39,7 +38,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.ButtonVariant
 import com.sampoom.android.core.ui.component.CommonButton
-import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.feature.order.domain.model.OrderStatus
 
@@ -49,16 +47,21 @@ fun OrderDetailScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: OrderDetailViewModel = hiltViewModel()
 ) {
+    val errorLabel = stringResource(R.string.common_error)
+    val cancelLabel = stringResource(R.string.order_detail_toast_order_cancel)
+    val receiveLabel = stringResource(R.string.order_detail_toast_order_receive)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullToRefreshState()
     var showCancelOrderDialog by remember { mutableStateOf(false) }
     var showReceiveOrderDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
+    LaunchedEffect(errorLabel, cancelLabel, receiveLabel) {
+        viewModel.bindLabel(errorLabel, cancelLabel, receiveLabel)
+    }
 
     // 성공 시 Toast 표시 후 다이얼로그 닫기
     LaunchedEffect(uiState.isProcessingCancelSuccess) {
         if (uiState.isProcessingCancelSuccess) {
-            Toast.makeText(context, context.getString(R.string.order_detail_toast_order_cancel), Toast.LENGTH_SHORT).show()
             viewModel.clearSuccess()
             viewModel.onEvent(OrderDetailUiEvent.LoadOrder)
         }
@@ -67,17 +70,8 @@ fun OrderDetailScreen(
     // 성공 시 Toast 표시 후 다이얼로그 닫기
     LaunchedEffect(uiState.isProcessingReceiveSuccess) {
         if (uiState.isProcessingReceiveSuccess) {
-            Toast.makeText(context, context.getString(R.string.order_detail_toast_order_receive), Toast.LENGTH_SHORT).show()
             viewModel.clearSuccess()
             viewModel.onEvent(OrderDetailUiEvent.LoadOrder)
-        }
-    }
-
-    // 실패 시 Toast 표시
-    LaunchedEffect(uiState.isProcessingError) {
-        uiState.isProcessingError?.let { error ->
-            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-            viewModel.onEvent(OrderDetailUiEvent.ClearError)
         }
     }
 
@@ -111,10 +105,11 @@ fun OrderDetailScreen(
                 )
             },
             bottomBar = {
-                val orderStatus = uiState.orderDetail.firstOrNull()?.status
+                val orderStatus = uiState.orderDetail?.status
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .navigationBarsPadding()
                         .padding(16.dp)
                 ) {
                     CommonButton(
@@ -161,20 +156,22 @@ fun OrderDetailScreen(
                     )
                 }
 
-                uiState.orderDetail.isEmpty() -> {
-                    EmptyContent(
-                        message = stringResource(R.string.order_empty_list),
-                        modifier = Modifier
-                            .height(200.dp)
-                            .fillMaxWidth()
-                    )
-                }
+//                uiState.orderDetail -> {
+//                    EmptyContent(
+//                        message = stringResource(R.string.order_empty_list),
+//                        modifier = Modifier
+//                            .height(200.dp)
+//                            .fillMaxWidth()
+//                    )
+//                }
 
                 else -> {
-                    OrderDetailContent(
-                        order = uiState.orderDetail,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    uiState.orderDetail?.let { order ->
+                        OrderDetailContent(
+                            order = order,
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
                 }
             }
         }

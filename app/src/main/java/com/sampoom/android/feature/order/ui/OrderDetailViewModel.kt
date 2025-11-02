@@ -5,11 +5,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
+import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.feature.order.domain.usecase.CancelOrderUseCase
 import com.sampoom.android.feature.order.domain.usecase.GetOrderDetailUseCase
 import com.sampoom.android.feature.order.domain.usecase.ReceiveOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -18,6 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OrderDetailViewModel @Inject constructor(
+    private val messageHandler: GlobalMessageHandler,
     private val getOrderDetailUseCase: GetOrderDetailUseCase,
     private val cancelOrderUseCase: CancelOrderUseCase,
     private val receiveOrderUseCase: ReceiveOrderUseCase,
@@ -46,9 +47,13 @@ class OrderDetailViewModel @Inject constructor(
     }
 
     private var errorLabel: String = ""
+    private var cancelLabel: String = ""
+    private var receiveLabel: String = ""
 
-    fun bindLabel(error: String) {
+    fun bindLabel(error: String, cancel: String, receive: String) {
         errorLabel = error
+        cancelLabel = cancel
+        receiveLabel = receive
     }
 
     init {
@@ -62,7 +67,6 @@ class OrderDetailViewModel @Inject constructor(
             is OrderDetailUiEvent.RetryOrder -> loadOrderDetail(getOrderId())
             is OrderDetailUiEvent.CancelOrder -> cancelOrder(getOrderId())
             is OrderDetailUiEvent.ReceiveOrder -> receiveOrder(getOrderId())
-            is OrderDetailUiEvent.ClearError -> _uiState.update { it.copy(isProcessingError = null) }
         }
     }
 
@@ -71,10 +75,10 @@ class OrderDetailViewModel @Inject constructor(
             _uiState.update { it.copy(orderDetailLoading = true, orderDetailError = null) }
 
             getOrderDetailUseCase(orderId)
-                .onSuccess { orderList ->
+                .onSuccess { order ->
                     _uiState.update {
                         it.copy(
-                            orderDetail = orderList.items,
+                            orderDetail = order,
                             orderDetailLoading = false,
                             orderDetailError = null
                         )
@@ -82,10 +86,13 @@ class OrderDetailViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
                         it.copy(
                             orderDetailLoading = false,
-                            orderDetailError = backendMessage ?: (throwable.message ?: errorLabel)
+                            orderDetailError = error
                         )
                     }
                 }
@@ -95,25 +102,25 @@ class OrderDetailViewModel @Inject constructor(
 
     private fun cancelOrder(orderId: Long) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isProcessing = true, isProcessingError = null) }
+            _uiState.update { it.copy(isProcessing = true) }
 
             cancelOrderUseCase(orderId)
                 .onSuccess {
+                    messageHandler.showMessage(message = cancelLabel, isError = false)
                     _uiState.update {
                         it.copy(
                             isProcessing = false,
-                            isProcessingCancelSuccess = true,
-                            isProcessingError = null
+                            isProcessingCancelSuccess = true
                         )
                     }
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
-                        it.copy(
-                            isProcessing = false,
-                            isProcessingError = backendMessage ?: (throwable.message ?: errorLabel)
-                        )
+                        it.copy(isProcessing = false)
                     }
                 }
             Log.d(TAG, "submit: ${_uiState.value}")
@@ -122,25 +129,25 @@ class OrderDetailViewModel @Inject constructor(
 
     private fun receiveOrder(orderId: Long) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isProcessing = true, isProcessingError = null) }
+            _uiState.update { it.copy(isProcessing = true) }
 
             receiveOrderUseCase(orderId)
                 .onSuccess {
+                    messageHandler.showMessage(message = receiveLabel, isError = false)
                     _uiState.update {
                         it.copy(
                             isProcessing = false,
-                            isProcessingReceiveSuccess = true,
-                            isProcessingError = null
+                            isProcessingReceiveSuccess = true
                         )
                     }
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
-                        it.copy(
-                            isProcessing = false,
-                            isProcessingError = backendMessage ?: (throwable.message ?: errorLabel)
-                        )
+                        it.copy(isProcessing = false)
                     }
                 }
             Log.d(TAG, "submit: ${_uiState.value}")

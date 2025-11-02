@@ -7,6 +7,4 @@ sealed interface OutboundListUiEvent {
     data class UpdateQuantity(val outboundId: Long, val quantity: Long) : OutboundListUiEvent
     data class DeleteOutbound(val outboundId: Long) : OutboundListUiEvent
     object DeleteAllOutbound : OutboundListUiEvent
-    object ClearUpdateError : OutboundListUiEvent
-    object ClearDeleteError : OutboundListUiEvent
 }

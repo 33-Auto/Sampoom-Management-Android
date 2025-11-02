@@ -1,6 +1,6 @@
 package com.sampoom.android.core.network
 
-import com.sampoom.android.core.datastore.AuthPreferences
+import com.sampoom.android.core.preferences.AuthPreferences
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

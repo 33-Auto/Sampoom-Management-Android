@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -30,12 +29,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.component.OrderItem
+import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.textColor
-import com.sampoom.android.core.util.formatDate
 import com.sampoom.android.feature.order.domain.model.Order
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -47,6 +49,7 @@ fun OrderListScreen(
 ) {
     val errorLabel = stringResource(R.string.common_error)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val orderListPaged = viewModel.orderListPaged.collectAsLazyPagingItems()
     val pullRefreshState = rememberPullToRefreshState()
     val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
 
@@ -54,9 +57,13 @@ fun OrderListScreen(
         viewModel.bindLabel(errorLabel)
     }
 
+    LaunchedEffect(Unit) {
+        orderListPaged.refresh()
+    }
+
     PullToRefreshBox(
         isRefreshing = false,
-        onRefresh = { viewModel.onEvent(OrderListUiEvent.LoadOrderList) },
+        onRefresh = { orderListPaged.refresh() },
         state = pullRefreshState,
         modifier = Modifier.fillMaxSize(),
         indicator = {
@@ -86,8 +93,8 @@ fun OrderListScreen(
                 )
             }
 
-            when {
-                uiState.orderLoading -> {
+            when (orderListPaged.loadState.refresh) {
+                is LoadState.Loading -> {
                     Box(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -97,27 +104,14 @@ fun OrderListScreen(
                     }
                 }
 
-                uiState.orderError != null -> {
+                is LoadState.Error -> {
                     Box(
                         modifier = Modifier
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorContent(
-                            onRetry = { viewModel.onEvent(OrderListUiEvent.RetryOrderList) },
-                            modifier = Modifier.height(200.dp)
-                        )
-                    }
-                }
-
-                uiState.orderList.isEmpty() -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        EmptyContent(
-                            message = stringResource(R.string.order_empty_list),
+                            onRetry = { orderListPaged.retry() },
                             modifier = Modifier.height(200.dp)
                         )
                     }
@@ -131,12 +125,66 @@ fun OrderListScreen(
                             .padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(uiState.orderList) { order ->
-                            OrderItem(
-                                order = order,
-                                onClick = { onNavigateOrderDetail(order) }
-                            )
+                        items(
+                            count = orderListPaged.itemCount,
+                            key = orderListPaged.itemKey { it.orderId }
+                        ) { index ->
+                            val order = orderListPaged[index]
+                            if (order != null) {
+                                OrderItem(
+                                    order = order,
+                                    onClick = { onNavigateOrderDetail(order) }
+                                )
+                            }
                         }
+
+                        // 로딩 상태 처리
+                        item {
+                            when (orderListPaged.loadState.append) {
+                                is LoadState.Loading -> {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator()
+                                    }
+                                }
+                                is LoadState.Error -> {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.common_error),
+                                            color = FailRed
+                                        )
+                                    }
+                                }
+                                else -> {}
+                            }
+                        }
+
+                        // 빈 상태 처리
+                        if (orderListPaged.loadState.refresh !is LoadState.Loading && orderListPaged.itemCount == 0) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    EmptyContent(
+                                        message = stringResource(R.string.order_empty_list),
+                                        modifier = Modifier.height(200.dp)
+                                    )
+                                }
+                            }
+                        }
+
                         item { Spacer(Modifier.height(100.dp)) }
                     }
                 }

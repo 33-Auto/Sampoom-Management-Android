@@ -7,7 +7,5 @@ sealed interface CartListUiEvent {
     data class UpdateQuantity(val cartItemId: Long, val quantity: Long) : CartListUiEvent
     data class DeleteCart(val cartItemId: Long) : CartListUiEvent
     object DeleteAllCart : CartListUiEvent
-    object ClearUpdateError : CartListUiEvent
-    object ClearDeleteError : CartListUiEvent
     object DismissOrderResult : CartListUiEvent
 }

@@ -1,7 +1,7 @@
 package com.sampoom.android.feature.outbound.data.remote.api
 
-import com.sampoom.android.core.network.ApiResponse
-import com.sampoom.android.core.network.ApiSuccessResponse
+import com.sampoom.android.core.model.ApiResponse
+import com.sampoom.android.core.model.ApiSuccessResponse
 import com.sampoom.android.feature.outbound.data.remote.dto.AddOutboundRequestDto
 import com.sampoom.android.feature.outbound.data.remote.dto.OutboundDto
 import com.sampoom.android.feature.outbound.data.remote.dto.UpdateOutboundRequestDto

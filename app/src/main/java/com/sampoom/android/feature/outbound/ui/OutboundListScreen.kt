@@ -58,24 +58,23 @@ fun OutboundListScreen(
     viewModel: OutboundListViewModel = hiltViewModel()
 ) {
     val errorLabel = stringResource(R.string.common_error)
+    val successLabel = stringResource(R.string.outbound_toast_order_text)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullToRefreshState()
     var showEmptyOutboundDialog by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.clearSuccess()
     }
 
     LaunchedEffect(errorLabel) {
-        viewModel.bindLabel(errorLabel)
+        viewModel.bindLabel(errorLabel, successLabel)
         viewModel.onEvent(OutboundListUiEvent.LoadOutboundList)
     }
 
     LaunchedEffect(uiState.isOrderSuccess) {
         if (uiState.isOrderSuccess) {
-            Toast.makeText(context, context.getString(R.string.outbound_toast_order_text), Toast.LENGTH_SHORT).show()
             viewModel.clearSuccess()
         }
     }

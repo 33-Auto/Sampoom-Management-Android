@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.sampoom.android.core.network.serverMessageOrNull
+import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.model.SearchResult
 import com.sampoom.android.feature.part.domain.usecase.GetCategoryUseCase
@@ -29,6 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PartViewModel @Inject constructor(
+    private val messageHandler: GlobalMessageHandler,
     private val getCategoryUseCase: GetCategoryUseCase,
     private val getGroupUseCase: GetGroupUseCase,
     private val searchPartsUseCase: SearchPartsUseCase
@@ -99,10 +101,13 @@ class PartViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
                         it.copy(
                             categoryLoading = false,
-                            categoryError = backendMessage ?: (throwable.message ?: errorLabel)
+                            categoryError = error
                         )
                     }
                 }
@@ -136,11 +141,14 @@ class PartViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
                     if (_uiState.value.selectedCategory?.id != categoryId) return@launch
+
                     _uiState.update {
                         it.copy(
                             groupLoading = false,
-                            groupError = backendMessage ?: (throwable.message ?: errorLabel)
+                            groupError = error
                         )
                     }
                 }

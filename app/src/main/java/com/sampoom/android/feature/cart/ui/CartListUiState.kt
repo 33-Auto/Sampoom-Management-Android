@@ -14,5 +14,5 @@ data class CartListUiState(
     val deleteError: String? = null,
     val isProcessing: Boolean = false,
     val processError: String? = null,
-    val processedOrder: List<Order>? = null
+    val processedOrder: Order? = null
 )

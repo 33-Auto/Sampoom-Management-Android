@@ -5,5 +5,4 @@ sealed interface OrderDetailUiEvent {
     object RetryOrder : OrderDetailUiEvent
     object ReceiveOrder : OrderDetailUiEvent
     object CancelOrder : OrderDetailUiEvent
-    object ClearError : OrderDetailUiEvent
 }
