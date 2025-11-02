@@ -95,6 +95,7 @@ class CartListViewModel @Inject constructor(
             createOrderUseCase(cartList)
                 .onSuccess { order ->
                     _uiState.update { it.copy(isProcessing = false, processedOrder = order) }
+                    deleteAllCart()
                     loadCartList()
                 }
                 .onFailure { throwable ->

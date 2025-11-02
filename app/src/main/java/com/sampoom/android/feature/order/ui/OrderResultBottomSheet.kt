@@ -59,7 +59,10 @@ fun OrderResultBottomSheet(
 
     LaunchedEffect(order.orderId) {
         viewModel.setOrderIdFromApi(order.orderId)
+        viewModel.onEvent(OrderDetailUiEvent.LoadOrder)
     }
+
+    val displayedOrder = uiState.orderDetail ?: order
 
     // 성공 시 Toast 표시 후 다이얼로그 닫기
     LaunchedEffect(uiState.isProcessingCancelSuccess) {
@@ -85,7 +88,7 @@ fun OrderResultBottomSheet(
 
             // OrderDetailContent 재사용
             OrderDetailContent(
-                order = order,
+                order = displayedOrder,
                 modifier = Modifier.weight(1f)
             )
 
@@ -97,7 +100,7 @@ fun OrderResultBottomSheet(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                val orderStatus = order.status
+                val orderStatus = displayedOrder.status
                 CommonButton(
                     modifier = Modifier.weight(1f),
                     variant = ButtonVariant.Error,
