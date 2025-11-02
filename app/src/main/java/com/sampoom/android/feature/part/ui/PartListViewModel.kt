@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
+import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.feature.part.domain.usecase.GetPartUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -16,6 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PartListViewModel @Inject constructor(
+    private val messageHandler: GlobalMessageHandler,
     private val getPartListUseCase: GetPartUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -67,10 +69,13 @@ class PartListViewModel @Inject constructor(
                 }
                 .onFailure { throwable ->
                     val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
                     _uiState.update {
                         it.copy(
                             partListLoading = false,
-                            partListError = backendMessage ?: (throwable.message ?: errorLabel)
+                            partListError = error
                         )
                     }
                 }

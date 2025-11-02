@@ -1,7 +1,7 @@
 package com.sampoom.android.feature.cart.data.remote.api
 
-import com.sampoom.android.core.network.ApiResponse
-import com.sampoom.android.core.network.ApiSuccessResponse
+import com.sampoom.android.core.model.ApiResponse
+import com.sampoom.android.core.model.ApiSuccessResponse
 import com.sampoom.android.feature.cart.data.remote.dto.AddCartRequestDto
 import com.sampoom.android.feature.cart.data.remote.dto.CartDto
 import com.sampoom.android.feature.cart.data.remote.dto.UpdateCartRequestDto

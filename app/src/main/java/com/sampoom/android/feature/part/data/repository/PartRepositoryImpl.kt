@@ -13,7 +13,6 @@ import com.sampoom.android.feature.part.domain.model.SearchResult
 import com.sampoom.android.feature.part.domain.repository.PartRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-import kotlin.coroutines.cancellation.CancellationException
 
 class PartRepositoryImpl @Inject constructor(
     private val api: PartApi,
@@ -24,8 +23,6 @@ class PartRepositoryImpl @Inject constructor(
             val dto = api.getCategoryList()
             val categoryItems = dto.data.map { it.toModel() }
             CategoryList(items = categoryItems)
-        }.onFailure { exception ->
-            if (exception is CancellationException) throw exception
         }
     }
 
@@ -34,8 +31,6 @@ class PartRepositoryImpl @Inject constructor(
             val response = api.getGroupList(categoryId)
             val groupItems = response.data.map { it.toModel() }
             GroupList(items = groupItems)
-        }.onFailure { exception ->
-            if (exception is CancellationException) throw exception
         }
     }
 
@@ -44,8 +39,6 @@ class PartRepositoryImpl @Inject constructor(
             val response = api.getPartList(groupId)
             val partItems = response.data.map { it.toModel() }
             PartList(items = partItems)
-        }.onFailure { exception ->
-            if (exception is CancellationException) throw exception
         }
     }
 

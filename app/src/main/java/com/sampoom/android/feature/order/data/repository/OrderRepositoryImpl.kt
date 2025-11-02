@@ -1,46 +1,66 @@
 package com.sampoom.android.feature.order.data.repository
 
-import com.sampoom.android.core.datastore.AuthPreferences
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.sampoom.android.core.preferences.AuthPreferences
 import com.sampoom.android.feature.cart.domain.model.CartList
 import com.sampoom.android.feature.order.data.mapper.toModel
+import com.sampoom.android.feature.order.data.paging.OrderPagingSource
 import com.sampoom.android.feature.order.data.remote.api.OrderApi
-import com.sampoom.android.feature.order.data.remote.dto.OrderItems
+import com.sampoom.android.feature.order.data.remote.dto.OrderCategoryDto
+import com.sampoom.android.feature.order.data.remote.dto.OrderGroupDto
+import com.sampoom.android.feature.order.data.remote.dto.OrderPartDto
 import com.sampoom.android.feature.order.data.remote.dto.OrderRequestDto
-import com.sampoom.android.feature.order.domain.model.OrderList
+import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.domain.repository.OrderRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-import kotlin.coroutines.cancellation.CancellationException
 
 class OrderRepositoryImpl @Inject constructor(
     private val api: OrderApi,
-    private val preferences: AuthPreferences
+    private val preferences: AuthPreferences,
+    private val pagingSourceFactory: OrderPagingSource.Factory
 ) : OrderRepository {
-    override suspend fun getOrderList(): Result<OrderList> {
-        return runCatching {
-            val dto = api.getOrderList()
-            val orderItems = dto.data.map { it.toModel() }
-            OrderList(items = orderItems)
-        }.onFailure { exception ->
-            if (exception is CancellationException) throw exception
-        }
+    override fun getOrderList(): Flow<PagingData<Order>> {
+        return Pager(
+            config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = { pagingSourceFactory.create() }
+        ).flow
     }
 
-    override suspend fun createOrder(cartList: CartList): Result<OrderList> {
+    override suspend fun createOrder(cartList: CartList): Result<Order> {
         return runCatching {
-            val user = preferences.getStoredUser() ?: throw Exception("No user information available")
-            val items = cartList.items
-                .flatMap { it.groups }
-                .flatMap { it.parts }
-                .map { part -> OrderItems(code = part.code, quantity = part.quantity) }
+            val agencyName = preferences.getStoredUser()?.branch ?: throw Exception()
+            val items = cartList.items.map { cart ->
+                OrderCategoryDto(
+                    categoryId = cart.categoryId,
+                    categoryName = cart.categoryName,
+                    groups = cart.groups.map { group ->
+                        OrderGroupDto(
+                            groupId = group.groupId,
+                            groupName = group.groupName,
+                            parts = group.parts.map { part ->
+                                OrderPartDto(
+                                    partId = part.partId,
+                                    code = part.code,
+                                    name = part.name,
+                                    quantity = part.quantity
+                                )
+                            }
+                        )
+                    }
+                )
+            }
+
             val request = OrderRequestDto(
-                branch = user.branch,
+                agencyName = agencyName,
                 items = items
             )
+
             val dto = api.createOrder(request)
-            val orderItems = dto.data.map { it.toModel() }
-            OrderList(items = orderItems)
-        }.onFailure { exception ->
-            if (exception is CancellationException) throw exception
+            if (!dto.success) throw Exception(dto.message)
+            dto.data.toModel()
         }
     }
 
@@ -48,18 +68,14 @@ class OrderRepositoryImpl @Inject constructor(
         return runCatching {
             val dto = api.receiveOrder(orderId)
             if (!dto.success) throw Exception(dto.message)
-        }.onFailure { exception ->
-            if (exception is CancellationException) throw exception
         }
     }
 
-    override suspend fun getOrderDetail(orderId: Long): Result<OrderList> {
+    override suspend fun getOrderDetail(orderId: Long): Result<Order> {
         return runCatching {
             val dto = api.getOrderDetail(orderId)
-            val orderItems = dto.data.map { it.toModel() }
-            OrderList(items = orderItems)
-        }.onFailure { exception ->
-            if (exception is CancellationException) throw exception
+            if (!dto.success) throw Exception(dto.message)
+            dto.data.toModel()
         }
     }
 
@@ -67,8 +83,6 @@ class OrderRepositoryImpl @Inject constructor(
         return runCatching {
             val dto = api.cancelOrder(orderId)
             if (!dto.success) throw Exception(dto.message)
-        }.onFailure { exception ->
-            if (exception is CancellationException) throw exception
         }
     }
 }

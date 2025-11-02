@@ -1,7 +1,5 @@
 package com.sampoom.android.feature.dashboard.ui
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,6 +44,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
@@ -55,8 +54,8 @@ import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
+import com.sampoom.android.feature.auth.domain.model.User
 import com.sampoom.android.feature.order.domain.model.Order
-import com.sampoom.android.feature.user.domain.model.User
 
 @Composable
 fun DashboardScreen(
@@ -68,9 +67,9 @@ fun DashboardScreen(
 ) {
     val errorLabel = stringResource(R.string.common_error)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val pullRefreshState = rememberPullToRefreshState()
-    val isManager = true // TODO: Role 검증
     val user by viewModel.user.collectAsStateWithLifecycle()
+    val pullRefreshState = rememberPullToRefreshState()
+    val isManager = user?.role == "ADMIN"
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)
@@ -162,6 +161,8 @@ fun DashboardScreen(
                         }
                     )
                 }
+
+                item { Spacer(Modifier.height(100.dp)) }
             }
         }
     }
@@ -334,7 +335,6 @@ fun ButtonCard(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OrderListSection(
     viewModel: DashboardViewModel,
@@ -342,6 +342,8 @@ fun OrderListSection(
     onNavigateOrderDetail: (Order) -> Unit,
     onNavigationOrder: () -> Unit
 ) {
+    val orderListPaged = viewModel.orderListPaged.collectAsLazyPagingItems()
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -368,8 +370,8 @@ fun OrderListSection(
             }
         }
 
-        when {
-            uiState.dashboardLoading -> {
+        when (orderListPaged.loadState.refresh) {
+            is LoadState.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -380,7 +382,7 @@ fun OrderListSection(
                 }
             }
 
-            uiState.dashboardError != null -> {
+            is LoadState.Error -> {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -394,34 +396,36 @@ fun OrderListSection(
                 }
             }
 
-            uiState.orderList.isEmpty() -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    EmptyContent(
-                        message = stringResource(R.string.order_empty_list),
-                        modifier = Modifier.height(200.dp)
-                    )
-                }
-            }
-
             else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(uiState.orderList) { order ->
-                        OrderItem(
-                            order = order,
-                            onClick = { onNavigateOrderDetail(order) }
+                if (orderListPaged.itemCount == 0) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        EmptyContent(
+                            message = stringResource(R.string.order_empty_list),
+                            modifier = Modifier.height(200.dp)
                         )
                     }
-                    item { Spacer(Modifier.height(100.dp)) }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // 처음 5개만 표시
+                        repeat(minOf(orderListPaged.itemCount, 5)) { index ->
+                            val order = orderListPaged[index]
+                            if (order != null) {
+                                OrderItem(
+                                    order = order,
+                                    onClick = { onNavigateOrderDetail(order) }
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }

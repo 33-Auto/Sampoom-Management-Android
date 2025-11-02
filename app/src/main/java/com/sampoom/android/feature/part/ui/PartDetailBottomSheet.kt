@@ -1,6 +1,5 @@
 package com.sampoom.android.feature.part.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -49,17 +47,18 @@ fun PartDetailBottomSheet(
     viewModel: PartDetailViewModel = hiltViewModel()
 ) {
     val errorLabel = stringResource(R.string.common_error)
+    val addOutboundLabel = stringResource(R.string.outbound_toast_success)
+    val addCartLabel = stringResource(R.string.cart_toast_success)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showOutboundDialog by remember { mutableStateOf(false) }
     var showCartDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.clearSuccess()
+        viewModel.clearStatus()
     }
 
-    LaunchedEffect(errorLabel) {
-        viewModel.bindLabel(errorLabel)
+    LaunchedEffect(errorLabel, addOutboundLabel, addCartLabel) {
+        viewModel.bindLabel(errorLabel, addOutboundLabel, addCartLabel)
     }
 
     LaunchedEffect(part.partId) {
@@ -69,24 +68,23 @@ fun PartDetailBottomSheet(
     // 성공 시 Toast 표시 후 다이얼로그 닫기
     LaunchedEffect(uiState.isOutboundSuccess) {
         if (uiState.isOutboundSuccess) {
-            Toast.makeText(context, context.getString(R.string.outbound_toast_success), Toast.LENGTH_SHORT).show()
-            viewModel.clearSuccess()
+            viewModel.clearStatus()
+            onDismiss()
         }
     }
 
     // 성공 시 Toast 표시 후 다이얼로그 닫기
     LaunchedEffect(uiState.isCartSuccess) {
         if (uiState.isCartSuccess) {
-            Toast.makeText(context, context.getString(R.string.cart_toast_success), Toast.LENGTH_SHORT).show()
-            viewModel.clearSuccess()
+            viewModel.clearStatus()
+            onDismiss()
         }
     }
 
-    // 실패 시 Toast 표시
     LaunchedEffect(uiState.updateError) {
-        uiState.updateError?.let { error ->
-            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-            viewModel.onEvent(PartDetailUiEvent.ClearError)
+        if (uiState.updateError != null) {
+            viewModel.clearStatus()
+            onDismiss()
         }
     }
 

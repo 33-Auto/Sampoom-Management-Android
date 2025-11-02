@@ -1,6 +1,6 @@
 package com.sampoom.android.feature.part.data.remote.api
 
-import com.sampoom.android.core.network.ApiResponse
+import com.sampoom.android.core.model.ApiResponse
 import com.sampoom.android.feature.part.data.remote.dto.CategoryDto
 import com.sampoom.android.feature.part.data.remote.dto.GroupDto
 import com.sampoom.android.feature.part.data.remote.dto.PartDto

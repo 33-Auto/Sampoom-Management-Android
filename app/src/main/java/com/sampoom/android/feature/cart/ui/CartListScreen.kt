@@ -65,9 +65,9 @@ fun CartListScreen(
         viewModel.onEvent(CartListUiEvent.LoadCartList)
     }
 
-    uiState.processedOrder?.let { orders ->
+    uiState.processedOrder?.let { order ->
         OrderResultBottomSheet(
-            order = orders,
+            order = order,
             onDismiss = { viewModel.onEvent(CartListUiEvent.DismissOrderResult)}
         )
     }
@@ -120,7 +120,6 @@ fun CartListScreen(
                     }
                 }
             }
-
 
             when {
                 uiState.cartLoading -> {

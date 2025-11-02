@@ -46,7 +46,7 @@ import com.sampoom.android.feature.order.domain.model.OrderStatus
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderResultBottomSheet(
-    order: List<Order>,
+    order: Order,
     onDismiss: () -> Unit,
     viewModel: OrderDetailViewModel = hiltViewModel()
 ) {
@@ -57,8 +57,8 @@ fun OrderResultBottomSheet(
     var showCancelOrderDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    LaunchedEffect(order.firstOrNull()?.orderId) {
-        if (order.isNotEmpty()) viewModel.setOrderIdFromApi(order.first().orderId)
+    LaunchedEffect(order.orderId) {
+        viewModel.setOrderIdFromApi(order.orderId)
     }
 
     // 성공 시 Toast 표시 후 다이얼로그 닫기
@@ -67,14 +67,6 @@ fun OrderResultBottomSheet(
             Toast.makeText(context, context.getString(R.string.order_detail_toast_order_cancel), Toast.LENGTH_SHORT).show()
             viewModel.clearSuccess()
             viewModel.onEvent(OrderDetailUiEvent.LoadOrder)
-        }
-    }
-
-    // 실패 시 Toast 표시
-    LaunchedEffect(uiState.isProcessingError) {
-        uiState.isProcessingError?.let { error ->
-            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
-            viewModel.onEvent(OrderDetailUiEvent.ClearError)
         }
     }
 
@@ -105,12 +97,11 @@ fun OrderResultBottomSheet(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                val orderStatus = order.firstOrNull()?.status
+                val orderStatus = order.status
                 CommonButton(
                     modifier = Modifier.weight(1f),
                     variant = ButtonVariant.Error,
-                    enabled = orderStatus != null &&
-                            !uiState.isProcessing &&
+                    enabled = !uiState.isProcessing &&
                             orderStatus == OrderStatus.PENDING,
                     onClick = { showCancelOrderDialog = true }
                 ) {

@@ -28,7 +28,7 @@ import kotlin.collections.forEach
 
 @Composable
 fun OrderDetailContent(
-    order: List<Order>,
+    order: Order,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -37,27 +37,25 @@ fun OrderDetailContent(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        order.forEach { order ->
-            item {
-                OrderInfoCard(order = order)
-            }
-            item {
-                Text(
-                    text = stringResource(R.string.order_detail_order_items_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = textColor()
-                )
-            }
-            order.items.forEach { category ->
-                category.groups.forEach { group ->
-                    item {
-                        OrderSection(
-                            categoryName = category.categoryName,
-                            groupName = group.groupName,
-                            parts = group.parts
-                        )
-                    }
+        item {
+            OrderInfoCard(order = order)
+        }
+        item {
+            Text(
+                text = stringResource(R.string.order_detail_order_items_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = textColor()
+            )
+        }
+        order.items.forEach { category ->
+            category.groups.forEach { group ->
+                item {
+                    OrderSection(
+                        categoryName = category.categoryName,
+                        groupName = group.groupName,
+                        parts = group.parts
+                    )
                 }
             }
         }

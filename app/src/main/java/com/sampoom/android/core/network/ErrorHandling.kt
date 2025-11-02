@@ -3,12 +3,9 @@ package com.sampoom.android.core.network
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import com.sampoom.android.core.model.ApiErrorResponse
 import retrofit2.HttpException
-
-data class ApiErrorResponse(
-    val code: Int? = null,
-    val message: String? = null
-)
+import kotlin.jvm.java
 
 fun Throwable.serverMessageOrNull(): String? {
     if (this is HttpException) {

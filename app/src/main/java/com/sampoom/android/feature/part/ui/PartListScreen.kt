@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +52,7 @@ import com.sampoom.android.core.ui.theme.disableColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.part.domain.model.Part
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +61,7 @@ fun PartListScreen(
     navController: NavHostController = rememberNavController(),
     viewModel: PartListViewModel = hiltViewModel()
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val groupName by navController.previousBackStackEntry?.savedStateHandle?.getStateFlow<String?>(
         "groupName",
         null
@@ -74,8 +77,17 @@ fun PartListScreen(
     val pullRefreshState = rememberPullToRefreshState()
 
     // ModalBottomSheet 상태 관리
-    val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(true)
+    val selectedPart = uiState.selectedPart
+
+    // selectedPart가 변경되면 시트 표시/숨김
+    LaunchedEffect(selectedPart) {
+        if (selectedPart != null && !sheetState.isVisible) {
+            sheetState.show()
+        } else if (selectedPart == null && sheetState.isVisible) {
+            sheetState.hide()
+        }
+    }
 
     PullToRefreshBox(
         isRefreshing = false,
@@ -160,7 +172,6 @@ fun PartListScreen(
                                 part = part,
                                 onClick = {
                                     viewModel.onEvent(PartListUiEvent.ShowBottomSheet(part))
-                                    showBottomSheet = true
                                 }
                             )
                         }
@@ -170,20 +181,24 @@ fun PartListScreen(
         }
     }
 
-    if (showBottomSheet) {
+    if (selectedPart != null) {
         uiState.selectedPart?.let { selectedPart ->
             ModalBottomSheet(
                 onDismissRequest = {
-                    showBottomSheet = false
-                    viewModel.onEvent(PartListUiEvent.DismissBottomSheet)
+                    coroutineScope.launch {
+                        sheetState.hide()
+                        viewModel.onEvent(PartListUiEvent.DismissBottomSheet)
+                    }
                 },
                 sheetState = sheetState
             ) {
                 PartDetailBottomSheet(
                     part = selectedPart,
                     onDismiss = {
-                        showBottomSheet = false
-                        viewModel.onEvent(PartListUiEvent.DismissBottomSheet)
+                        coroutineScope.launch {
+                            sheetState.hide()
+                            viewModel.onEvent(PartListUiEvent.DismissBottomSheet)
+                        }
                     }
                 )
             }
