@@ -2,7 +2,6 @@ package com.sampoom.android.feature.order.domain.usecase
 
 import androidx.paging.PagingData
 import com.sampoom.android.feature.order.domain.model.Order
-import com.sampoom.android.feature.order.domain.model.OrderList
 import com.sampoom.android.feature.order.domain.repository.OrderRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

@@ -106,7 +106,7 @@ class OrderDetailViewModel @Inject constructor(
 
             cancelOrderUseCase(orderId)
                 .onSuccess {
-                    messageHandler.showMessage(message = cancelLabel, isError = true)
+                    messageHandler.showMessage(message = cancelLabel, isError = false)
                     _uiState.update {
                         it.copy(
                             isProcessing = false,
@@ -133,7 +133,7 @@ class OrderDetailViewModel @Inject constructor(
 
             receiveOrderUseCase(orderId)
                 .onSuccess {
-                    messageHandler.showMessage(message = receiveLabel, isError = true)
+                    messageHandler.showMessage(message = receiveLabel, isError = false)
                     _uiState.update {
                         it.copy(
                             isProcessing = false,

@@ -83,7 +83,7 @@ class LoginViewModel @Inject constructor(
         if (!_uiState.value.isValid) return@launch
 
         val s = _uiState.value
-        _uiState.update { it.copy(loading = true) }
+        _uiState.update { it.copy(loading = true, success = false) }
         singIn(s.email, s.password)
             .onSuccess {
                 _uiState.update {
@@ -96,7 +96,7 @@ class LoginViewModel @Inject constructor(
                 messageHandler.showMessage(message = error, isError = true)
 
                 _uiState.update {
-                    it.copy(loading = false)
+                    it.copy(loading = false, success = false)
                 }
             }
         Log.d(TAG, "submit: ${_uiState.value}")

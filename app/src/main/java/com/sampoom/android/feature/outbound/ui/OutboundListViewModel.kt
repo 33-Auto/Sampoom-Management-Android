@@ -94,7 +94,7 @@ class OutboundListViewModel @Inject constructor(
 
             processOutboundUseCase()
                 .onSuccess {
-                    messageHandler.showMessage(message = successLabel, isError = true)
+                    messageHandler.showMessage(message = successLabel, isError = false)
 
                     _uiState.update { it.copy(outboundLoading = false, isOrderSuccess = true) }
                     loadOutboundList()

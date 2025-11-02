@@ -5,7 +5,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.sampoom.android.core.model.ApiErrorResponse
 import retrofit2.HttpException
-import kotlin.jvm.java
 
 fun Throwable.serverMessageOrNull(): String? {
     if (this is HttpException) {
