@@ -1,6 +1,5 @@
 package com.sampoom.android.feature.order.ui
 
-import android.R.attr.onClick
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
