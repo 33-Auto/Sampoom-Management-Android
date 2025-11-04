@@ -111,9 +111,20 @@
     <string name="order_detail_toast_order_receive">입고 처리되었습니다</string>
 
     <!-- 주문 상태 -->
-    <string name="order_status_pending">승인대기</string>
+    <string name="order_status_pending">대기중</string>
+    <string name="order_status_confirmed">주문확인</string>
+    <string name="order_status_shipping">배송중</string>
+    <string name="order_status_delayed">배송지연</string>
+    <string name="order_status_producing">생산중</string>
+    <string name="order_status_arrived">배송완료</string>
     <string name="order_status_completed">입고완료</string>
     <string name="order_status_canceled">주문취소</string>
+
+    <!-- 설정 -->
+    <string name="setting_title">설정</string>
+    <string name="setting_edit_profile">프로필 수정</string>
+    <string name="setting_logout">로그아웃</string>
+    <string name="setting_dialog_logout">로그아웃 하시겠습니까?</string>
 
     <!-- Common -->
     <string name="common_error">오류가 발생했습니다</string>

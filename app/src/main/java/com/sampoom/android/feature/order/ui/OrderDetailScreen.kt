@@ -127,7 +127,7 @@ fun OrderDetailScreen(
                         modifier = Modifier.weight(1f),
                         enabled = orderStatus != null &&
                                 !uiState.isProcessing &&
-                                orderStatus == OrderStatus.PENDING,
+                                orderStatus == OrderStatus.ARRIVED,
                         onClick = { showReceiveOrderDialog = true }
                     ) {
                         Text(stringResource(R.string.order_detail_order_receive))

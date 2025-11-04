@@ -17,5 +17,5 @@ interface AuthRepository {
     suspend fun refreshToken(): Result<User>
     suspend fun clearTokens(): Result<Unit>
     suspend fun isSignedIn(): Boolean
-    suspend fun getProfile(): Result<User>
+    suspend fun getProfile(workspace: String): Result<User>
 }

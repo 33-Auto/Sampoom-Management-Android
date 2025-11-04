@@ -1,7 +1,6 @@
 package com.sampoom.android.feature.auth.data.repository
 
 import com.sampoom.android.core.preferences.AuthPreferences
-import com.sampoom.android.feature.auth.data.mapper.mergeWith
 import com.sampoom.android.feature.auth.data.mapper.toModel
 import com.sampoom.android.feature.auth.data.remote.api.AuthApi
 import com.sampoom.android.feature.auth.data.remote.dto.LoginRequestDto
@@ -24,14 +23,16 @@ class AuthRepositoryImpl @Inject constructor(
         position: String
     ): Result<User> {
         return runCatching {
-            val signUpRes = api.signUp(SignUpRequestDto(
-                email = email,
-                password = password,
-                workspace = workspace,
-                branch = branch,
-                userName = userName,
-                position = position
-            ))
+            val signUpRes = api.signUp(
+                SignUpRequestDto(
+                    email = email,
+                    password = password,
+                    workspace = workspace,
+                    branch = branch,
+                    userName = userName,
+                    position = position
+                )
+            )
             if (!signUpRes.success) throw Exception(signUpRes.message)
             signIn(email, password).getOrThrow()
         }
@@ -42,34 +43,60 @@ class AuthRepositoryImpl @Inject constructor(
         password: String
     ): Result<User> {
         return runCatching {
-            val loginDto = api.login(LoginRequestDto(email, password))
+            val loginDto = api.login(
+                LoginRequestDto(
+                    workspace = "AGENCY",
+                    email = email,
+                    password = password
+                )
+            )
             if (!loginDto.success) throw Exception(loginDto.message)
             val loginUser = loginDto.data.toModel()
 
             preferences.saveUser(loginUser)
 
-            val profileDto = getProfile()
+            val profileDto = getProfile("AGENCY")
             val profileUser = profileDto.getOrThrow()
 
-            val user = loginUser.mergeWith(profileUser)
+            val user = User(
+                userId = loginUser.userId,
+                userName = profileUser.userName,
+                email = profileUser.email,
+                role = profileUser.role,
+                accessToken = loginUser.accessToken,
+                refreshToken = loginUser.refreshToken,
+                expiresIn = loginUser.expiresIn,
+                position = profileUser.position,
+                workspace = profileUser.workspace,
+                branch = profileUser.branch,
+                agencyId = profileUser.agencyId,
+                startedAt = profileUser.startedAt,
+                endedAt = profileUser.endedAt
+            )
 
             preferences.saveUser(user)
             user
         }
     }
 
-    override suspend fun signOut() : Result<Unit> {
+    override suspend fun signOut(): Result<Unit> {
         return runCatching {
             val dto = api.logout()
             if (!dto.success) throw Exception(dto.message)
+        }.onSuccess {
+            preferences.clear()
+        }.onFailure {
+            preferences.clear()
         }
     }
 
     override suspend fun refreshToken(): Result<User> {
         return runCatching {
-            val refreshToken = preferences.getRefreshToken() ?: throw Exception("No refresh token available")
+            val refreshToken =
+                preferences.getRefreshToken() ?: throw Exception("No refresh token available")
             val response = api.refresh(RefreshRequestDto(refreshToken))
-            val existingUser = preferences.getStoredUser() ?: throw Exception("No user information available")
+            val existingUser =
+                preferences.getStoredUser() ?: throw Exception("No user information available")
 
             val updatedUser = existingUser.copy(
                 accessToken = response.data.accessToken,
@@ -89,9 +116,9 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun isSignedIn(): Boolean = preferences.hasToken()
 
-    override suspend fun getProfile(): Result<User> {
+    override suspend fun getProfile(workspace: String): Result<User> {
         return runCatching {
-            val dto = api.getProfile()
+            val dto = api.getProfile(workspace)
             if (!dto.success) throw Exception(dto.message)
             dto.data.toModel()
         }

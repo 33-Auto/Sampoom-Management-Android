@@ -12,28 +12,34 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
-// TODO: AgencyId 동적 주입
 interface CartApi {
     // 장바구니 목록 조회
-    @GET("agency/1/cart")
-    suspend fun getCartList(): ApiResponse<List<CartDto>>
+    @GET("agency/{agencyId}/cart")
+    suspend fun getCartList(@Path("agencyId") agencyId: Long): ApiResponse<List<CartDto>>
 
     // 장바구니에 부품 추가
-    @POST("agency/1/cart")
-    suspend fun addCart(@Body body: AddCartRequestDto): ApiSuccessResponse
+    @POST("agency/{agencyId}/cart")
+    suspend fun addCart(
+        @Path("agencyId") agencyId: Long,
+        @Body body: AddCartRequestDto
+    ): ApiSuccessResponse
 
     // 장바구니 항목 삭제
-    @DELETE("agency/1/cart/{cartItemId}")
-    suspend fun deleteCart(@Path("cartItemId") cartItemId: Long): ApiSuccessResponse
+    @DELETE("agency/{agencyId}/cart/{cartItemId}")
+    suspend fun deleteCart(
+        @Path("agencyId") agencyId: Long,
+        @Path("cartItemId") cartItemId: Long
+    ): ApiSuccessResponse
 
     // 장바구니 수량 변경
-    @PUT("agency/1/cart/{cartItemId}")
+    @PUT("agency/{agencyId}/cart/{cartItemId}")
     suspend fun updateCart(
+        @Path("agencyId") agencyId: Long,
         @Path("cartItemId") cartItemId: Long,
         @Body body: UpdateCartRequestDto
     ): ApiSuccessResponse
 
     // 장바구니 전체 비우기
-    @DELETE("agency/1/cart/clear")
-    suspend fun deleteAllCart(): ApiSuccessResponse
+    @DELETE("agency/{agencyId}/cart/clear")
+    suspend fun deleteAllCart(@Path("agencyId") agencyId: Long): ApiSuccessResponse
 }

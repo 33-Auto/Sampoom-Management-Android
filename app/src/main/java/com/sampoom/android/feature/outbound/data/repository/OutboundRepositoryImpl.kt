@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.outbound.data.repository
 
+import com.sampoom.android.core.preferences.AuthPreferences
 import com.sampoom.android.feature.outbound.data.mapper.toModel
 import com.sampoom.android.feature.outbound.data.remote.api.OutboundApi
 import com.sampoom.android.feature.outbound.data.remote.dto.AddOutboundRequestDto
@@ -9,11 +10,13 @@ import com.sampoom.android.feature.outbound.domain.repository.OutboundRepository
 import jakarta.inject.Inject
 
 class OutboundRepositoryImpl @Inject constructor(
-    private val api: OutboundApi
+    private val api: OutboundApi,
+    private val authPreferences: AuthPreferences
 ) : OutboundRepository {
     override suspend fun getOutboundList(): Result<OutboundList> {
         return runCatching {
-            val dto = api.getOutboundList()
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.getOutboundList(agencyId)
             val outboundItems = dto.data.map { it.toModel() }
             OutboundList(items = outboundItems)
         }
@@ -21,7 +24,8 @@ class OutboundRepositoryImpl @Inject constructor(
 
     override suspend fun processOutbound(): Result<Unit> {
         return runCatching {
-            val dto = api.processOutbound()
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.processOutbound(agencyId)
             if (!dto.success) throw Exception(dto.message)
         }
     }
@@ -31,21 +35,25 @@ class OutboundRepositoryImpl @Inject constructor(
         quantity: Long
     ): Result<Unit> {
         return runCatching {
-            val dto = api.addOutbound(AddOutboundRequestDto(partId, quantity))
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto =
+                api.addOutbound(agencyId = agencyId, body = AddOutboundRequestDto(partId, quantity))
             if (!dto.success) throw Exception(dto.message)
         }
     }
 
     override suspend fun deleteOutbound(outboundId: Long): Result<Unit> {
         return runCatching {
-            val dto = api.deleteOutbound(outboundId)
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.deleteOutbound(agencyId = agencyId, outboundId = outboundId)
             if (!dto.success) throw Exception(dto.message)
         }
     }
 
     override suspend fun deleteAllOutbound(): Result<Unit> {
         return runCatching {
-            val dto = api.deleteAllOutbound()
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.deleteAllOutbound(agencyId)
             if (!dto.success) throw Exception(dto.message)
         }
     }
@@ -55,7 +63,12 @@ class OutboundRepositoryImpl @Inject constructor(
         quantity: Long
     ): Result<Unit> {
         return runCatching {
-            val dto = api.updateOutbound(outboundId, UpdateOutboundRequestDto(quantity))
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.updateOutbound(
+                agencyId = agencyId,
+                outboundId = outboundId,
+                body = UpdateOutboundRequestDto(quantity)
+            )
             if (!dto.success) throw Exception(dto.message)
         }
     }

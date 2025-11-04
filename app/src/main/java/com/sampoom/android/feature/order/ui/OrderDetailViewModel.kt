@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.feature.order.domain.usecase.CancelOrderUseCase
+import com.sampoom.android.feature.order.domain.usecase.CompleteOrderUseCase
 import com.sampoom.android.feature.order.domain.usecase.GetOrderDetailUseCase
 import com.sampoom.android.feature.order.domain.usecase.ReceiveOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,7 @@ class OrderDetailViewModel @Inject constructor(
     private val messageHandler: GlobalMessageHandler,
     private val getOrderDetailUseCase: GetOrderDetailUseCase,
     private val cancelOrderUseCase: CancelOrderUseCase,
+    private val completeOrderUseCase: CompleteOrderUseCase,
     private val receiveOrderUseCase: ReceiveOrderUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -130,26 +132,23 @@ class OrderDetailViewModel @Inject constructor(
     private fun receiveOrder(orderId: Long) {
         viewModelScope.launch {
             _uiState.update { it.copy(isProcessing = true) }
+            try {
+                receiveOrderUseCase(orderId).getOrThrow()     // 1단계
+                completeOrderUseCase(orderId).getOrThrow()    // 2단계
 
-            receiveOrderUseCase(orderId)
-                .onSuccess {
-                    messageHandler.showMessage(message = receiveLabel, isError = false)
-                    _uiState.update {
-                        it.copy(
-                            isProcessing = false,
-                            isProcessingReceiveSuccess = true
-                        )
-                    }
+                messageHandler.showMessage(message = receiveLabel, isError = false)
+                _uiState.update {
+                    it.copy(
+                        isProcessing = false,
+                        isProcessingReceiveSuccess = true
+                    )
                 }
-                .onFailure { throwable ->
-                    val backendMessage = throwable.serverMessageOrNull()
-                    val error = backendMessage ?: (throwable.message ?: errorLabel)
-                    messageHandler.showMessage(message = error, isError = true)
-
-                    _uiState.update {
-                        it.copy(isProcessing = false)
-                    }
-                }
+            } catch (t: Throwable) {
+                val backendMessage = t.serverMessageOrNull()
+                val error = backendMessage ?: (t.message ?: errorLabel)
+                messageHandler.showMessage(message = error, isError = true)
+                _uiState.update { it.copy(isProcessing = false) }
+            }
             Log.d(TAG, "submit: ${_uiState.value}")
         }
     }

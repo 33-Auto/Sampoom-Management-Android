@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.EmptyContent
@@ -55,21 +55,36 @@ import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.auth.domain.model.User
+import com.sampoom.android.feature.auth.domain.model.UserRole
 import com.sampoom.android.feature.order.domain.model.Order
 
 @Composable
 fun DashboardScreen(
     paddingValues: PaddingValues,
+    onSettingClick: () -> Unit,
     onNavigateOrderDetail: (Order) -> Unit,
     onNavigationOrder: () -> Unit,
-    onLogoutClick: () -> Unit,
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val errorLabel = stringResource(R.string.common_error)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val user by viewModel.user.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullToRefreshState()
-    val isManager = user?.role == "ADMIN"
+    val orderListPaged = viewModel.orderListPaged.collectAsLazyPagingItems()
+    val isManager = when (user?.role) {
+        UserRole.STAFF,
+        UserRole.SENIOR_STAFF,
+        UserRole.ASSISTANT_MANAGER,
+        UserRole.MANAGER,
+        UserRole.DEPUTY_GENERAL_MANAGER,
+        UserRole.GENERAL_MANAGER,
+        UserRole.DIRECTOR,
+        UserRole.VICE_PRESIDENT,
+        UserRole.PRESIDENT,
+        UserRole.CHAIRMAN -> true
+
+        else -> false
+    }
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)
@@ -77,7 +92,10 @@ fun DashboardScreen(
 
     PullToRefreshBox(
         isRefreshing = false,
-        onRefresh = { viewModel.onEvent(DashboardUiEvent.LoadDashboard) },
+        onRefresh = {
+            viewModel.onEvent(DashboardUiEvent.LoadDashboard)
+            orderListPaged.refresh()
+        },
         state = pullRefreshState,
         modifier = Modifier.fillMaxSize(),
         indicator = {
@@ -123,7 +141,7 @@ fun DashboardScreen(
                     }
 
                     IconButton(
-                        onClick = { }
+                        onClick = { onSettingClick() }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.settings),
@@ -139,12 +157,6 @@ fun DashboardScreen(
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                item {
-                    Button(onClick = { onLogoutClick() }) {
-                        Text("로그아웃")
-                    }
-                }
-
                 item { TitleSection(user) }
 
                 item { ButtonSection(isManager) }
@@ -152,7 +164,7 @@ fun DashboardScreen(
                 item {
                     OrderListSection(
                         viewModel = viewModel,
-                        uiState = uiState,
+                        orderListPaged = orderListPaged,
                         onNavigateOrderDetail = { order ->
                             onNavigateOrderDetail(order)
                         },
@@ -179,7 +191,7 @@ fun TitleSection(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = user?.branch ?: "", // TODO: Agency Id 받아오기
+            text = user?.branch ?: "",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = textColor()
@@ -190,7 +202,7 @@ fun TitleSection(
 
             pushStringAnnotation(tag = "NAME", annotation = "name")
             withStyle(style = SpanStyle(color = Main500)) {
-                append(user?.userName ?: "")   // TODO : 이름 받아오기
+                append(user?.userName ?: "")
             }
             append(stringResource(R.string.dashboard_title_hello_sir))
             pop()
@@ -338,11 +350,10 @@ fun ButtonCard(
 @Composable
 fun OrderListSection(
     viewModel: DashboardViewModel,
-    uiState: DashboardUiState,
+    orderListPaged: LazyPagingItems<Order>,
     onNavigateOrderDetail: (Order) -> Unit,
     onNavigationOrder: () -> Unit
 ) {
-    val orderListPaged = viewModel.orderListPaged.collectAsLazyPagingItems()
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -390,7 +401,7 @@ fun OrderListSection(
                     contentAlignment = Alignment.Center
                 ) {
                     ErrorContent(
-                        onRetry = { viewModel.onEvent(DashboardUiEvent.RetryDashboard) },
+                        onRetry = { orderListPaged.refresh() },
                         modifier = Modifier.height(200.dp)
                     )
                 }

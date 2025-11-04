@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -48,6 +49,7 @@ import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.backgroundColor
 import com.sampoom.android.core.ui.theme.textColor
+import com.sampoom.android.feature.auth.domain.model.User
 import com.sampoom.android.feature.auth.ui.AuthViewModel
 import com.sampoom.android.feature.auth.ui.LoginScreen
 import com.sampoom.android.feature.auth.ui.SignUpScreen
@@ -58,6 +60,7 @@ import com.sampoom.android.feature.order.ui.OrderListScreen
 import com.sampoom.android.feature.outbound.ui.OutboundListScreen
 import com.sampoom.android.feature.part.ui.PartListScreen
 import com.sampoom.android.feature.part.ui.PartScreen
+import com.sampoom.android.feature.setting.ui.SettingScreen
 import kotlinx.coroutines.flow.filterNotNull
 
 // Auth Screen
@@ -100,6 +103,7 @@ fun AppNavHost(
     val authViewModel: AuthViewModel = hiltViewModel()
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
     val isLoading by authViewModel.isLoading.collectAsState()
+    val user by viewModel.user.collectAsStateWithLifecycle()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -177,16 +181,16 @@ fun AppNavHost(
                 }
             )
         }
-        composable(ROUTE_HOME) { MainScreen(navController, authViewModel) }
+        composable(ROUTE_HOME) { MainScreen(navController, user) }
         composable(ROUTE_PARTS) {
             PartScreen(
                 onNavigateBack = {
                     navController.navigateUp()
                 },
                 onNavigatePartList = { group ->
-                    // TODO: 실제 사용자의 agencyId 사용
                     navController.currentBackStackEntry?.savedStateHandle?.set("groupName", group.name)
-                    navController.navigate(routePartList(1, group.id))
+                    val agencyId = user?.agencyId
+                    if (agencyId != null) navController.navigate(routePartList(agencyId, group.id))
                 }
             )
         }
@@ -217,6 +221,22 @@ fun AppNavHost(
                 }
             )
         }
+        composable(
+            ROUTE_SETTINGS
+        ) {
+            SettingScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                },
+                onLogoutClick = {
+                    authViewModel.signOut()
+                    navController.navigate(ROUTE_LOGIN) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
     }
     TopSnackBarHost(hostState = snackBarHostState, isError = currentMessage?.isError ?: false)
 }
@@ -224,7 +244,7 @@ fun AppNavHost(
 @Composable
 fun MainScreen(
     parentNavController: NavHostController,
-    authViewModel: AuthViewModel
+    user: User?
 ) {
     val navController = rememberNavController()
 
@@ -239,21 +259,18 @@ fun MainScreen(
             composable(ROUTE_DASHBOARD) {
                 DashboardScreen(
                     paddingValues = innerPadding,
+                    onSettingClick = {
+                        parentNavController.navigate(ROUTE_SETTINGS)
+                    },
                     onNavigateOrderDetail = { order ->
-                        parentNavController.navigate(routeOrderDetail(1, order.orderId))
+                        val agencyId = user?.agencyId
+                        if (agencyId != null) parentNavController.navigate(routeOrderDetail(agencyId, order.orderId))
                     },
                     onNavigationOrder = {
                         navController.navigate(ROUTE_ORDERS) {
                             popUpTo(ROUTE_DASHBOARD) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
-                        }
-                    },
-                    onLogoutClick = {
-                        authViewModel.signOut()
-                        parentNavController.navigate(ROUTE_LOGIN) {
-                            popUpTo(parentNavController.graph.startDestinationId) { inclusive = true }
-                            launchSingleTop = true
                         }
                     }
                 )
@@ -272,8 +289,8 @@ fun MainScreen(
                 OrderListScreen(
                     paddingValues = innerPadding,
                     onNavigateOrderDetail = { order ->
-                        // TODO: 실제 사용자의 agencyId 사용
-                        parentNavController.navigate(routeOrderDetail(1, order.orderId))
+                        val agencyId = user?.agencyId
+                        if (agencyId != null) parentNavController.navigate(routeOrderDetail(agencyId, order.orderId))
                     }
                 )
             }

@@ -18,9 +18,14 @@ import com.sampoom.android.feature.order.domain.model.OrderStatus
 @Composable
 fun StatusChip(status: OrderStatus) {
     val (text, color) = when (status) {
-        OrderStatus.PENDING -> stringResource(R.string.order_status_pending) to WaitYellow
-        OrderStatus.COMPLETED -> stringResource(R.string.order_status_completed) to SuccessGreen
-        OrderStatus.CANCELED -> stringResource(R.string.order_status_canceled) to FailRed
+        OrderStatus.PENDING -> stringResource(R.string.order_status_pending) to WaitYellow  // 대기중
+        OrderStatus.CONFIRMED -> stringResource(R.string.order_status_confirmed) to WaitYellow    // 주문 확인
+        OrderStatus.SHIPPING -> stringResource(R.string.order_status_shipping) to WaitYellow // 배송 중
+        OrderStatus.DELAYED -> stringResource(R.string.order_status_delayed) to WaitYellow  // 배송 지연
+        OrderStatus.PRODUCING -> stringResource(R.string.order_status_producing) to WaitYellow    // 생산 중
+        OrderStatus.ARRIVED -> stringResource(R.string.order_status_arrived) to WaitYellow  // 배송 완료
+        OrderStatus.COMPLETED -> stringResource(R.string.order_status_completed) to SuccessGreen    // 입고 완료
+        OrderStatus.CANCELED -> stringResource(R.string.order_status_canceled) to FailRed   // 주문 취소
     }
 
     Surface(

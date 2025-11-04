@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 class OrderRepositoryImpl @Inject constructor(
     private val api: OrderApi,
-    private val preferences: AuthPreferences,
+    private val authPreferences: AuthPreferences,
     private val pagingSourceFactory: OrderPagingSource.Factory
 ) : OrderRepository {
     override fun getOrderList(): Flow<PagingData<Order>> {
@@ -31,7 +31,7 @@ class OrderRepositoryImpl @Inject constructor(
 
     override suspend fun createOrder(cartList: CartList): Result<Order> {
         return runCatching {
-            val agencyName = preferences.getStoredUser()?.branch ?: throw Exception()
+            val agencyName = authPreferences.getStoredUser()?.branch ?: throw Exception()
             val items = cartList.items.map { cart ->
                 OrderCategoryDto(
                     categoryId = cart.categoryId,
@@ -64,9 +64,17 @@ class OrderRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun completeOrder(orderId: Long): Result<Unit> {
+        return runCatching {
+            val dto = api.completeOrder(orderId)
+            if (!dto.success) throw Exception(dto.message)
+        }
+    }
+
     override suspend fun receiveOrder(orderId: Long): Result<Unit> {
         return runCatching {
-            val dto = api.receiveOrder(orderId)
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.receiveOrder(agencyId = agencyId, orderId = orderId)
             if (!dto.success) throw Exception(dto.message)
         }
     }

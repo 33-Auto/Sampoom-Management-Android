@@ -12,32 +12,38 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-// TODO: AgencyId 동적 주입
 interface OutboundApi {
     // 출고 목록 조회
-    @GET("agency/1/outbound")
-    suspend fun getOutboundList(): ApiResponse<List<OutboundDto>>
+    @GET("agency/{agencyId}/outbound")
+    suspend fun getOutboundList(@Path("agencyId") agencyId: Long): ApiResponse<List<OutboundDto>>
 
     // 출고 목록에 부품 추가
-    @POST("agency/1/outbound")
-    suspend fun addOutbound(@Body body: AddOutboundRequestDto): ApiSuccessResponse
+    @POST("agency/{agencyId}/outbound")
+    suspend fun addOutbound(
+        @Path("agencyId") agencyId: Long,
+        @Body body: AddOutboundRequestDto
+    ): ApiSuccessResponse
 
     // 출고 처리
-    @POST("agency/1/outbound/process")
-    suspend fun processOutbound(): ApiSuccessResponse
+    @POST("agency/{agencyId}/outbound/process")
+    suspend fun processOutbound(@Path("agencyId") agencyId: Long): ApiSuccessResponse
 
     // 출고 항목 삭제
-    @DELETE("agency/1/outbound/{outboundId}")
-    suspend fun deleteOutbound(@Path("outboundId") outboundId: Long): ApiSuccessResponse
+    @DELETE("agency/{agencyId}/outbound/{outboundId}")
+    suspend fun deleteOutbound(
+        @Path("agencyId") agencyId: Long,
+        @Path("outboundId") outboundId: Long
+    ): ApiSuccessResponse
 
     // 출고 수량 변경
-    @PATCH("agency/1/outbound/{outboundId}")
+    @PATCH("agency/{agencyId}/outbound/{outboundId}")
     suspend fun updateOutbound(
+        @Path("agencyId") agencyId: Long,
         @Path("outboundId") outboundId: Long,
         @Body body: UpdateOutboundRequestDto
     ): ApiSuccessResponse
 
     // 출고 목록 전체 비우기
-    @DELETE("agency/1/outbound/clear")
-    suspend fun deleteAllOutbound(): ApiSuccessResponse
+    @DELETE("agency/{agencyId}/outbound/clear")
+    suspend fun deleteAllOutbound(@Path("agencyId") agencyId: Long): ApiSuccessResponse
 }
