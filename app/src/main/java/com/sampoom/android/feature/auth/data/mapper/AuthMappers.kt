@@ -3,12 +3,13 @@ package com.sampoom.android.feature.auth.data.mapper
 import com.sampoom.android.feature.auth.data.remote.dto.GetProfileResponseDto
 import com.sampoom.android.feature.auth.data.remote.dto.LoginResponseDto
 import com.sampoom.android.feature.auth.domain.model.User
+import com.sampoom.android.feature.auth.domain.model.UserRole
 
 fun LoginResponseDto.toModel(): User = User(
     userId = userId,
     userName = "",
     email = "",
-    role = "",
+    role = UserRole.STAFF,
     accessToken = accessToken,
     refreshToken = refreshToken,
     expiresIn = expiresIn,
@@ -24,7 +25,7 @@ fun GetProfileResponseDto.toModel(): User = User(
     userId = userId,
     userName = userName,
     email = email,
-    role = role,
+    role = role.toUserRole(),
     accessToken = "",
     refreshToken = "",
     expiresIn = 0L,
@@ -42,3 +43,9 @@ fun User.mergeWith(profile: User): User = this.copy(
     workspace = profile.workspace,
     branch = profile.branch
 )
+
+private fun String.toUserRole(): UserRole = try {
+    UserRole.valueOf(this.uppercase())
+} catch (_: Exception) {
+    UserRole.STAFF
+}

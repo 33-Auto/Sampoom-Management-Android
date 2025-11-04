@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.sampoom.android.feature.auth.domain.model.User
+import com.sampoom.android.feature.auth.domain.model.UserRole
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,7 +49,7 @@ class AuthPreferences @Inject constructor(
             prefs[Keys.USER_ID] = cryptoManager.encrypt(user.userId.toString())
             prefs[Keys.USER_NAME] = cryptoManager.encrypt(user.userName)
             prefs[Keys.USER_EMAIL] = cryptoManager.encrypt(user.email)
-            prefs[Keys.USER_ROLE] = cryptoManager.encrypt(user.role)
+            prefs[Keys.USER_ROLE] = cryptoManager.encrypt(user.role.name)
             prefs[Keys.USER_POSITION] = cryptoManager.encrypt(user.position)
             prefs[Keys.USER_WORKSPACE] = cryptoManager.encrypt(user.workspace)
             prefs[Keys.USER_BRANCH] = cryptoManager.encrypt(user.branch)
@@ -95,7 +96,9 @@ class AuthPreferences @Inject constructor(
                     cryptoManager.decrypt(userId).toLong(),
                     cryptoManager.decrypt(userName),
                     cryptoManager.decrypt(userEmail),
-                    cryptoManager.decrypt(userRole),
+                    cryptoManager.decrypt(userRole).let { decrypted ->
+                        try { UserRole.valueOf(decrypted.uppercase()) } catch (_: Exception) { UserRole.STAFF }
+                    },
                     cryptoManager.decrypt(accessToken),
                     cryptoManager.decrypt(refreshToken),
                     remaining,

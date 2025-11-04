@@ -55,6 +55,7 @@ import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.auth.domain.model.User
+import com.sampoom.android.feature.auth.domain.model.UserRole
 import com.sampoom.android.feature.order.domain.model.Order
 
 @Composable
@@ -70,7 +71,20 @@ fun DashboardScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullToRefreshState()
     val orderListPaged = viewModel.orderListPaged.collectAsLazyPagingItems()
-    val isManager = user?.role == "ADMIN"
+    val isManager = when (user?.role) {
+        UserRole.STAFF,
+        UserRole.SENIOR_STAFF,
+        UserRole.ASSISTANT_MANAGER,
+        UserRole.MANAGER,
+        UserRole.DEPUTY_GENERAL_MANAGER,
+        UserRole.GENERAL_MANAGER,
+        UserRole.DIRECTOR,
+        UserRole.VICE_PRESIDENT,
+        UserRole.PRESIDENT,
+        UserRole.CHAIRMAN -> true
+
+        else -> false
+    }
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)

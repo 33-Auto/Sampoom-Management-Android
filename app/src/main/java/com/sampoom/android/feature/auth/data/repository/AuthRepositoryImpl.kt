@@ -1,7 +1,6 @@
 package com.sampoom.android.feature.auth.data.repository
 
 import com.sampoom.android.core.preferences.AuthPreferences
-import com.sampoom.android.feature.auth.data.mapper.mergeWith
 import com.sampoom.android.feature.auth.data.mapper.toModel
 import com.sampoom.android.feature.auth.data.remote.api.AuthApi
 import com.sampoom.android.feature.auth.data.remote.dto.LoginRequestDto
@@ -10,7 +9,6 @@ import com.sampoom.android.feature.auth.data.remote.dto.SignUpRequestDto
 import com.sampoom.android.feature.auth.domain.model.User
 import com.sampoom.android.feature.auth.domain.repository.AuthRepository
 import javax.inject.Inject
-import kotlin.math.log
 
 class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
