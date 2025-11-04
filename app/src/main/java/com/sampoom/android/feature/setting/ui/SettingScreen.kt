@@ -136,7 +136,6 @@ fun SettingScreen(
                 TextButton(
                     onClick = {
                         showLogoutDialog = false
-                        onLogoutClick()
                     }
                 ) {
                     Text(stringResource(R.string.common_confirm))
