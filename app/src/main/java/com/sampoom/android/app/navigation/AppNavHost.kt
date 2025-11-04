@@ -189,7 +189,8 @@ fun AppNavHost(
                 },
                 onNavigatePartList = { group ->
                     navController.currentBackStackEntry?.savedStateHandle?.set("groupName", group.name)
-                    navController.navigate(routePartList(user?.agencyId ?: 0, group.id))
+                    val agencyId = user?.agencyId
+                    if (agencyId != null) navController.navigate(routePartList(agencyId, group.id))
                 }
             )
         }
@@ -262,7 +263,8 @@ fun MainScreen(
                         parentNavController.navigate(ROUTE_SETTINGS)
                     },
                     onNavigateOrderDetail = { order ->
-                        parentNavController.navigate(routeOrderDetail(user?.agencyId ?: 0, order.orderId))
+                        val agencyId = user?.agencyId
+                        if (agencyId != null) parentNavController.navigate(routeOrderDetail(agencyId, order.orderId))
                     },
                     onNavigationOrder = {
                         navController.navigate(ROUTE_ORDERS) {
@@ -287,7 +289,8 @@ fun MainScreen(
                 OrderListScreen(
                     paddingValues = innerPadding,
                     onNavigateOrderDetail = { order ->
-                        parentNavController.navigate(routeOrderDetail(user?.agencyId ?: 0, order.orderId))
+                        val agencyId = user?.agencyId
+                        if (agencyId != null) parentNavController.navigate(routeOrderDetail(agencyId, order.orderId))
                     }
                 )
             }

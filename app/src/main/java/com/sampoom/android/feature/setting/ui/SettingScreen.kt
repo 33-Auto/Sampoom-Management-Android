@@ -187,16 +187,16 @@ fun UserSection(
                 style = MaterialTheme.typography.bodyMedium,
                 color = textSecondaryColor()
             )
-            if (!user?.startedAt.isNullOrEmpty()) {
+            user?.startedAt?.takeIf { it.isNotBlank() }?.let { startedAt ->
                 Text(
-                    text = formatDate(user.startedAt),
+                    text = formatDate(startedAt),
                     style = MaterialTheme.typography.bodyMedium,
                     color = textSecondaryColor()
                 )
             }
-            if (!user?.endedAt.isNullOrEmpty()) {
+            user?.endedAt?.takeIf { it.isNotBlank() }?.let { endedAt ->
                 Text(
-                    text = formatDate(user.endedAt),
+                    text = formatDate(endedAt),
                     style = MaterialTheme.typography.bodyMedium,
                     color = textSecondaryColor()
                 )

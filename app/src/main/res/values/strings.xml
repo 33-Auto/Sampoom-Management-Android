@@ -137,6 +137,9 @@
     <string name="common_EA">EA</string>
     <string name="common_slash">-</string>
 
+    <!-- 에러 -->
+    <string name="user_branch_error">지점명을 찾을 수 없습니다.</string>
+
     <!-- Validation -->
     <string name="validation_email_required">이메일을 입력해주세요</string>
     <string name="validation_email_invalid">올바른 이메일 형식이 아닙니다</string>
