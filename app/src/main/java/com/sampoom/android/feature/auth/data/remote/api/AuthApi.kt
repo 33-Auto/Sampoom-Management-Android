@@ -16,6 +16,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface AuthApi {
     @POST("auth/signup")
@@ -33,7 +34,7 @@ interface AuthApi {
     suspend fun login(@Body body: LoginRequestDto): ApiResponse<LoginResponseDto>
 
     @GET("user/profile")
-    suspend fun getProfile(): ApiResponse<GetProfileResponseDto>
+    suspend fun getProfile(@Query("workspace") workspace: String): ApiResponse<GetProfileResponseDto>
 
     @PATCH("user/profile")
     suspend fun updateProfile(@Body body: UpdateProfileRequestDto): ApiResponse<UpdateProfileResponseDto>

@@ -2,6 +2,7 @@ package com.sampoom.android.feature.part.data.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.sampoom.android.core.preferences.AuthPreferences
 import com.sampoom.android.feature.part.data.mapper.toModel
 import com.sampoom.android.feature.part.data.remote.api.PartApi
 import com.sampoom.android.feature.part.domain.model.SearchResult
@@ -11,6 +12,7 @@ import dagger.assisted.AssistedInject
 
 class PartPagingSource @AssistedInject constructor(
     private val api: PartApi,
+    private val authPreferences: AuthPreferences,
     @Assisted private val keyword: String
 ) : PagingSource<Int, SearchResult>() {
 
@@ -29,7 +31,8 @@ class PartPagingSource @AssistedInject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchResult> {
         return try {
             val page = params.key ?: 0
-            val response = api.searchParts(keyword, page, 20)
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val response = api.searchParts(agencyId, keyword, page, 20)
 
             val flatParts = response.data.toModel()
 

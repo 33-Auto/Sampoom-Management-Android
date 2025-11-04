@@ -28,7 +28,7 @@ class OrderPagingSource @AssistedInject constructor(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Order> {
         return try {
-            val agencyName = authPreferences.getStoredUser()?.branch ?: ""
+            val agencyName = authPreferences.getStoredUser()?.branch ?: throw Exception()
             val page = params.key ?: 0
             val pageSize = params.loadSize
             val response = api.getOrderList(agencyName, page, pageSize)

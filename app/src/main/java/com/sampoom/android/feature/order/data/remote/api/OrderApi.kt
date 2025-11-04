@@ -12,7 +12,6 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-// TODO: AgencyId 동적 주입
 interface OrderApi {
     // 주문 목록 조회
     @GET("order/requested")
@@ -26,9 +25,16 @@ interface OrderApi {
     @POST("order/")
     suspend fun createOrder(@Body orderRequestDto: OrderRequestDto): ApiResponse<OrderDto>
 
-    // 주문 입고 처리
-    @PATCH("agency/1/orders/{orderId}/receive")
-    suspend fun receiveOrder(@Path("orderId") orderId: Long): ApiSuccessResponse
+    // 주문 완료 처리
+    @PATCH("order/complete/{orderId}")
+    suspend fun completeOrder(@Path("orderId") orderId: Long): ApiSuccessResponse
+
+    // 주문 입고 처리 (대리점)
+    @PATCH("agency/{agencyId}/orders/{orderId}/receive")
+    suspend fun receiveOrder(
+        @Path("agencyId") agencyId: Long,
+        @Path("orderId") orderId: Long
+    ): ApiSuccessResponse
 
     // 주문 상세 조회
     @GET("order/{orderId}")

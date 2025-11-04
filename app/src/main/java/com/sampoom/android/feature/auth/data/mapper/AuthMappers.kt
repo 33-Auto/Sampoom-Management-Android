@@ -7,25 +7,33 @@ import com.sampoom.android.feature.auth.domain.model.User
 fun LoginResponseDto.toModel(): User = User(
     userId = userId,
     userName = "",
-    role = role,
+    email = "",
+    role = "",
     accessToken = accessToken,
     refreshToken = refreshToken,
     expiresIn = expiresIn,
     position = "",
     workspace = "",
-    branch = ""
+    branch = "",
+    agencyId = 0,
+    startedAt = null,
+    endedAt = null
 )
 
 fun GetProfileResponseDto.toModel(): User = User(
     userId = userId,
     userName = userName,
-    role = "",
+    email = email,
+    role = role,
     accessToken = "",
     refreshToken = "",
     expiresIn = 0L,
     position = position,
     workspace = workspace,
-    branch = branch
+    branch = branch,
+    agencyId = organizationId,
+    startedAt = startedAt,
+    endedAt = endedAt
 )
 
 fun User.mergeWith(profile: User): User = this.copy(

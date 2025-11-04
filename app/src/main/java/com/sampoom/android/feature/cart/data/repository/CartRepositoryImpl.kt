@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.cart.data.repository
 
+import com.sampoom.android.core.preferences.AuthPreferences
 import com.sampoom.android.feature.cart.data.mapper.toModel
 import com.sampoom.android.feature.cart.data.remote.api.CartApi
 import com.sampoom.android.feature.cart.data.remote.dto.AddCartRequestDto
@@ -9,11 +10,13 @@ import com.sampoom.android.feature.cart.domain.repository.CartRepository
 import javax.inject.Inject
 
 class CartRepositoryImpl @Inject constructor(
-    private val api: CartApi
+    private val api: CartApi,
+    private val authPreferences: AuthPreferences
 ) : CartRepository {
     override suspend fun getCartList(): Result<CartList> {
         return runCatching {
-            val dto = api.getCartList()
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.getCartList(agencyId)
             val cartItems = dto.data.map { it.toModel() }
             CartList(items = cartItems)
         }
@@ -24,21 +27,24 @@ class CartRepositoryImpl @Inject constructor(
         quantity: Long
     ): Result<Unit> {
         return runCatching {
-            val dto = api.addCart(AddCartRequestDto(partId, quantity))
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.addCart(agencyId = agencyId, body = AddCartRequestDto(partId, quantity))
             if (!dto.success) throw Exception(dto.message)
         }
     }
 
     override suspend fun deleteCart(cartItemId: Long): Result<Unit> {
         return runCatching {
-            val dto = api.deleteCart(cartItemId)
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.deleteCart(agencyId = agencyId, cartItemId = cartItemId)
             if (!dto.success) throw Exception(dto.message)
         }
     }
 
     override suspend fun deleteAllCart(): Result<Unit> {
         return runCatching {
-            val dto = api.deleteAllCart()
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.deleteAllCart(agencyId)
             if (!dto.success) throw Exception(dto.message)
         }
     }
@@ -48,7 +54,8 @@ class CartRepositoryImpl @Inject constructor(
         quantity: Long
     ): Result<Unit> {
         return runCatching {
-            val dto = api.updateCart(cartItemId, UpdateCartRequestDto(quantity))
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val dto = api.updateCart(agencyId = agencyId, cartItemId = cartItemId, body = UpdateCartRequestDto(quantity))
             if (!dto.success) throw Exception(dto.message)
         }
     }

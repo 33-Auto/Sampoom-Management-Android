@@ -9,7 +9,6 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-// TODO: AgencyId 동적 주입
 interface PartApi {
     @GET("agency/category")
     suspend fun getCategoryList(): ApiResponse<List<CategoryDto>>
@@ -17,11 +16,15 @@ interface PartApi {
     @GET("agency/category/{categoryId}")
     suspend fun getGroupList(@Path("categoryId") categoryId: Long): ApiResponse<List<GroupDto>>
 
-    @GET("agency/1/group/{groupId}")
-    suspend fun getPartList(@Path("groupId") groupId: Long): ApiResponse<List<PartDto>>
+    @GET("agency/{agencyId}/group/{groupId}")
+    suspend fun getPartList(
+        @Path("agencyId") agencyId: Long,
+        @Path("groupId") groupId: Long
+    ): ApiResponse<List<PartDto>>
 
-    @GET("agency/1/search")
+    @GET("agency/{agencyId}/search")
     suspend fun searchParts(
+        @Path("agencyId") agencyId: Long,
         @Query("keyword") keyword: String,
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20

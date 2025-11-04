@@ -3,6 +3,7 @@ package com.sampoom.android.feature.part.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.sampoom.android.core.preferences.AuthPreferences
 import com.sampoom.android.feature.part.data.mapper.toModel
 import com.sampoom.android.feature.part.data.paging.PartPagingSource
 import com.sampoom.android.feature.part.data.remote.api.PartApi
@@ -16,6 +17,7 @@ import javax.inject.Inject
 
 class PartRepositoryImpl @Inject constructor(
     private val api: PartApi,
+    private val authPreferences: AuthPreferences,
     private val pagingSourceFactory: PartPagingSource.Factory
 ) : PartRepository {
     override suspend fun getCategoryList(): Result<CategoryList> {
@@ -36,7 +38,8 @@ class PartRepositoryImpl @Inject constructor(
 
     override suspend fun getPartList(groupId: Long): Result<PartList> {
         return runCatching {
-            val response = api.getPartList(groupId)
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
+            val response = api.getPartList(agencyId = agencyId, groupId = groupId)
             val partItems = response.data.map { it.toModel() }
             PartList(items = partItems)
         }
