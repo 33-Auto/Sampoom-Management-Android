@@ -167,12 +167,12 @@ fun UserSection(
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = user?.userName.toString(),
+                text = user?.userName ?: "",
                 style = MaterialTheme.typography.headlineLarge,
                 color = textColor()
             )
             Text(
-                text = user?.position.toString(),
+                text = user?.position ?: "",
                 style = MaterialTheme.typography.bodyMedium,
                 color = textSecondaryColor()
             )
@@ -182,7 +182,7 @@ fun UserSection(
             horizontalAlignment = Alignment.End
         ) {
             Text(
-                text = user?.email.toString(),
+                text = user?.email ?: "",
                 style = MaterialTheme.typography.bodyMedium,
                 color = textSecondaryColor()
             )
