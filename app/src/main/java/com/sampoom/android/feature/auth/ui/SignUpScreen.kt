@@ -15,7 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -26,7 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -39,8 +45,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.sampoom.android.R
+import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.component.CommonTextField
+import com.sampoom.android.core.util.positionToKorean
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +79,9 @@ fun SignUpScreen(
     LaunchedEffect(state.success) {
         if (state.success) onSuccess()
     }
+
+    val positionItems = remember { UserPosition.entries }
+    var positionMenuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -148,16 +159,52 @@ fun SignUpScreen(
                     text = stringResource(R.string.signup_title_position),
                     fontSize = labelTextSize
                 )
-                CommonTextField(
-                    modifier = Modifier.fillMaxWidth().focusRequester(positionFocus),
-                    value = state.position,
-                    onValueChange = { viewModel.onEvent(SignUpUiEvent.PositionChanged(it)) },
-                    placeholder = stringResource(R.string.signup_placeholder_position),
-                    isError = state.positionError != null,
-                    errorMessage = state.positionError,
-                    imeAction = ImeAction.Next,
-                    keyboardActions = KeyboardActions(onNext = { emailFocus.requestFocus() })
-                )
+//                CommonTextField(
+//                    modifier = Modifier.fillMaxWidth().focusRequester(positionFocus),
+//                    value = state.position,
+//                    onValueChange = { viewModel.onEvent(SignUpUiEvent.PositionChanged(it)) },
+//                    placeholder = stringResource(R.string.signup_placeholder_position),
+//                    isError = state.positionError != null,
+//                    errorMessage = state.positionError,
+//                    imeAction = ImeAction.Next,
+//                    keyboardActions = KeyboardActions(onNext = { emailFocus.requestFocus() })
+//                )
+                ExposedDropdownMenuBox(
+                    expanded = positionMenuExpanded,
+                    onExpandedChange = { positionMenuExpanded = it }
+                ) {
+                    CommonTextField(
+                        modifier = Modifier
+                            .menuAnchor(
+                                type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                                enabled = true
+                            )
+                            .fillMaxWidth(),
+                        readOnly = true,
+                        value = state.position?.let { positionToKorean(it) } ?: "",
+                        onValueChange = {},
+                        placeholder = stringResource(R.string.signup_placeholder_position),
+                        isError = state.positionError != null,
+                        errorMessage = state.positionError,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = positionMenuExpanded) },
+                        singleLine = true
+                    )
+                    ExposedDropdownMenu(
+                        expanded = positionMenuExpanded,
+                        onDismissRequest = { positionMenuExpanded = false }
+                    ) {
+                        positionItems.forEach { role ->
+                            DropdownMenuItem(
+                                text = { Text(positionToKorean(role)) },
+                                onClick = {
+                                    viewModel.onEvent(SignUpUiEvent.PositionChanged(role))
+                                    positionMenuExpanded = false
+                                    emailFocus.requestFocus()
+                                }
+                            )
+                        }
+                    }
+                }
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.signup_title_email),

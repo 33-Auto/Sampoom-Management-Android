@@ -1,6 +1,7 @@
 package com.sampoom.android.feature.auth.data.repository
 
 import com.sampoom.android.core.preferences.AuthPreferences
+import com.sampoom.android.core.util.retry
 import com.sampoom.android.feature.auth.data.mapper.toModel
 import com.sampoom.android.feature.auth.data.remote.api.AuthApi
 import com.sampoom.android.feature.auth.data.remote.dto.LoginRequestDto
@@ -14,6 +15,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val api: AuthApi,
     private val preferences: AuthPreferences
 ) : AuthRepository {
+
     override suspend fun signUp(
         email: String,
         password: String,
@@ -55,8 +57,9 @@ class AuthRepositoryImpl @Inject constructor(
 
             preferences.saveUser(loginUser)
 
-            val profileDto = getProfile("AGENCY")
-            val profileUser = profileDto.getOrThrow()
+            val profileUser = retry(times = 5, initialDelay = 300) {
+                getProfile("AGENCY").getOrThrow()
+            }
 
             val user = User(
                 userId = loginUser.userId,

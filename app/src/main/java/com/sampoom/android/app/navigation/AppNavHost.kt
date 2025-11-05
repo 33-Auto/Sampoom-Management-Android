@@ -128,18 +128,18 @@ fun AppNavHost(
             }
     }
 
-    LaunchedEffect(currentRoute, homeNavColor, lightIcons) {
-        val window = activity?.window ?: return@LaunchedEffect
-        if (currentRoute == ROUTE_HOME) {
-            window.navigationBarColor = homeNavColor.toArgb()
-            WindowInsetsControllerCompat(window, window.decorView)
-                .isAppearanceLightNavigationBars = lightIcons
-        } else {
-            window.navigationBarColor = elseNavColor.toArgb()
-            WindowInsetsControllerCompat(window, window.decorView)
-                .isAppearanceLightNavigationBars = lightIcons
-        }
-    }
+//    LaunchedEffect(currentRoute, homeNavColor, lightIcons) {
+//        val window = activity?.window ?: return@LaunchedEffect
+//        if (currentRoute == ROUTE_HOME) {
+//            window.navigationBarColor = homeNavColor.toArgb()
+//            WindowInsetsControllerCompat(window, window.decorView)
+//                .isAppearanceLightNavigationBars = lightIcons
+//        } else {
+//            window.navigationBarColor = elseNavColor.toArgb()
+//            WindowInsetsControllerCompat(window, window.decorView)
+//                .isAppearanceLightNavigationBars = lightIcons
+//        }
+//    }
 
     if (isLoading) {
         Box(

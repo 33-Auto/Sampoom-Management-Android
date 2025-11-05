@@ -1,10 +1,12 @@
 package com.sampoom.android.feature.auth.ui
 
+import com.sampoom.android.core.model.UserPosition
+
 data class SignUpUiState(
     val name: String = "",
     val workspace: String = "AGENCY",
     val branch: String = "",
-    val position: String = "",
+    val position: UserPosition? = null,
     val email: String = "",
     val password: String = "",
     val passwordCheck: String = "",
@@ -23,7 +25,7 @@ data class SignUpUiState(
     val isValid: Boolean
         get() = name.isNotBlank() &&
                 branch.isNotBlank() &&
-                position.isNotBlank() &&
+                position != null &&
                 email.isNotBlank() &&
                 password.isNotBlank() &&
                 passwordCheck.isNotBlank() &&
