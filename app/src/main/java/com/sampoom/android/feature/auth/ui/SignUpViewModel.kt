@@ -4,9 +4,13 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sampoom.android.R
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.feature.auth.domain.AuthValidator
+import com.sampoom.android.feature.auth.domain.AuthValidator.validateEmail
+import com.sampoom.android.feature.auth.domain.AuthValidator.validatePassword
+import com.sampoom.android.feature.auth.domain.AuthValidator.validatePasswordCheck
 import com.sampoom.android.feature.auth.domain.ValidationResult
 import com.sampoom.android.feature.auth.domain.usecase.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -90,7 +94,11 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun validatePosition() {
-        val result = AuthValidator.validateNotEmpty(_state.value.position, positionLabel)
+        val result = if (_state.value.position == null) {
+            ValidationResult.Error(messageResId = R.string.common_required_field)
+        } else {
+            ValidationResult.Success
+        }
         _state.value = _state.value.copy(
             positionError = result.toErrorMessage()
         )
@@ -143,7 +151,7 @@ class SignUpViewModel @Inject constructor(
             workspace = s.workspace,
             branch = s.branch,
             userName = s.name,
-            position = s.position
+            position = s.position!!.name
         )
             .onSuccess {
                 _state.update {

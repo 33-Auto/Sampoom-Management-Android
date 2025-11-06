@@ -42,6 +42,7 @@ import com.sampoom.android.core.ui.theme.disableColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.core.util.formatDate
+import com.sampoom.android.core.util.positionToKorean
 import com.sampoom.android.feature.auth.domain.model.User
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,13 +67,6 @@ fun SettingScreen(
         if (uiState.profileChangeSuccess) {
             viewModel.clearSuccess()
             viewModel.onEvent(SettingUiEvent.LoadProfile)
-        }
-    }
-
-    LaunchedEffect(uiState.logoutSuccess) {
-        if (uiState.logoutSuccess) {
-            viewModel.clearSuccess()
-            onLogoutClick()
         }
     }
 
@@ -136,6 +130,7 @@ fun SettingScreen(
                 TextButton(
                     onClick = {
                         showLogoutDialog = false
+                        onLogoutClick()
                     }
                 ) {
                     Text(stringResource(R.string.common_confirm))
@@ -172,7 +167,7 @@ fun UserSection(
                 color = textColor()
             )
             Text(
-                text = user?.position ?: "",
+                text = positionToKorean(user?.position),
                 style = MaterialTheme.typography.bodyMedium,
                 color = textSecondaryColor()
             )

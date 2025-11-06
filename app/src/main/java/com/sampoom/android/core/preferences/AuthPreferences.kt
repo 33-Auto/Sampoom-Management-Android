@@ -6,13 +6,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.feature.auth.domain.model.User
-import com.sampoom.android.feature.auth.domain.model.UserRole
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.first
-import java.time.LocalDateTime
 
 // Per official guidance, DataStore instance should be single and at top-level.
 private val Context.authDataStore by preferencesDataStore(name = "auth_prefs")
@@ -49,8 +48,8 @@ class AuthPreferences @Inject constructor(
             prefs[Keys.USER_ID] = cryptoManager.encrypt(user.userId.toString())
             prefs[Keys.USER_NAME] = cryptoManager.encrypt(user.userName)
             prefs[Keys.USER_EMAIL] = cryptoManager.encrypt(user.email)
-            prefs[Keys.USER_ROLE] = cryptoManager.encrypt(user.role.name)
-            prefs[Keys.USER_POSITION] = cryptoManager.encrypt(user.position)
+            prefs[Keys.USER_ROLE] = cryptoManager.encrypt(user.role)
+            prefs[Keys.USER_POSITION] = cryptoManager.encrypt(user.position.name)
             prefs[Keys.USER_WORKSPACE] = cryptoManager.encrypt(user.workspace)
             prefs[Keys.USER_BRANCH] = cryptoManager.encrypt(user.branch)
             prefs[Keys.USER_AGENCY_ID] = cryptoManager.encrypt(user.agencyId.toString())
@@ -96,13 +95,13 @@ class AuthPreferences @Inject constructor(
                     cryptoManager.decrypt(userId).toLong(),
                     cryptoManager.decrypt(userName),
                     cryptoManager.decrypt(userEmail),
-                    cryptoManager.decrypt(userRole).let { decrypted ->
-                        try { UserRole.valueOf(decrypted.uppercase()) } catch (_: Exception) { UserRole.STAFF }
-                    },
+                    cryptoManager.decrypt(userRole),
                     cryptoManager.decrypt(accessToken),
                     cryptoManager.decrypt(refreshToken),
                     remaining,
-                    cryptoManager.decrypt(userPosition),
+                    cryptoManager.decrypt(userPosition).let { decrypted ->
+                        try { UserPosition.valueOf(decrypted.uppercase()) } catch (_: Exception) { UserPosition.STAFF }
+                    },
                     cryptoManager.decrypt(userWorkspace),
                     cryptoManager.decrypt(userBranch),
                     cryptoManager.decrypt(userAgencyId).toLong(),

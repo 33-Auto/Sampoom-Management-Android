@@ -38,7 +38,9 @@ fun CommonTextField(
     isError: Boolean = false,
     errorMessage: String? = null,
     imeAction: ImeAction = ImeAction.Next,
-    keyboardActions: KeyboardActions = KeyboardActions()
+    keyboardActions: KeyboardActions = KeyboardActions(),
+    readOnly: Boolean = false,
+    singleLine: Boolean = true
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -84,7 +86,8 @@ fun CommonTextField(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
-                singleLine = true,
+                readOnly = readOnly,
+                singleLine = singleLine,
                 enabled = enabled,
                 isError = isError,
                 trailingIcon = trailingIconView,

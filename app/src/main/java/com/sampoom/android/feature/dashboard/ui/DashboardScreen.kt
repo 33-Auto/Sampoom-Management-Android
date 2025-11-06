@@ -47,6 +47,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.sampoom.android.R
+import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.component.OrderItem
@@ -55,7 +56,6 @@ import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.auth.domain.model.User
-import com.sampoom.android.feature.auth.domain.model.UserRole
 import com.sampoom.android.feature.order.domain.model.Order
 
 @Composable
@@ -71,17 +71,17 @@ fun DashboardScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullToRefreshState()
     val orderListPaged = viewModel.orderListPaged.collectAsLazyPagingItems()
-    val isManager = when (user?.role) {
-        UserRole.STAFF,
-        UserRole.SENIOR_STAFF,
-        UserRole.ASSISTANT_MANAGER,
-        UserRole.MANAGER,
-        UserRole.DEPUTY_GENERAL_MANAGER,
-        UserRole.GENERAL_MANAGER,
-        UserRole.DIRECTOR,
-        UserRole.VICE_PRESIDENT,
-        UserRole.PRESIDENT,
-        UserRole.CHAIRMAN -> true
+    val isManager = when (user?.position) {
+        UserPosition.STAFF,
+        UserPosition.SENIOR_STAFF,
+        UserPosition.ASSISTANT_MANAGER,
+        UserPosition.MANAGER,
+        UserPosition.DEPUTY_GENERAL_MANAGER,
+        UserPosition.GENERAL_MANAGER,
+        UserPosition.DIRECTOR,
+        UserPosition.VICE_PRESIDENT,
+        UserPosition.PRESIDENT,
+        UserPosition.CHAIRMAN -> true
 
         else -> false
     }
