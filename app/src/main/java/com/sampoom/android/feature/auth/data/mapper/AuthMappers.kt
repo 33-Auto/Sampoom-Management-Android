@@ -29,7 +29,7 @@ fun GetProfileResponseDto.toModel(): User = User(
     accessToken = "",
     refreshToken = "",
     expiresIn = 0L,
-    position = position.toUserRole(),
+    position = position.toUserPosition(),
     workspace = workspace,
     branch = branch,
     agencyId = organizationId,
@@ -44,7 +44,7 @@ fun User.mergeWith(profile: User): User = this.copy(
     branch = profile.branch
 )
 
-private fun String.toUserRole(): UserPosition = try {
+private fun String.toUserPosition(): UserPosition = try {
     UserPosition.valueOf(this.uppercase())
 } catch (_: IllegalArgumentException) {
     UserPosition.STAFF
