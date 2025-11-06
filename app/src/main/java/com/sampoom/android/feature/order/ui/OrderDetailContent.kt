@@ -1,12 +1,16 @@
 package com.sampoom.android.feature.order.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Divider
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -16,14 +20,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.StatusChip
 import com.sampoom.android.core.ui.theme.backgroundCardColor
+import com.sampoom.android.core.ui.theme.disableColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
+import com.sampoom.android.core.util.formatWon
 import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.domain.model.OrderPart
+import com.sampoom.android.feature.order.domain.model.subtotal
+import com.sampoom.android.feature.order.domain.model.totalCost
 import kotlin.collections.forEach
 
 @Composable
@@ -59,6 +68,7 @@ fun OrderDetailContent(
                 }
             }
         }
+        item { Spacer(Modifier.height(50.dp).fillMaxWidth()) }
     }
 }
 
@@ -99,6 +109,22 @@ private fun OrderInfoCard(order: Order) {
 
                 StatusChip(status = order.status)
             }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.order_detail_total_amount),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textSecondaryColor()
+                )
+                Text(
+                    text = formatWon(order.totalCost),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
@@ -109,7 +135,9 @@ private fun OrderInfoRow(
     value: String
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -154,32 +182,53 @@ private fun OrderPartItem(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = backgroundCardColor())
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier.weight(1F)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = part.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = textColor()
-                )
-                Text(
-                    text = part.code,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = textSecondaryColor()
-                )
+                Column(
+                    modifier = Modifier.weight(1F)
+                ) {
+                    Text(
+                        text = part.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = textColor()
+                    )
+                    Text(
+                        text = part.code,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = textSecondaryColor()
+                    )
+                }
+
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = formatWon(part.standardCost),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "x ${part.quantity}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
 
+            Spacer(Modifier.padding(4.dp))
+            Divider(Modifier.background(textSecondaryColor()))
+            Spacer(Modifier.padding(4.dp))
+
             Text(
-                text = part.quantity.toString(),
+                text = formatWon(part.subtotal),
                 style = MaterialTheme.typography.titleMedium,
-                color = textColor()
+                textAlign = TextAlign.End,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

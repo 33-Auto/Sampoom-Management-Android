@@ -156,15 +156,6 @@ fun OrderDetailScreen(
                     )
                 }
 
-//                uiState.orderDetail -> {
-//                    EmptyContent(
-//                        message = stringResource(R.string.order_empty_list),
-//                        modifier = Modifier
-//                            .height(200.dp)
-//                            .fillMaxWidth()
-//                    )
-//                }
-
                 else -> {
                     uiState.orderDetail?.let { order ->
                         OrderDetailContent(

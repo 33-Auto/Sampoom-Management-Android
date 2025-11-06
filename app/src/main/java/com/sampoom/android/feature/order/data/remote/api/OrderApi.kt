@@ -5,6 +5,7 @@ import com.sampoom.android.core.model.ApiSuccessResponse
 import com.sampoom.android.feature.order.data.remote.dto.OrderDto
 import com.sampoom.android.feature.order.data.remote.dto.OrderListDto
 import com.sampoom.android.feature.order.data.remote.dto.OrderRequestDto
+import com.sampoom.android.feature.order.data.remote.dto.ReceiveStockRequestDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -30,10 +31,10 @@ interface OrderApi {
     suspend fun completeOrder(@Path("orderId") orderId: Long): ApiSuccessResponse
 
     // 주문 입고 처리 (대리점)
-    @PATCH("agency/{agencyId}/orders/{orderId}/receive")
+    @PATCH("agency/{agencyId}/stock")
     suspend fun receiveOrder(
         @Path("agencyId") agencyId: Long,
-        @Path("orderId") orderId: Long
+        @Body body: ReceiveStockRequestDto
     ): ApiSuccessResponse
 
     // 주문 상세 조회

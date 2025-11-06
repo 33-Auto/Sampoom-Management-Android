@@ -17,5 +17,10 @@ data class CartPart(
     val partId: Long,
     val code: String,
     val name: String,
-    val quantity: Long
+    val quantity: Long,
+    val standardCost: Long
 )
+
+// 품목 합계(단가 x 수량)
+val CartPart.subtotal: Long
+    get() = standardCost * quantity

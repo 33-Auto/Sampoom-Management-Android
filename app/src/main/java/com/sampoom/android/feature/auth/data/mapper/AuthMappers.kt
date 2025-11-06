@@ -2,8 +2,10 @@ package com.sampoom.android.feature.auth.data.mapper
 
 import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.feature.auth.data.remote.dto.GetProfileResponseDto
+import com.sampoom.android.feature.auth.data.remote.dto.GetVendorsResponseDto
 import com.sampoom.android.feature.auth.data.remote.dto.LoginResponseDto
 import com.sampoom.android.feature.auth.domain.model.User
+import com.sampoom.android.feature.auth.domain.model.Vendor
 
 fun LoginResponseDto.toModel(): User = User(
     userId = userId,
@@ -37,15 +39,18 @@ fun GetProfileResponseDto.toModel(): User = User(
     endedAt = endedAt
 )
 
-fun User.mergeWith(profile: User): User = this.copy(
-    userName = profile.userName,
-    position = profile.position,
-    workspace = profile.workspace,
-    branch = profile.branch
-)
-
 private fun String.toUserPosition(): UserPosition = try {
     UserPosition.valueOf(this.uppercase())
 } catch (_: IllegalArgumentException) {
     UserPosition.STAFF
 }
+
+fun GetVendorsResponseDto.toModel(): Vendor = Vendor(
+    id = id,
+    vendorCode = vendorCode,
+    name = name,
+    businessNumber = businessNumber,
+    ceoName = ceoName,
+    address = address,
+    status = status
+)

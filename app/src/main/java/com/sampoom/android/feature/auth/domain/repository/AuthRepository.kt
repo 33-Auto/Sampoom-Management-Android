@@ -1,6 +1,7 @@
 package com.sampoom.android.feature.auth.domain.repository
 
 import com.sampoom.android.feature.auth.domain.model.User
+import com.sampoom.android.feature.auth.domain.model.VendorList
 
 interface AuthRepository {
     suspend fun signUp(
@@ -18,4 +19,5 @@ interface AuthRepository {
     suspend fun clearTokens(): Result<Unit>
     suspend fun isSignedIn(): Boolean
     suspend fun getProfile(workspace: String): Result<User>
+    suspend fun getVendorList(): Result<VendorList>
 }

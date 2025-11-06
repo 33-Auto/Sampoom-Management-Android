@@ -133,8 +133,26 @@ class OrderDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isProcessing = true) }
             try {
-                receiveOrderUseCase(orderId).getOrThrow()     // 1단계
-                completeOrderUseCase(orderId).getOrThrow()    // 2단계
+                val order = _uiState.value.orderDetail ?: throw Exception()
+                val items: List<Pair<Long, Long>> = order.items.flatMap { category ->
+                    category.groups.flatMap { group ->
+                        group.parts.map { part -> part.partId to part.quantity }
+                    }
+                }
+                completeOrderUseCase(orderId)
+                    .onFailure { t ->
+                        val error = t.serverMessageOrNull() ?: (t.message ?: errorLabel)
+                        messageHandler.showMessage(message = error, isError = true)
+                        _uiState.update { it.copy(isProcessing = false) }
+                        return@launch
+                    }
+                receiveOrderUseCase(items)
+                    .onFailure { t ->
+                        val error = t.serverMessageOrNull() ?: (t.message ?: errorLabel)
+                        messageHandler.showMessage(message = error, isError = true)
+                        _uiState.update { it.copy(isProcessing = false) }
+                        return@launch
+                    }
 
                 messageHandler.showMessage(message = receiveLabel, isError = false)
                 _uiState.update {

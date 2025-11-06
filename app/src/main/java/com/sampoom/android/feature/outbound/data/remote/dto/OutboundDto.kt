@@ -17,5 +17,6 @@ data class OutboundPartDto(
     val partId: Long,
     val code: String,
     val name: String,
-    val quantity: Long
+    val quantity: Long,
+    val standardCost: Long
 )

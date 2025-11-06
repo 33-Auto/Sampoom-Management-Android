@@ -50,7 +50,7 @@ import com.sampoom.android.R
 import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
-import com.sampoom.android.core.ui.component.OrderItem
+import com.sampoom.android.feature.order.ui.OrderItem
 import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor

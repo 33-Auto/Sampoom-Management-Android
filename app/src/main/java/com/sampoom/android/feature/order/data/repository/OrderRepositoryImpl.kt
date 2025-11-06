@@ -12,6 +12,8 @@ import com.sampoom.android.feature.order.data.remote.dto.OrderCategoryDto
 import com.sampoom.android.feature.order.data.remote.dto.OrderGroupDto
 import com.sampoom.android.feature.order.data.remote.dto.OrderPartDto
 import com.sampoom.android.feature.order.data.remote.dto.OrderRequestDto
+import com.sampoom.android.feature.order.data.remote.dto.ReceiveStockItemDto
+import com.sampoom.android.feature.order.data.remote.dto.ReceiveStockRequestDto
 import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.domain.repository.OrderRepository
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +47,8 @@ class OrderRepositoryImpl @Inject constructor(
                                     partId = part.partId,
                                     code = part.code,
                                     name = part.name,
-                                    quantity = part.quantity
+                                    quantity = part.quantity,
+                                    standardCost = part.standardCost
                                 )
                             }
                         )
@@ -71,10 +74,15 @@ class OrderRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun receiveOrder(orderId: Long): Result<Unit> {
+    override suspend fun receiveOrder(items: List<Pair<Long, Long>>): Result<Unit> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
-            val dto = api.receiveOrder(agencyId = agencyId, orderId = orderId)
+            val body = ReceiveStockRequestDto(
+                items = items.map { (partId, quantity) ->
+                    ReceiveStockItemDto(partId = partId, quantity = quantity)
+                }
+            )
+            val dto = api.receiveOrder(agencyId = agencyId, body = body)
             if (!dto.success) throw Exception(dto.message)
         }
     }

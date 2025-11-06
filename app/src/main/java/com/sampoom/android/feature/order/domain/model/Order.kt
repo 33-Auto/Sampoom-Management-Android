@@ -25,5 +25,17 @@ data class OrderPart(
     val partId: Long,
     val code: String,
     val name: String,
-    val quantity: Long
+    val quantity: Long,
+    val standardCost: Long
 )
+
+// 파일 하단에 추가
+val OrderPart.subtotal: Long
+    get() = standardCost * quantity
+
+val Order.totalCost: Long
+    get() = items.sumOf { category ->
+        category.groups.sumOf { group ->
+            group.parts.sumOf { it.subtotal }
+        }
+    }
