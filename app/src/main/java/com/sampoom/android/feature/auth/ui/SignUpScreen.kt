@@ -159,16 +159,6 @@ fun SignUpScreen(
                     text = stringResource(R.string.signup_title_position),
                     fontSize = labelTextSize
                 )
-//                CommonTextField(
-//                    modifier = Modifier.fillMaxWidth().focusRequester(positionFocus),
-//                    value = state.position,
-//                    onValueChange = { viewModel.onEvent(SignUpUiEvent.PositionChanged(it)) },
-//                    placeholder = stringResource(R.string.signup_placeholder_position),
-//                    isError = state.positionError != null,
-//                    errorMessage = state.positionError,
-//                    imeAction = ImeAction.Next,
-//                    keyboardActions = KeyboardActions(onNext = { emailFocus.requestFocus() })
-//                )
                 ExposedDropdownMenuBox(
                     expanded = positionMenuExpanded,
                     onExpandedChange = { positionMenuExpanded = it }
@@ -186,7 +176,6 @@ fun SignUpScreen(
                         placeholder = stringResource(R.string.signup_placeholder_position),
                         isError = state.positionError != null,
                         errorMessage = state.positionError,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = positionMenuExpanded) },
                         singleLine = true
                     )
                     ExposedDropdownMenu(

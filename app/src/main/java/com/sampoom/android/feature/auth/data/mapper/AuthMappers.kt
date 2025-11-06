@@ -46,6 +46,6 @@ fun User.mergeWith(profile: User): User = this.copy(
 
 private fun String.toUserRole(): UserPosition = try {
     UserPosition.valueOf(this.uppercase())
-} catch (_: Exception) {
+} catch (_: IllegalArgumentException) {
     UserPosition.STAFF
 }

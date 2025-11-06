@@ -1,6 +1,8 @@
 package com.sampoom.android.core.util
 
 import kotlinx.coroutines.delay
+import java.io.IOException
+import java.net.SocketTimeoutException
 
 suspend fun <T> retry(
     times: Int = 5,
@@ -14,7 +16,12 @@ suspend fun <T> retry(
         try {
             return block()
         } catch (t: Throwable) {
-            // 서버 반영 지연에서만 재시도하고, 다른 오류는 그대로 throw 하려면 필터링 가능
+            when (t) {
+                is SocketTimeoutException, is IOException -> {
+
+                }
+                else -> throw t
+            }
         }
         delay(currentDelay)
         currentDelay = (currentDelay * factor).toLong().coerceAtMost(maxDelay)

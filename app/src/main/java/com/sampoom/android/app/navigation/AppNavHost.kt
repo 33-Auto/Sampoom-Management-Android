@@ -104,14 +104,6 @@ fun AppNavHost(
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
     val isLoading by authViewModel.isLoading.collectAsState()
     val user by viewModel.user.collectAsStateWithLifecycle()
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-    val activity = LocalContext.current as? ComponentActivity
-    val homeNavColor = backgroundCardColor()
-    val elseNavColor = backgroundColor()
-    val lightIcons = !isSystemInDarkTheme()
-
     val snackBarHostState = rememberCommonSnackBarHostState()
     var currentMessage by remember { mutableStateOf<SnackBarMessage?>(null) }
 
@@ -127,19 +119,6 @@ fun AppNavHost(
                 )
             }
     }
-
-//    LaunchedEffect(currentRoute, homeNavColor, lightIcons) {
-//        val window = activity?.window ?: return@LaunchedEffect
-//        if (currentRoute == ROUTE_HOME) {
-//            window.navigationBarColor = homeNavColor.toArgb()
-//            WindowInsetsControllerCompat(window, window.decorView)
-//                .isAppearanceLightNavigationBars = lightIcons
-//        } else {
-//            window.navigationBarColor = elseNavColor.toArgb()
-//            WindowInsetsControllerCompat(window, window.decorView)
-//                .isAppearanceLightNavigationBars = lightIcons
-//        }
-//    }
 
     if (isLoading) {
         Box(

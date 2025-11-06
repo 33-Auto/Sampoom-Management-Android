@@ -40,8 +40,7 @@ fun CommonTextField(
     imeAction: ImeAction = ImeAction.Next,
     keyboardActions: KeyboardActions = KeyboardActions(),
     readOnly: Boolean = false,
-    singleLine: Boolean = true,
-    trailingIcon: @Composable (() -> Unit)? = null
+    singleLine: Boolean = true
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 

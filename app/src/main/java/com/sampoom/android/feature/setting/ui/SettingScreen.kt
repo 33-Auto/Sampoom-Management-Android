@@ -70,13 +70,6 @@ fun SettingScreen(
         }
     }
 
-//    LaunchedEffect(uiState.logoutSuccess) {
-//        if (uiState.logoutSuccess) {
-//            viewModel.clearSuccess()
-//            onLogoutClick()
-//        }
-//    }
-
     PullToRefreshBox(
         isRefreshing = false,
         onRefresh = { viewModel.onEvent(SettingUiEvent.LoadProfile) },
