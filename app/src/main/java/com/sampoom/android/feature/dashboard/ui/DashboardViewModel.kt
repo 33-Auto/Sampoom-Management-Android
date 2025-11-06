@@ -4,9 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.feature.auth.domain.model.User
 import com.sampoom.android.feature.auth.domain.usecase.GetStoredUserUseCase
+import com.sampoom.android.feature.dashboard.domain.usecase.GetDashboardUseCase
+import com.sampoom.android.feature.dashboard.domain.usecase.WeeklySummaryUseCase
 import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.domain.usecase.GetOrderUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +17,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +25,9 @@ import javax.inject.Inject
 class DashboardViewModel @Inject constructor(
     private val messageHandler: GlobalMessageHandler,
     private val getOrderListUseCase: GetOrderUseCase,
-    private val getStoredUserUseCase: GetStoredUserUseCase
+    private val getStoredUserUseCase: GetStoredUserUseCase,
+    private val getDashboardUseCase: GetDashboardUseCase,
+    private val getWeeklySummaryUseCase: WeeklySummaryUseCase
 ): ViewModel() {
 
     private companion object {
@@ -38,13 +44,14 @@ class DashboardViewModel @Inject constructor(
         .cachedIn(viewModelScope)
 
     private var errorLabel: String = ""
-    private var loadJob: Job? = null
 
     fun bindLabel(error: String) {
         errorLabel = error
     }
 
     init {
+        loadDashboard()
+        loadWeeklySummary()
         viewModelScope.launch {
             _user.value = getStoredUserUseCase()
         }
@@ -52,36 +59,72 @@ class DashboardViewModel @Inject constructor(
 
     fun onEvent(event: DashboardUiEvent) {
         when (event) {
-            is DashboardUiEvent.LoadDashboard -> {}//loadOrderList()
-            is DashboardUiEvent.RetryDashboard -> {}//loadOrderList()
+            is DashboardUiEvent.LoadDashboard -> {
+                loadDashboard()
+                loadWeeklySummary()
+            }
+            is DashboardUiEvent.RetryDashboard -> {
+                loadDashboard()
+                loadWeeklySummary()
+            }
         }
     }
 
-//    private fun loadOrderList() {
-//        if (loadJob?.isActive == true) return
-//        loadJob = viewModelScope.launch {
-//            _uiState.update { it.copy(dashboardLoading = true, dashboardError = null) }
-//
-//            getOrderListUseCase()
-//                .onSuccess { orderList ->
-//                    _uiState.update {
-//                        it.copy(
-//                            orderList = orderList.items.take(5),
-//                            dashboardLoading = false,
-//                            dashboardError = null
-//                        )
-//                    }
-//                }
-//                .onFailure { throwable ->
-//                    val backendMessage = throwable.serverMessageOrNull()
-//                    _uiState.update {
-//                        it.copy(
-//                            dashboardLoading = false,
-//                            dashboardError = backendMessage ?: (throwable.message ?: errorLabel)
-//                        )
-//                    }
-//                }
-//            Log.d(TAG, "submit: ${_uiState.value}")
-//        }
-//    }
+    private fun loadDashboard() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(dashboardLoading = true, dashboardError = null) }
+
+            getDashboardUseCase()
+                .onSuccess { dashboard ->
+                    _uiState.update {
+                        it.copy(
+                            dashboard = dashboard,
+                            dashboardLoading = false,
+                            dashboardError = null
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
+                    _uiState.update {
+                        it.copy(
+                            dashboardLoading = false,
+                            dashboardError = error
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun loadWeeklySummary() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(dashboardLoading = true, dashboardError = null) }
+
+            getWeeklySummaryUseCase()
+                .onSuccess { weeklySummary ->
+                    _uiState.update {
+                        it.copy(
+                            weeklySummary = weeklySummary,
+                            dashboardLoading = false,
+                            dashboardError = null
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
+                    _uiState.update {
+                        it.copy(
+                            dashboardLoading = false,
+                            dashboardError = error
+                        )
+                    }
+                }
+        }
+    }
 }
