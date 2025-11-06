@@ -9,4 +9,4 @@ import com.sampoom.android.feature.cart.domain.model.CartPart
 
 fun CartDto.toModel(): Cart = Cart(categoryId, categoryName, groups.map { it.toModel() })
 fun CartGroupDto.toModel(): CartGroup = CartGroup(groupId, groupName, parts.map { it.toModel() })
-fun CartPartDto.toModel(): CartPart = CartPart(cartItemId, partId, code, name, quantity)
+fun CartPartDto.toModel(): CartPart = CartPart(cartItemId, partId, code, name, quantity, standardCost)

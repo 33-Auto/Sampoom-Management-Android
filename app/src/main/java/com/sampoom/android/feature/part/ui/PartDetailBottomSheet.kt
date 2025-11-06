@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,6 +39,7 @@ import com.sampoom.android.core.ui.component.ButtonVariant
 import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
+import com.sampoom.android.core.util.formatWon
 import com.sampoom.android.feature.part.domain.model.Part
 
 @Composable
@@ -114,11 +116,24 @@ fun PartDetailBottomSheet(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            Text(
-                stringResource(R.string.part_current_quantity) +
-                        part.quantity.toString() +
-                        stringResource(R.string.common_EA)
-            )
+
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = formatWon(part.standardCost),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.End,
+                    color = textColor()
+                )
+                Text(
+                    stringResource(R.string.part_current_quantity) +
+                            part.quantity.toString() +
+                            stringResource(R.string.common_EA)
+                )
+            }
+
         }
 
         Spacer(Modifier.height(16.dp))

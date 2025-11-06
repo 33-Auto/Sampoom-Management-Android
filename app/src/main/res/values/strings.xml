@@ -81,7 +81,7 @@
     <string name="outbound_dialog_order_text">출고 처리하시겠습니까?</string>
     <string name="outbound_dialog_empty_text">출고목록을 비우시겠습니까?</string>
     <string name="outbound_toast_order_text">출고 처리되었습니다</string>
-    <string name="outbound_order_parts">부품 출고처리</string>
+    <string name="outbound_order_parts">출고처리</string>
 
     <!-- 장바구니 목록 -->
     <string name="cart_title">장바구니</string>
@@ -92,7 +92,7 @@
     <string name="cart_dialog_order_text">장바구니 목록의 상품을 주문하시겠습니까?</string>
     <string name="cart_dialog_empty_text">장바구니를 비우시겠습니까?</string>
     <string name="cart_toast_order_text">주문이 완료되었습니다</string>
-    <string name="cart_order_parts">부품 주문</string>
+    <string name="cart_order_parts">주문하기</string>
 
     <!-- 주문 관리 -->
     <string name="order_title">주문관리</string>
@@ -109,6 +109,7 @@
     <string name="order_detail_order_receive">입고처리</string>
     <string name="order_detail_dialog_order_receive">입고 처리하시겠습니까?</string>
     <string name="order_detail_toast_order_receive">입고 처리되었습니다</string>
+    <string name="order_detail_total_amount">총 가격</string>
 
     <!-- 주문 상태 -->
     <string name="order_status_pending">대기중</string>

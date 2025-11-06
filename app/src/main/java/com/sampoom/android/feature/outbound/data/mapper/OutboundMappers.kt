@@ -9,4 +9,4 @@ import com.sampoom.android.feature.outbound.domain.model.OutboundPart
 
 fun OutboundDto.toModel(): Outbound = Outbound(categoryId, categoryName, groups.map { it.toModel() })
 fun OutboundGroupDto.toModel(): OutboundGroup = OutboundGroup(groupId, groupName, parts.map { it.toModel() })
-fun OutboundPartDto.toModel(): OutboundPart = OutboundPart(outboundId, partId, code, name, quantity)
+fun OutboundPartDto.toModel(): OutboundPart = OutboundPart(outboundId, partId, code, name, quantity, standardCost)

@@ -11,6 +11,7 @@ import com.sampoom.android.feature.auth.data.remote.dto.RefreshResponseDto
 import com.sampoom.android.feature.auth.data.remote.dto.UpdateProfileRequestDto
 import com.sampoom.android.feature.auth.data.remote.dto.UpdateProfileResponseDto
 import com.sampoom.android.feature.auth.data.remote.dto.GetProfileResponseDto
+import com.sampoom.android.feature.auth.data.remote.dto.GetVendorsResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
@@ -38,4 +39,7 @@ interface AuthApi {
 
     @PATCH("user/profile")
     suspend fun updateProfile(@Body body: UpdateProfileRequestDto): ApiResponse<UpdateProfileResponseDto>
+
+    @GET("site/vendors")
+    suspend fun getVendors(): ApiResponse<List<GetVendorsResponseDto>>
 }

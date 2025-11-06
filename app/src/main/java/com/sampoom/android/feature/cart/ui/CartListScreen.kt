@@ -46,7 +46,9 @@ import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
+import com.sampoom.android.core.util.formatWon
 import com.sampoom.android.feature.cart.domain.model.CartPart
+import com.sampoom.android.feature.cart.domain.model.subtotal
 import com.sampoom.android.feature.order.ui.OrderResultBottomSheet
 
 @Composable
@@ -68,7 +70,7 @@ fun CartListScreen(
     uiState.processedOrder?.let { order ->
         OrderResultBottomSheet(
             order = order,
-            onDismiss = { viewModel.onEvent(CartListUiEvent.DismissOrderResult)}
+            onDismiss = { viewModel.onEvent(CartListUiEvent.DismissOrderResult) }
         )
     }
 
@@ -87,7 +89,9 @@ fun CartListScreen(
             )
         }
     ) {
-        Column(Modifier.fillMaxSize().padding(paddingValues)) {
+        Column(Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -192,7 +196,7 @@ fun CartListScreen(
                             variant = ButtonVariant.Primary,
                             size = ButtonSize.Large,
                             onClick = { showConfirmDialog = true }
-                        ) { Text(stringResource(R.string.cart_order_parts)) }
+                        ) { Text("${formatWon(uiState.totalCost)} ${stringResource(R.string.cart_order_parts)}") }
                     }
                 }
             }
@@ -364,30 +368,6 @@ private fun CartPartItem(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
-//                    OutlinedTextField(
-//                        value = part.quantity.toString(),
-//                        onValueChange = { newValue ->
-//                            when {
-//                                newValue.isEmpty() -> onEvent(OutboundListUiEvent.UpdateQuantity(part.outboundId, 1))
-//                                newValue == "0" -> onEvent(OutboundListUiEvent.UpdateQuantity(part.outboundId, 1))
-//                                else -> {
-//                                    val newQuantity = newValue.toLongOrNull()
-//                                    if (newQuantity != null && newQuantity > 0) onEvent(OutboundListUiEvent.UpdateQuantity(part.outboundId, newQuantity))
-//                                    else onEvent(OutboundListUiEvent.UpdateQuantity(part.outboundId, 1))
-//                                }
-//                            }
-//                        },
-//                        modifier = Modifier.width(100.dp),
-//                        singleLine = true,
-//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                        textStyle = MaterialTheme.typography.titleMedium.copy(textAlign = TextAlign.Center),
-//                        colors = OutlinedTextFieldDefaults.colors(
-//                            focusedBorderColor = Color.Transparent,
-//                            unfocusedBorderColor = Color.Transparent,
-//                            disabledBorderColor = Color.Transparent,
-//                            errorBorderColor = Color.Transparent
-//                        )
-//                    )
                     CommonButton(
                         variant = ButtonVariant.Neutral,
                         size = ButtonSize.Large,
@@ -407,6 +387,21 @@ private fun CartPartItem(
                         )
                     }
                 }
+            }
+
+            val subtotal = part.subtotal
+
+            Spacer(Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = formatWon(subtotal),
+                    style = MaterialTheme.typography.titleLarge
+                )
             }
         }
     }

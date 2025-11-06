@@ -15,4 +15,13 @@ data class CartListUiState(
     val isProcessing: Boolean = false,
     val processError: String? = null,
     val processedOrder: Order? = null
-)
+) {
+    val totalCost: Long
+        get() = cartList.sumOf { category ->
+            category.groups.sumOf { group ->
+                group.parts.sumOf { part ->
+                    part.standardCost * part.quantity
+                }
+            }
+        }
+}

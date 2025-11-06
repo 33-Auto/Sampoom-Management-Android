@@ -10,4 +10,13 @@ data class OutboundListUiState(
     val isUpdating: Boolean = false,
     val isDeleting: Boolean = false,
     val isOrderSuccess: Boolean = false
-)
+) {
+    val totalCost: Long
+        get() = outboundList.sumOf { category ->
+            category.groups.sumOf { group ->
+                group.parts.sumOf { part ->
+                    part.standardCost * part.quantity
+                }
+            }
+        }
+}

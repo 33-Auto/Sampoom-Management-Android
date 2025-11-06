@@ -8,7 +8,10 @@ import com.sampoom.android.feature.auth.data.remote.dto.LoginRequestDto
 import com.sampoom.android.feature.auth.data.remote.dto.RefreshRequestDto
 import com.sampoom.android.feature.auth.data.remote.dto.SignUpRequestDto
 import com.sampoom.android.feature.auth.domain.model.User
+import com.sampoom.android.feature.auth.domain.model.VendorList
 import com.sampoom.android.feature.auth.domain.repository.AuthRepository
+import com.sampoom.android.feature.outbound.data.mapper.toModel
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -36,7 +39,11 @@ class AuthRepositoryImpl @Inject constructor(
                 )
             )
             if (!signUpRes.success) throw Exception(signUpRes.message)
-            signIn(email, password).getOrThrow()
+
+            delay(500)
+            retry(times = 5, initialDelay = 500) {
+                signIn(email, password).getOrThrow()
+            }
         }
     }
 
@@ -124,6 +131,15 @@ class AuthRepositoryImpl @Inject constructor(
             val dto = api.getProfile(workspace)
             if (!dto.success) throw Exception(dto.message)
             dto.data.toModel()
+        }
+    }
+
+    override suspend fun getVendorList(): Result<VendorList> {
+        return runCatching {
+            val dto = api.getVendors()
+            if (!dto.success) throw Exception(dto.message)
+            val vendorItems = dto.data.map { it.toModel() }
+            VendorList(items = vendorItems)
         }
     }
 }

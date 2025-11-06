@@ -12,7 +12,7 @@ import com.sampoom.android.feature.part.domain.model.SearchResult
 
 fun CategoryDto.toModel(): Category = Category(id, code, name)
 fun GroupDto.toModel(): Group = Group(id, code, name, categoryId)
-fun PartDto.toModel(): Part = Part(partId, code, name, quantity)
+fun PartDto.toModel(): Part = Part(partId, code, name, quantity, standardCost)
 
 fun SearchCategoryDto.toModel(): List<SearchResult> {
     return groups.flatMap { group ->

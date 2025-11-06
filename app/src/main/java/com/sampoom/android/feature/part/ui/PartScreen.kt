@@ -63,6 +63,7 @@ import com.sampoom.android.core.ui.theme.backgroundColor
 import com.sampoom.android.core.ui.theme.disableColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
+import com.sampoom.android.core.util.formatWon
 import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.model.Group
 import com.sampoom.android.feature.part.domain.model.Part
@@ -579,6 +580,8 @@ fun SearchResultsList(
                 else -> {}
             }
         }
+
+        item { Spacer(Modifier.height(50.dp))}
     }
 }
 
@@ -627,11 +630,19 @@ private fun SearchPartItem(
                 )
             }
 
-            Text(
-                text = "${part.quantity}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = textColor()
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = formatWon(part.standardCost),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = textColor()
+                )
+
+                Text(
+                    text = "${part.quantity}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textColor()
+                )
+            }
 
             Icon(
                 painterResource(R.drawable.chevron_right),

@@ -10,7 +10,7 @@ interface OrderRepository {
     fun getOrderList(): Flow<PagingData<Order>>
     suspend fun createOrder(cartList: CartList): Result<Order>
     suspend fun completeOrder(orderId: Long): Result<Unit>
-    suspend fun receiveOrder(orderId: Long): Result<Unit>
+    suspend fun receiveOrder(items: List<Pair<Long, Long>>): Result<Unit>
     suspend fun getOrderDetail(orderId: Long): Result<Order>
     suspend fun cancelOrder(orderId: Long): Result<Unit>
 }

@@ -12,4 +12,4 @@ import com.sampoom.android.feature.order.domain.model.OrderPart
 fun OrderDto.toModel(): Order = Order(orderId, orderNumber, createdAt, status, agencyName, items.map { it.toModel() })
 fun OrderCategoryDto.toModel(): OrderCategory = OrderCategory(categoryId, categoryName, groups.map { it.toModel() })
 fun OrderGroupDto.toModel(): OrderGroup = OrderGroup(groupId, groupName, parts.map { it.toModel() })
-fun OrderPartDto.toModel(): OrderPart = OrderPart(partId, code, name, quantity)
+fun OrderPartDto.toModel(): OrderPart = OrderPart(partId, code, name, quantity, standardCost)

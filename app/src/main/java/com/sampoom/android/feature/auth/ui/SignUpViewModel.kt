@@ -12,6 +12,7 @@ import com.sampoom.android.feature.auth.domain.AuthValidator.validateEmail
 import com.sampoom.android.feature.auth.domain.AuthValidator.validatePassword
 import com.sampoom.android.feature.auth.domain.AuthValidator.validatePasswordCheck
 import com.sampoom.android.feature.auth.domain.ValidationResult
+import com.sampoom.android.feature.auth.domain.usecase.GetVendorUseCase
 import com.sampoom.android.feature.auth.domain.usecase.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class SignUpViewModel @Inject constructor(
     private val messageHandler: GlobalMessageHandler,
     private val singUp: SignUpUseCase,
+    private val getVendorUseCase: GetVendorUseCase,
     private val application: Application
 ) : ViewModel() {
 
@@ -39,6 +41,10 @@ class SignUpViewModel @Inject constructor(
     private var positionLabel: String = ""
     private var errorLabel: String = ""
 
+    init {
+        loadVendors()
+    }
+
     fun bindLabels(name: String, branch: String, position: String, error: String) {
         nameLabel = name
         branchLabel = branch
@@ -51,8 +57,15 @@ class SignUpViewModel @Inject constructor(
             _state.value = _state.value.copy(name = e.name)
             validateName()
         }
-        is SignUpUiEvent.BranchChanged -> {
-            _state.value = _state.value.copy(branch = e.branch)
+//        is SignUpUiEvent.BranchChanged -> {
+//            _state.value = _state.value.copy(branch = e.branch)
+//            validateBranch()
+//        }
+        is SignUpUiEvent.VendorChanged -> {
+            _state.value = _state.value.copy(
+                selectedVendor = e.vendor,
+                branch = e.vendor.name
+            )
             validateBranch()
         }
         is SignUpUiEvent.PositionChanged -> {
@@ -168,5 +181,26 @@ class SignUpViewModel @Inject constructor(
                 }
             }
         Log.d(TAG, "submit: ${_state.value}")
+    }
+
+    private fun loadVendors() {
+        viewModelScope.launch {
+            _state.update { it.copy(vendorsLoading = true) }
+            getVendorUseCase()
+                .onSuccess { vendorList ->
+                    _state.update {
+                        it.copy(
+                            vendors = vendorList.items,
+                            vendorsLoading = false
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+                    _state.update { it.copy(vendorsLoading = false) }
+                }
+        }
     }
 }

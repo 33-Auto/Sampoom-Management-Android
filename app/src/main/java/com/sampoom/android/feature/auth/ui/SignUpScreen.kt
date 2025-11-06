@@ -82,6 +82,7 @@ fun SignUpScreen(
 
     val positionItems = remember { UserPosition.entries }
     var positionMenuExpanded by remember { mutableStateOf(false) }
+    var vendorMenuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -144,16 +145,50 @@ fun SignUpScreen(
                     text = stringResource(R.string.signup_title_branch),
                     fontSize = labelTextSize
                 )
-                CommonTextField(
-                    modifier = Modifier.fillMaxWidth().focusRequester(branchFocus),
-                    value = state.branch,
-                    onValueChange = { viewModel.onEvent(SignUpUiEvent.BranchChanged(it)) },
-                    placeholder = stringResource(R.string.signup_placeholder_branch),
-                    isError = state.branchError != null,
-                    errorMessage = state.branchError,
-                    imeAction = ImeAction.Next,
-                    keyboardActions = KeyboardActions(onNext = { positionFocus.requestFocus() })
-                )
+                ExposedDropdownMenuBox(
+                    expanded = vendorMenuExpanded,
+                    onExpandedChange = { vendorMenuExpanded = it && !state.vendorsLoading }
+                ) {
+                    CommonTextField(
+                        modifier = Modifier
+                            .menuAnchor(
+                                type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                                enabled = true
+                            )
+                            .fillMaxWidth()
+                            .focusRequester(branchFocus),
+                        readOnly = true,
+                        value = state.selectedVendor?.name ?: "",
+                        onValueChange = {},
+                        placeholder = stringResource(R.string.signup_placeholder_branch),
+                        isError = state.branchError != null,
+                        errorMessage = state.branchError,
+                        singleLine = true,
+                        enabled = !state.vendorsLoading
+                    )
+                    ExposedDropdownMenu(
+                        expanded = vendorMenuExpanded,
+                        onDismissRequest = { vendorMenuExpanded = false }
+                    ) {
+                        if (state.vendorsLoading) {
+                            DropdownMenuItem(
+                                text = { Text("로딩 중...") },
+                                onClick = {}
+                            )
+                        } else {
+                            state.vendors.forEach { vendor ->
+                                DropdownMenuItem(
+                                    text = { Text(vendor.name) },
+                                    onClick = {
+                                        viewModel.onEvent(SignUpUiEvent.VendorChanged(vendor))
+                                        vendorMenuExpanded = false
+                                        positionFocus.requestFocus()
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.signup_title_position),

@@ -35,7 +35,6 @@ import androidx.paging.compose.itemKey
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
-import com.sampoom.android.core.ui.component.OrderItem
 import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.feature.order.domain.model.Order
@@ -118,6 +117,20 @@ fun OrderListScreen(
                 }
 
                 else -> {
+                    // 빈 상태 처리
+                    if (orderListPaged.loadState.refresh !is LoadState.Loading && orderListPaged.itemCount == 0) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            EmptyContent(
+                                message = stringResource(R.string.order_empty_list),
+                                modifier = Modifier.height(200.dp)
+                            )
+                        }
+                    }
                     LazyColumn(
                         state = listState,
                         modifier = Modifier
@@ -165,23 +178,6 @@ fun OrderListScreen(
                                     }
                                 }
                                 else -> {}
-                            }
-                        }
-
-                        // 빈 상태 처리
-                        if (orderListPaged.loadState.refresh !is LoadState.Loading && orderListPaged.itemCount == 0) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    EmptyContent(
-                                        message = stringResource(R.string.order_empty_list),
-                                        modifier = Modifier.height(200.dp)
-                                    )
-                                }
                             }
                         }
 
