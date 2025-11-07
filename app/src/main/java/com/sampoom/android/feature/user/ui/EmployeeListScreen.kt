@@ -140,7 +140,7 @@ fun EmployeeListScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorContent(
-                            onRetry = { viewModel.onEvent(EmployeeListUiEvent.RetryEmployeeList) },
+                            onRetry = { employeeListPaged.refresh() },
                             modifier = Modifier.height(200.dp)
                         )
                     }
