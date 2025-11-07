@@ -266,7 +266,7 @@ fun ButtonSection(
                 modifier = Modifier.weight(1f),
                 painter = painterResource(R.drawable.car),
                 painterDescription = stringResource(R.string.dashboard_parts_all),
-                text = (dashboard?.totalParts ?: 0L).toString(),
+                text = (dashboard?.totalParts ?: stringResource(R.string.common_slash)).toString(),
                 subText = stringResource(R.string.dashboard_parts_all),
                 onClick = { }
             )
@@ -275,7 +275,7 @@ fun ButtonSection(
                 modifier = Modifier.weight(1f),
                 painter = painterResource(R.drawable.block),
                 painterDescription = stringResource(R.string.dashboard_parts_out_of_stock),
-                text = (dashboard?.outOfStockParts ?: 0L).toString(),
+                text = (dashboard?.outOfStockParts ?: stringResource(R.string.common_slash)).toString(),
                 subText = stringResource(R.string.dashboard_parts_out_of_stock),
                 onClick = { }
             )
@@ -289,7 +289,7 @@ fun ButtonSection(
                 modifier = Modifier.weight(1f),
                 painter = painterResource(R.drawable.warning),
                 painterDescription = stringResource(R.string.dashboard_parts_low_stock),
-                text = (dashboard?.lowStockParts ?: 0L).toString(),
+                text = (dashboard?.lowStockParts ?: stringResource(R.string.common_slash)).toString(),
                 subText = stringResource(R.string.dashboard_parts_low_stock),
                 onClick = { }
             )
@@ -298,7 +298,7 @@ fun ButtonSection(
                 modifier = Modifier.weight(1f),
                 painter = painterResource(R.drawable.parts),
                 painterDescription = stringResource(R.string.dashboard_parts_on_hand),
-                text = (dashboard?.totalQuantity ?: 0L).toString(),
+                text = (dashboard?.totalQuantity ?: stringResource(R.string.common_slash)).toString(),
                 subText = stringResource(R.string.dashboard_parts_on_hand),
                 onClick = { }
             )
@@ -484,7 +484,7 @@ fun WeeklySummarySection(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = (weeklySummary?.inStockParts ?: 0L).toString(),
+                        text = (weeklySummary?.inStockParts ?: stringResource(R.string.common_slash)).toString(),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = SuccessGreen
@@ -501,7 +501,7 @@ fun WeeklySummarySection(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = (weeklySummary?.outStockParts ?: 0L).toString(),
+                        text = (weeklySummary?.outStockParts ?: stringResource(R.string.common_slash)).toString(),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = FailRed
