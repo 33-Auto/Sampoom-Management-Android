@@ -9,5 +9,7 @@ data class DashboardUiState(
     val dashboard: Dashboard? = null,
     val weeklySummary: WeeklySummary? = null,
     val dashboardLoading: Boolean = false,
-    val dashboardError: String? = null
+    val dashboardError: String? = null,
+    val weeklySummaryLoading: Boolean = false,
+    val weeklySummaryError: String? = null,
 )

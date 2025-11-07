@@ -101,15 +101,15 @@ class DashboardViewModel @Inject constructor(
 
     private fun loadWeeklySummary() {
         viewModelScope.launch {
-            _uiState.update { it.copy(dashboardLoading = true, dashboardError = null) }
+            _uiState.update { it.copy(weeklySummaryLoading = true, weeklySummaryError = null) }
 
             getWeeklySummaryUseCase()
                 .onSuccess { weeklySummary ->
                     _uiState.update {
                         it.copy(
                             weeklySummary = weeklySummary,
-                            dashboardLoading = false,
-                            dashboardError = null
+                            weeklySummaryLoading = false,
+                            weeklySummaryError = null
                         )
                     }
                 }
@@ -120,8 +120,8 @@ class DashboardViewModel @Inject constructor(
 
                     _uiState.update {
                         it.copy(
-                            dashboardLoading = false,
-                            dashboardError = error
+                            weeklySummaryLoading = false,
+                            weeklySummaryError = error
                         )
                     }
                 }

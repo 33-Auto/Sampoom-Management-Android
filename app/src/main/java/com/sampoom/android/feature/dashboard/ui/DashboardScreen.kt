@@ -1,6 +1,5 @@
 package com.sampoom.android.feature.dashboard.ui
 
-import android.R.attr.onClick
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -52,7 +51,6 @@ import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.theme.FailRed
-import com.sampoom.android.feature.order.ui.OrderItem
 import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.SuccessGreen
 import com.sampoom.android.core.ui.theme.backgroundCardColor
@@ -62,6 +60,7 @@ import com.sampoom.android.feature.auth.domain.model.User
 import com.sampoom.android.feature.dashboard.domain.model.Dashboard
 import com.sampoom.android.feature.dashboard.domain.model.WeeklySummary
 import com.sampoom.android.feature.order.domain.model.Order
+import com.sampoom.android.feature.order.ui.OrderItem
 
 @Composable
 fun DashboardScreen(
