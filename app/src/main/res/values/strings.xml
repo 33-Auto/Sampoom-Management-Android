@@ -1,3 +1,155 @@
 <resources>
-    <string name="app_name">SampoomManagement</string>
+    <string name="app_name">삼품관리</string>
+
+    <!-- Navigation Bar -->
+    <string name="nav_back">뒤로가기</string>
+    <string name="nav_dashboard">대시보드</string>
+    <string name="nav_delivery">출고목록</string>
+    <string name="nav_cart">장바구니</string>
+    <string name="nav_order">주문관리</string>
+    <string name="nav_employee">직원관리</string>
+    <string name="nav_setting">설정</string>
+
+    <!-- 로그인 -->
+    <string name="login_title">로그인</string>
+    <string name="login_title_email">이메일</string>
+    <string name="login_title_password">비밀번호</string>
+    <string name="login_placeholder_email">이메일 입력</string>
+    <string name="login_placeholder_password">비밀번호 입력</string>
+    <string name="login_button_login">로그인</string>
+    <string name="login_button_login_loading">로그인 중…</string>
+    <string name="login_need_account">계정이 없으신가요?</string>
+    <string name="login_signup">회원가입</string>
+    <string name="login_do">하기</string>
+
+    <!-- 회원가입 -->
+    <string name="signup_title">회원가입</string>
+    <string name="signup_title_name">이름</string>
+    <string name="signup_title_branch">지점</string>
+    <string name="signup_title_position">직급</string>
+    <string name="signup_title_email">이메일</string>
+    <string name="signup_title_password">비밀번호</string>
+    <string name="signup_title_password_check">비밀번호 확인</string>
+    <string name="signup_placeholder_name">이름 입력</string>
+    <string name="signup_placeholder_branch">지점 선택</string>
+    <string name="signup_placeholder_position">직급 선택</string>
+    <string name="signup_placeholder_email">이메일 입력</string>
+    <string name="signup_placeholder_password">비밀번호 입력</string>
+    <string name="signup_placeholder_password_check">비밀번호 입력 확인</string>
+    <string name="signup_button_signup">회원가입</string>
+    <string name="signup_button_signup_loading">회원 가입 중…</string>
+
+    <!-- 대시 보드 -->
+    <string name="dashboard_title_hello">안녕하세요, </string>
+    <string name="dashboard_title_hello_sir">님!</string>
+    <string name="dashboard_title_description">오늘도 효율적인 재고 관리를 시작해보세요.</string>
+    <string name="dashboard_employee">직원 관리</string>
+    <string name="dashboard_parts_all">총 부품</string>
+    <string name="dashboard_parts_out_of_stock">품절 부품</string>
+    <string name="dashboard_parts_low_stock">부족 부품</string>
+    <string name="dashboard_parts_on_hand">보유 부품</string>
+    <string name="dashboard_order_recent_title">최근 주문</string>
+    <string name="dashboard_weekly_summary_title">이번 주 요약</string>
+    <string name="dashboard_weekly_summary_in_stock">입고 부품</string>
+    <string name="dashboard_weekly_summary_out_stock">출고 부품</string>
+
+    <!-- 부품 조회 -->
+    <string name="part_title">부품조회</string>
+    <string name="part_title_search">검색</string>
+    <string name="part_title_category">카테고리 선택</string>
+    <string name="part_title_group">그룹 선택</string>
+    <string name="part_placeholder_search">부품명으로 검색</string>
+    <string name="part_empty_category">카테고리 목록이 없습니다.</string>
+    <string name="part_empty_part">부품 목록이 없습니다.</string>
+    <string name="part_select_category">카테고리를 선택해주세요.</string>
+    <string name="part_empty_group">그룹 목록이 없습니다.</string>
+    <string name="part_search_empty">검색 결과가 없습니다.</string>
+    <string name="part_search_description">부품명으로 검색어를 입력하세요.</string>
+    <string name="part_search_clear">검색어 지우기</string>
+
+    <!-- 부품 조회 Bottom Sheet -->
+    <string name="part_current_quantity">현재 재고 : </string>
+    <string name="part_title_quantity">수량</string>
+    <string name="part_minus">-</string>
+    <string name="part_plus">+</string>
+    <string name="part_add_delivery">출고목록에 추가</string>
+    <string name="part_add_cart">장바구니에 추가</string>
+
+    <!-- 출고 목록 -->
+    <string name="outbound_title">출고목록</string>
+    <string name="outbound_empty_list">비우기</string>
+    <string name="outbound_empty_outbound">출고목록이 없습니다.</string>
+    <string name="outbound_dialog_text">출고 목록에 추가하시겠습니까?</string>
+    <string name="outbound_toast_success">출고 목록에 추가되었습니다</string>
+    <string name="outbound_dialog_order_text">출고 처리하시겠습니까?</string>
+    <string name="outbound_dialog_empty_text">출고목록을 비우시겠습니까?</string>
+    <string name="outbound_toast_order_text">출고 처리되었습니다</string>
+    <string name="outbound_order_parts">출고처리</string>
+
+    <!-- 장바구니 목록 -->
+    <string name="cart_title">장바구니</string>
+    <string name="cart_empty_list">비우기</string>
+    <string name="cart_empty_outbound">장바구니 목록이 없습니다.</string>
+    <string name="cart_dialog_text">장바구니 목록에 추가하시겠습니까?</string>
+    <string name="cart_toast_success">장바구니 목록에 추가되었습니다</string>
+    <string name="cart_dialog_order_text">장바구니 목록의 상품을 주문하시겠습니까?</string>
+    <string name="cart_dialog_empty_text">장바구니를 비우시겠습니까?</string>
+    <string name="cart_toast_order_text">주문이 완료되었습니다</string>
+    <string name="cart_order_parts">주문하기</string>
+
+    <!-- 주문 관리 -->
+    <string name="order_title">주문관리</string>
+    <string name="order_empty_list">주문관리 목록이 없습니다.</string>
+    <string name="order_detail_title">주문정보</string>
+    <string name="order_detail_order_number">주문번호</string>
+    <string name="order_detail_order_date">주문일자</string>
+    <string name="order_detail_order_agency">대리점</string>
+    <string name="order_detail_order_status">주문상태</string>
+    <string name="order_detail_order_items_title">주문상품</string>
+    <string name="order_detail_order_cancel">주문취소</string>
+    <string name="order_detail_dialog_order_cancel">주문 취소처리하시겠습니까?</string>
+    <string name="order_detail_toast_order_cancel">주문 취소처리되었습니다</string>
+    <string name="order_detail_order_receive">입고처리</string>
+    <string name="order_detail_dialog_order_receive">입고 처리하시겠습니까?</string>
+    <string name="order_detail_toast_order_receive">입고 처리되었습니다</string>
+    <string name="order_detail_total_amount">총 가격</string>
+
+    <!-- 주문 상태 -->
+    <string name="order_status_pending">대기중</string>
+    <string name="order_status_confirmed">주문확인</string>
+    <string name="order_status_shipping">배송중</string>
+    <string name="order_status_delayed">배송지연</string>
+    <string name="order_status_producing">생산중</string>
+    <string name="order_status_arrived">배송완료</string>
+    <string name="order_status_completed">입고완료</string>
+    <string name="order_status_canceled">주문취소</string>
+
+    <!-- 설정 -->
+    <string name="setting_title">설정</string>
+    <string name="setting_edit_profile">프로필 수정</string>
+    <string name="setting_logout">로그아웃</string>
+    <string name="setting_dialog_logout">로그아웃 하시겠습니까?</string>
+
+    <!-- Common -->
+    <string name="common_error">오류가 발생했습니다</string>
+    <string name="common_required_field">내용을 입력해주세요</string>
+    <string name="common_retry">다시 시도</string>
+    <string name="common_confirm">확인</string>
+    <string name="common_cancel">취소</string>
+    <string name="common_close">닫기</string>
+    <string name="common_delete">삭제</string>
+    <string name="common_detail">상세 보기</string>
+    <string name="common_EA">EA</string>
+    <string name="common_slash">-</string>
+
+    <!-- Validation -->
+    <string name="validation_email_required">이메일을 입력해주세요</string>
+    <string name="validation_email_invalid">올바른 이메일 형식이 아닙니다</string>
+    <string name="validation_password_required">비밀번호를 입력해주세요</string>
+    <string name="validation_password_min_length">비밀번호는 최소 8자 이상이어야 합니다</string>
+    <string name="validation_password_max_length">비밀번호는 최대 30자까지 가능합니다</string>
+    <string name="validation_password_complexity">영문, 숫자, 특수문자를 각각 1개 이상 포함해야 합니다</string>
+    <string name="validation_password_confirm_required">비밀번호 확인을 입력해주세요</string>
+    <string name="validation_password_mismatch">비밀번호가 일치하지 않습니다</string>
+    <string name="validation_field_required">%s을(를) 입력해주세요</string>
 </resources>

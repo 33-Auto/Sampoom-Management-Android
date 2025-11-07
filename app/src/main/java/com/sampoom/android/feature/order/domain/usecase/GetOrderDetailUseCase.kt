@@ -1,0 +1,11 @@
+package com.sampoom.android.feature.order.domain.usecase
+
+import com.sampoom.android.feature.order.domain.model.Order
+import com.sampoom.android.feature.order.domain.repository.OrderRepository
+import javax.inject.Inject
+
+class GetOrderDetailUseCase @Inject constructor(
+    private val repository: OrderRepository
+) {
+    suspend operator fun invoke(orderId: Long): Result<Order> = repository.getOrderDetail(orderId)
+}
