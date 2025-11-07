@@ -44,11 +44,14 @@
     <string name="dashboard_title_hello_sir">님!</string>
     <string name="dashboard_title_description">오늘도 효율적인 재고 관리를 시작해보세요.</string>
     <string name="dashboard_employee">직원 관리</string>
+    <string name="dashboard_parts_all">총 부품</string>
+    <string name="dashboard_parts_out_of_stock">품절 부품</string>
+    <string name="dashboard_parts_low_stock">부족 부품</string>
     <string name="dashboard_parts_on_hand">보유 부품</string>
-    <string name="dashboard_parts_in_progress">진행중 부품</string>
-    <string name="dashboard_shortage_of_parts">부족 부품</string>
-    <string name="dashboard_order_amount">주문 금액</string>
     <string name="dashboard_order_recent_title">최근 주문</string>
+    <string name="dashboard_weekly_summary_title">이번 주 요약</string>
+    <string name="dashboard_weekly_summary_in_stock">입고 부품</string>
+    <string name="dashboard_weekly_summary_out_stock">출고 부품</string>
 
     <!-- 부품 조회 -->
     <string name="part_title">부품조회</string>

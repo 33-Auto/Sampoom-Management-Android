@@ -50,13 +50,17 @@ import com.sampoom.android.R
 import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
-import com.sampoom.android.feature.order.ui.OrderItem
+import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.Main500
+import com.sampoom.android.core.ui.theme.SuccessGreen
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.feature.auth.domain.model.User
+import com.sampoom.android.feature.dashboard.domain.model.Dashboard
+import com.sampoom.android.feature.dashboard.domain.model.WeeklySummary
 import com.sampoom.android.feature.order.domain.model.Order
+import com.sampoom.android.feature.order.ui.OrderItem
 
 @Composable
 fun DashboardScreen(
@@ -159,11 +163,10 @@ fun DashboardScreen(
             ) {
                 item { TitleSection(user) }
 
-                item { ButtonSection(isManager) }
+                item { ButtonSection(isManager, uiState.dashboard) }
 
                 item {
                     OrderListSection(
-                        viewModel = viewModel,
                         orderListPaged = orderListPaged,
                         onNavigateOrderDetail = { order ->
                             onNavigateOrderDetail(order)
@@ -172,6 +175,12 @@ fun DashboardScreen(
                             onNavigationOrder()
                         }
                     )
+                }
+
+                item { Spacer(Modifier.height(32.dp)) }
+
+                item {
+                    WeeklySummarySection(modifier = Modifier, weeklySummary = uiState.weeklySummary)
                 }
 
                 item { Spacer(Modifier.height(100.dp)) }
@@ -225,7 +234,8 @@ fun TitleSection(
 
 @Composable
 fun ButtonSection(
-    isManager: Boolean
+    isManager: Boolean,
+    dashboard: Dashboard?
 ) {
     Column(
         modifier = Modifier
@@ -248,48 +258,48 @@ fun ButtonSection(
             )
         }
 
-        // 보유 부품, 진행중 주문
+        // 총 부품, 품절 부품
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             ButtonCard(
                 modifier = Modifier.weight(1f),
-                painter = painterResource(R.drawable.parts),
-                painterDescription = stringResource(R.string.dashboard_parts_on_hand),
-                text = 1234.toString(),   // TODO : API 연동
-                subText = stringResource(R.string.dashboard_parts_on_hand),
+                painter = painterResource(R.drawable.car),
+                painterDescription = stringResource(R.string.dashboard_parts_all),
+                text = (dashboard?.totalParts ?: stringResource(R.string.common_slash)).toString(),
+                subText = stringResource(R.string.dashboard_parts_all),
                 onClick = { }
             )
 
             ButtonCard(
                 modifier = Modifier.weight(1f),
-                painter = painterResource(R.drawable.orders),
-                painterDescription = stringResource(R.string.dashboard_parts_in_progress),
-                text = 23.toString(),   // TODO : API 연동
-                subText = stringResource(R.string.dashboard_parts_in_progress),
+                painter = painterResource(R.drawable.block),
+                painterDescription = stringResource(R.string.dashboard_parts_out_of_stock),
+                text = (dashboard?.outOfStockParts ?: stringResource(R.string.common_slash)).toString(),
+                subText = stringResource(R.string.dashboard_parts_out_of_stock),
                 onClick = { }
             )
         }
 
-        // 부족 부품, 주문 금액
+        // 부족 부품, 보유 부품
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             ButtonCard(
                 modifier = Modifier.weight(1f),
                 painter = painterResource(R.drawable.warning),
-                painterDescription = stringResource(R.string.dashboard_shortage_of_parts),
-                text = 19.toString(),   // TODO : API 연동
-                subText = stringResource(R.string.dashboard_shortage_of_parts),
+                painterDescription = stringResource(R.string.dashboard_parts_low_stock),
+                text = (dashboard?.lowStockParts ?: stringResource(R.string.common_slash)).toString(),
+                subText = stringResource(R.string.dashboard_parts_low_stock),
                 onClick = { }
             )
 
             ButtonCard(
                 modifier = Modifier.weight(1f),
-                painter = painterResource(R.drawable.money),
-                painterDescription = stringResource(R.string.dashboard_order_amount),
-                text = 4123200.toString(),   // TODO : API 연동
-                subText = stringResource(R.string.dashboard_order_amount),
+                painter = painterResource(R.drawable.parts),
+                painterDescription = stringResource(R.string.dashboard_parts_on_hand),
+                text = (dashboard?.totalQuantity ?: stringResource(R.string.common_slash)).toString(),
+                subText = stringResource(R.string.dashboard_parts_on_hand),
                 onClick = { }
             )
         }
@@ -349,12 +359,10 @@ fun ButtonCard(
 
 @Composable
 fun OrderListSection(
-    viewModel: DashboardViewModel,
     orderListPaged: LazyPagingItems<Order>,
     onNavigateOrderDetail: (Order) -> Unit,
     onNavigationOrder: () -> Unit
 ) {
-
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -437,6 +445,73 @@ fun OrderListSection(
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WeeklySummarySection(
+    modifier: Modifier,
+    weeklySummary: WeeklySummary?
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = backgroundCardColor()
+        ),
+        onClick = { },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.dashboard_weekly_summary_title),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = textColor()
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = (weeklySummary?.inStockParts ?: stringResource(R.string.common_slash)).toString(),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = SuccessGreen
+                    )
+                    Text(
+                        text = stringResource(R.string.dashboard_weekly_summary_in_stock),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Light,
+                        color = textSecondaryColor()
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = (weeklySummary?.outStockParts ?: stringResource(R.string.common_slash)).toString(),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = FailRed
+                    )
+                    Text(
+                        text = stringResource(R.string.dashboard_weekly_summary_out_stock),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Light,
+                        color = textSecondaryColor()
+                    )
                 }
             }
         }
