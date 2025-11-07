@@ -7,13 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.sampoom.android.R
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.core.util.GlobalMessageHandler
-import com.sampoom.android.feature.auth.domain.AuthValidator
-import com.sampoom.android.feature.auth.domain.AuthValidator.validateEmail
-import com.sampoom.android.feature.auth.domain.AuthValidator.validatePassword
-import com.sampoom.android.feature.auth.domain.AuthValidator.validatePasswordCheck
-import com.sampoom.android.feature.auth.domain.ValidationResult
+import com.sampoom.android.core.util.AuthValidator
+import com.sampoom.android.core.util.AuthValidator.validateEmail
+import com.sampoom.android.core.util.AuthValidator.validatePassword
+import com.sampoom.android.core.util.AuthValidator.validatePasswordCheck
+import com.sampoom.android.core.util.ValidationResult
 import com.sampoom.android.feature.auth.domain.usecase.GetVendorUseCase
 import com.sampoom.android.feature.auth.domain.usecase.SignUpUseCase
+import com.sampoom.android.feature.user.domain.usecase.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +27,7 @@ class SignUpViewModel @Inject constructor(
     private val messageHandler: GlobalMessageHandler,
     private val singUp: SignUpUseCase,
     private val getVendorUseCase: GetVendorUseCase,
+    private val getProfileUseCase: GetProfileUseCase,
     private val application: Application
 ) : ViewModel() {
 
@@ -118,21 +120,21 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun validateEmail() {
-        val result = AuthValidator.validateEmail(_state.value.email)
+        val result = validateEmail(_state.value.email)
         _state.value = _state.value.copy(
             emailError = result.toErrorMessage()
         )
     }
 
     private fun validatePassword() {
-        val result = AuthValidator.validatePassword(_state.value.password)
+        val result = validatePassword(_state.value.password)
         _state.value = _state.value.copy(
             passwordError = result.toErrorMessage()
         )
     }
 
     private fun validatePasswordCheck() {
-        val result = AuthValidator.validatePasswordCheck(_state.value.password, _state.value.passwordCheck)
+        val result = validatePasswordCheck(_state.value.password, _state.value.passwordCheck)
         _state.value = _state.value.copy(
             passwordCheckError = result.toErrorMessage()
         )
@@ -167,9 +169,21 @@ class SignUpViewModel @Inject constructor(
             position = s.position!!.name
         )
             .onSuccess {
-                _state.update {
-                    it.copy(loading = false, success = true)
-                }
+                getProfileUseCase("AGENCY")
+                    .onSuccess {
+                        _state.update {
+                            it.copy(loading = false, success = true)
+                        }
+                    }
+                    .onFailure { throwable ->
+                        val backendMessage = throwable.serverMessageOrNull()
+                        val error = backendMessage ?: (throwable.message ?: errorLabel)
+                        messageHandler.showMessage(message = error, isError = true)
+
+                        _state.update {
+                            it.copy(loading = false, success = false)
+                        }
+                    }
             }
             .onFailure { throwable ->
                 val backendMessage = throwable.serverMessageOrNull()

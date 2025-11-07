@@ -69,6 +69,7 @@ kotlin {
 dependencies {
     // hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.material3)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.androidx.hilt.navigation.compose)

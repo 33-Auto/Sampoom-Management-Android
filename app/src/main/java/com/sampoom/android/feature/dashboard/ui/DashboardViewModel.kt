@@ -6,14 +6,13 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.core.util.GlobalMessageHandler
-import com.sampoom.android.feature.auth.domain.model.User
-import com.sampoom.android.feature.auth.domain.usecase.GetStoredUserUseCase
 import com.sampoom.android.feature.dashboard.domain.usecase.GetDashboardUseCase
 import com.sampoom.android.feature.dashboard.domain.usecase.WeeklySummaryUseCase
 import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.domain.usecase.GetOrderUseCase
+import com.sampoom.android.feature.user.domain.model.User
+import com.sampoom.android.feature.user.domain.usecase.GetStoredUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -125,6 +124,12 @@ class DashboardViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    fun refreshUser() {
+        viewModelScope.launch {
+            _user.value = getStoredUserUseCase()
         }
     }
 }

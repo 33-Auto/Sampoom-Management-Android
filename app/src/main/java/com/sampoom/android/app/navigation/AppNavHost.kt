@@ -1,9 +1,7 @@
 package com.sampoom.android.app.navigation
 
 import android.annotation.SuppressLint
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,11 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -49,18 +44,19 @@ import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.backgroundColor
 import com.sampoom.android.core.ui.theme.textColor
-import com.sampoom.android.feature.auth.domain.model.User
 import com.sampoom.android.feature.auth.ui.AuthViewModel
 import com.sampoom.android.feature.auth.ui.LoginScreen
 import com.sampoom.android.feature.auth.ui.SignUpScreen
 import com.sampoom.android.feature.cart.ui.CartListScreen
 import com.sampoom.android.feature.dashboard.ui.DashboardScreen
+import com.sampoom.android.feature.dashboard.ui.SettingScreen
 import com.sampoom.android.feature.order.ui.OrderDetailScreen
 import com.sampoom.android.feature.order.ui.OrderListScreen
 import com.sampoom.android.feature.outbound.ui.OutboundListScreen
 import com.sampoom.android.feature.part.ui.PartListScreen
 import com.sampoom.android.feature.part.ui.PartScreen
-import com.sampoom.android.feature.setting.ui.SettingScreen
+import com.sampoom.android.feature.user.domain.model.User
+import com.sampoom.android.feature.user.ui.EmployeeListScreen
 import kotlinx.coroutines.flow.filterNotNull
 
 // Auth Screen
@@ -216,6 +212,13 @@ fun AppNavHost(
                 }
             )
         }
+        composable(ROUTE_EMPLOYEE) {
+            EmployeeListScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
     }
     TopSnackBarHost(hostState = snackBarHostState, isError = currentMessage?.isError ?: false)
 }
@@ -238,6 +241,9 @@ fun MainScreen(
             composable(ROUTE_DASHBOARD) {
                 DashboardScreen(
                     paddingValues = innerPadding,
+                    onEmployeeClick = {
+                        parentNavController.navigate(ROUTE_EMPLOYEE)
+                    },
                     onSettingClick = {
                         parentNavController.navigate(ROUTE_SETTINGS)
                     },
