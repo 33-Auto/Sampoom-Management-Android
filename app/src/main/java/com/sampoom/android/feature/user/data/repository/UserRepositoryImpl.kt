@@ -130,4 +130,22 @@ class UserRepositoryImpl @Inject constructor(
             completeEmployee
         }
     }
+
+    override suspend fun getEmployeeCount(): Result<Int> {
+        return runCatching {
+            val user = preferences.getStoredUser() ?: throw Exception()
+            val workspace = user.workspace
+            val organizationId = user.agencyId
+
+            val dto = api.getEmployeeList(
+                workspace = workspace,
+                organizationId = organizationId,
+                page = 0,
+                size = 1
+            )
+
+            if (!dto.success) throw Exception(dto.message)
+            dto.data.meta.totalElements
+        }
+    }
 }

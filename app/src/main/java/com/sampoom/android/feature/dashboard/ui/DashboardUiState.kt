@@ -12,4 +12,7 @@ data class DashboardUiState(
     val dashboardError: String? = null,
     val weeklySummaryLoading: Boolean = false,
     val weeklySummaryError: String? = null,
+    val employeeCount: Int? = null,
+    val employeeCountLoading: Boolean = false,
+    val employeeCountError: String? = null
 )

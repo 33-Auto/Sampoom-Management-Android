@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.dashboard.ui
 
+import android.R.attr.onClick
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -155,6 +156,7 @@ fun DashboardScreen(
                     ButtonSection(
                         isManager = isManager,
                         dashboard = uiState.dashboard,
+                        employeeCount = uiState.employeeCount,
                         onEmployeeClick = { onEmployeeClick() }
                     )
                 }
@@ -230,7 +232,8 @@ fun TitleSection(
 fun ButtonSection(
     onEmployeeClick: () -> Unit,
     isManager: Boolean,
-    dashboard: Dashboard?
+    dashboard: Dashboard?,
+    employeeCount: Int?
 ) {
     Column(
         modifier = Modifier
@@ -247,7 +250,7 @@ fun ButtonSection(
                 ),
                 painter = painterResource(R.drawable.employee),
                 painterDescription = stringResource(R.string.dashboard_employee),
-                text = 45.toString(),   // TODO : API 연동
+                text = employeeCount?.toString() ?: stringResource(R.string.common_slash),
                 subText = stringResource(R.string.dashboard_employee),
                 onClick = { onEmployeeClick() }
             )

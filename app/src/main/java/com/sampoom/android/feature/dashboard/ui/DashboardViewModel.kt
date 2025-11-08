@@ -11,6 +11,8 @@ import com.sampoom.android.feature.dashboard.domain.usecase.WeeklySummaryUseCase
 import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.domain.usecase.GetOrderUseCase
 import com.sampoom.android.feature.user.domain.model.User
+import com.sampoom.android.feature.user.domain.usecase.GetEmployeeCountUseCase
+import com.sampoom.android.feature.user.domain.usecase.GetEmployeeUseCase
 import com.sampoom.android.feature.user.domain.usecase.GetStoredUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +28,8 @@ class DashboardViewModel @Inject constructor(
     private val getOrderListUseCase: GetOrderUseCase,
     private val getStoredUserUseCase: GetStoredUserUseCase,
     private val getDashboardUseCase: GetDashboardUseCase,
-    private val getWeeklySummaryUseCase: WeeklySummaryUseCase
+    private val getWeeklySummaryUseCase: WeeklySummaryUseCase,
+    private val getEmployeeCountUseCase: GetEmployeeCountUseCase
 ): ViewModel() {
 
     private companion object {
@@ -51,6 +54,7 @@ class DashboardViewModel @Inject constructor(
     init {
         loadDashboard()
         loadWeeklySummary()
+        loadEmployeeCount()
         viewModelScope.launch {
             _user.value = getStoredUserUseCase()
         }
@@ -61,10 +65,12 @@ class DashboardViewModel @Inject constructor(
             is DashboardUiEvent.LoadDashboard -> {
                 loadDashboard()
                 loadWeeklySummary()
+                loadEmployeeCount()
             }
             is DashboardUiEvent.RetryDashboard -> {
                 loadDashboard()
                 loadWeeklySummary()
+                loadEmployeeCount()
             }
         }
     }
@@ -109,6 +115,35 @@ class DashboardViewModel @Inject constructor(
                             weeklySummary = weeklySummary,
                             weeklySummaryLoading = false,
                             weeklySummaryError = null
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    val backendMessage = throwable.serverMessageOrNull()
+                    val error = backendMessage ?: (throwable.message ?: errorLabel)
+                    messageHandler.showMessage(message = error, isError = true)
+
+                    _uiState.update {
+                        it.copy(
+                            weeklySummaryLoading = false,
+                            weeklySummaryError = error
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun loadEmployeeCount() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(employeeCountLoading = true, employeeCountError = null) }
+
+            getEmployeeCountUseCase()
+                .onSuccess { count ->
+                    _uiState.update {
+                        it.copy(
+                            employeeCount = count,
+                            employeeCountLoading = false,
+                            employeeCountError = null
                         )
                     }
                 }
