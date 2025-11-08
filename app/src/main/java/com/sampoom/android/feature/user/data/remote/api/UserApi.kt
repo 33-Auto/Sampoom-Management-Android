@@ -5,6 +5,8 @@ import com.sampoom.android.feature.user.data.remote.dto.GetProfileResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.EditEmployeeRequestDto
 import com.sampoom.android.feature.user.data.remote.dto.EditEmployeeResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.EmployeeListDto
+import com.sampoom.android.feature.user.data.remote.dto.UpdateEmployeeStatusRequestDto
+import com.sampoom.android.feature.user.data.remote.dto.UpdateEmployeeStatusResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.UpdateProfileRequestDto
 import com.sampoom.android.feature.user.data.remote.dto.UpdateProfileResponseDto
 import retrofit2.http.Body
@@ -34,4 +36,11 @@ interface UserApi {
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20
     ): ApiResponse<EmployeeListDto>
+
+    @PATCH("user/status/{userId}")
+    suspend fun updateEmployeeStatus(
+        @Path("userId") userId: Long,
+        @Query("workspace") workspace: String,
+        @Body body: UpdateEmployeeStatusRequestDto
+    ): ApiResponse<UpdateEmployeeStatusResponseDto>
 }

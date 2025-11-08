@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.user.domain.model
 
+import com.sampoom.android.core.model.EmployeeStatus
 import com.sampoom.android.core.model.UserPosition
 
 data class Employee(
@@ -11,6 +12,7 @@ data class Employee(
     val organizationId: Long,
     val branch: String,
     val position: UserPosition,
+    val employeeStatus: EmployeeStatus,
     val startedAt: String?,
     val endedAt: String?
 )

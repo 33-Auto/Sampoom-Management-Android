@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sampoom.android.core.ui.theme.FailRed
+import com.sampoom.android.core.ui.theme.Main300
 import com.sampoom.android.core.ui.theme.Main500
 import com.sampoom.android.core.ui.theme.White
 import com.sampoom.android.core.ui.theme.disableColor
@@ -81,15 +82,15 @@ fun CommonButton(
 
         // Light/secondary (tonal) filled button
         ButtonVariant.Secondary -> {
-            FilledTonalButton(
+            OutlinedButton(
                 onClick = onClick,
                 enabled = enabled,
                 shape = shape,
                 modifier = modifier.height(height),
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = Main500,
-                    contentColor = White,
-                    disabledContainerColor = disableColor(),
+                border = BorderStroke(1.dp, Main500),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Main300.copy(alpha = 0.3f),
+                    contentColor = Main500,
                     disabledContentColor = textSecondaryColor()
                 )
             ) {

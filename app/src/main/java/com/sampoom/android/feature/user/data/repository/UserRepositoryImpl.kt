@@ -3,12 +3,14 @@ package com.sampoom.android.feature.user.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.sampoom.android.core.model.EmployeeStatus
 import com.sampoom.android.core.preferences.AuthPreferences
 import com.sampoom.android.core.util.retry
 import com.sampoom.android.feature.user.data.mapper.toModel
 import com.sampoom.android.feature.user.data.paging.EmployeePagingSource
 import com.sampoom.android.feature.user.data.remote.api.UserApi
 import com.sampoom.android.feature.user.data.remote.dto.EditEmployeeRequestDto
+import com.sampoom.android.feature.user.data.remote.dto.UpdateEmployeeStatusRequestDto
 import com.sampoom.android.feature.user.data.remote.dto.UpdateProfileRequestDto
 import com.sampoom.android.feature.user.domain.model.Employee
 import com.sampoom.android.feature.user.domain.model.User
@@ -123,11 +125,46 @@ class UserRepositoryImpl @Inject constructor(
                 organizationId = employee.organizationId,
                 branch = employee.branch,
                 position = updatedEmployee.position,
+                employeeStatus = employee.employeeStatus,
                 startedAt = employee.startedAt,
                 endedAt = employee.endedAt
             )
 
             completeEmployee
+        }
+    }
+
+    override suspend fun updateEmployeeStatus(
+        employee: Employee,
+        workspace: String
+    ): Result<Employee> {
+        return runCatching {
+            val requestDto = UpdateEmployeeStatusRequestDto(
+                employeeStatus = employee.employeeStatus?.name ?: "-"
+            )
+            val dto = api.updateEmployeeStatus(
+                userId = employee.userId,
+                workspace = workspace,
+                body = requestDto
+            )
+            if (!dto.success) throw Exception(dto.message)
+
+            val updateEmployeeStatus = dto.data.toModel()
+            val completedEmployeeStatus = Employee(
+                userId = updateEmployeeStatus.userId,
+                email = employee.email,
+                role = employee.role,
+                userName = updateEmployeeStatus.userName.takeIf { it.isNotBlank() } ?: employee.userName,
+                workspace = updateEmployeeStatus.workspace.takeIf { it.isNotBlank() } ?: employee.workspace,
+                organizationId = employee.organizationId,
+                branch = employee.branch,
+                position = employee.position,
+                employeeStatus = updateEmployeeStatus.employeeStatus,
+                startedAt = employee.startedAt,
+                endedAt = employee.endedAt
+            )
+
+            completedEmployeeStatus
         }
     }
 

@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.user.ui
 
+import android.R.attr.text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +55,7 @@ import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
+import com.sampoom.android.core.util.employeeStatusToKorean
 import com.sampoom.android.core.util.formatDate
 import com.sampoom.android.core.util.positionToKorean
 import com.sampoom.android.feature.user.domain.model.Employee
@@ -73,6 +75,7 @@ fun EmployeeListScreen(
     val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
     val sheetState = rememberModalBottomSheetState(true)
     val selectedEmployee = uiState.selectedEmployee
+    val bottomSheetType = uiState.bottomSheetType
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)
@@ -82,10 +85,10 @@ fun EmployeeListScreen(
         employeeListPaged.refresh()
     }
 
-    LaunchedEffect(selectedEmployee) {
-        if (selectedEmployee != null && !sheetState.isVisible) {
+    LaunchedEffect(selectedEmployee, bottomSheetType) {
+        if (selectedEmployee != null && bottomSheetType != null && !sheetState.isVisible) {
             sheetState.show()
-        } else if (selectedEmployee == null && sheetState.isVisible) {
+        } else if ((selectedEmployee == null || bottomSheetType == null) && sheetState.isVisible) {
             sheetState.hide()
         }
     }
@@ -175,11 +178,11 @@ fun EmployeeListScreen(
                                 if (employee != null) {
                                     EmployeeListItemCard(
                                         employee = employee,
-                                        onDeleteClick = {
-
+                                        onStatusClick = {
+                                            viewModel.onEvent(EmployeeListUiEvent.ShowStatusBottomSheet(employee))
                                         },
                                         onEditClick = {
-                                            viewModel.onEvent(EmployeeListUiEvent.ShowBottomSheet(employee))
+                                            viewModel.onEvent(EmployeeListUiEvent.ShowEditBottomSheet(employee))
                                         }
                                     )
                                 }
@@ -225,26 +228,38 @@ fun EmployeeListScreen(
         }
     }
 
-    if (selectedEmployee != null) {
-        uiState.selectedEmployee?.let { selectedEmployee ->
-            ModalBottomSheet(
-                onDismissRequest = {
-                    coroutineScope.launch {
-                        viewModel.onEvent(EmployeeListUiEvent.DismissBottomSheet)
-                        sheetState.hide()
-                    }
-                },
-                sheetState = sheetState
-            ) {
-                EditEmployeeBottomSheet(
-                    employee = selectedEmployee,
-                    onDismiss = {
-                        coroutineScope.launch {
+    if (selectedEmployee != null && bottomSheetType != null) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                viewModel.onEvent(EmployeeListUiEvent.DismissBottomSheet)
+            },
+            sheetState = sheetState
+        ) {
+            when (bottomSheetType) {
+                EmployeeBottomSheetType.STATUS -> {
+                    UpdateEmployeeStatusBottomSheet(
+                        employee = selectedEmployee,
+                        onDismiss = {
                             viewModel.onEvent(EmployeeListUiEvent.DismissBottomSheet)
-                            sheetState.hide()
+                        },
+                        onStatusUpdated = { updatedEmployee ->
+                            viewModel.onEvent(EmployeeListUiEvent.DismissBottomSheet)
+                            employeeListPaged.refresh()
                         }
-                    }
-                )
+                    )
+                }
+                EmployeeBottomSheetType.EDIT -> {
+                    EditEmployeeBottomSheet(
+                        employee = selectedEmployee,
+                        onDismiss = {
+                            viewModel.onEvent(EmployeeListUiEvent.DismissBottomSheet)
+                        },
+                        onEmployeeUpdated = { updatedEmployee ->
+                            viewModel.onEvent(EmployeeListUiEvent.DismissBottomSheet)
+                            employeeListPaged.refresh()
+                        }
+                    )
+                }
             }
         }
     }
@@ -253,7 +268,7 @@ fun EmployeeListScreen(
 @Composable
 private fun EmployeeListItemCard(
     employee: Employee,
-    onDeleteClick: () -> Unit,
+    onStatusClick: () -> Unit,
     onEditClick: () -> Unit
 ) {
     Card(
@@ -265,11 +280,23 @@ private fun EmployeeListItemCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = employee.userName,
-                color = textColor(),
-                style = MaterialTheme.typography.titleLarge
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = employee.userName,
+                    color = textColor(),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(
+                    text = employeeStatusToKorean(employee.employeeStatus),
+                    color = textColor(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Light
+                )
+            }
+
             Text(
                 text = positionToKorean(employee.position),
                 color = textSecondaryColor(),
@@ -318,11 +345,11 @@ private fun EmployeeListItemCard(
             ) {
                 CommonButton(
                     modifier = Modifier.weight(1F),
-                    variant = ButtonVariant.Error,
+                    variant = ButtonVariant.Outlined,
                     size = ButtonSize.Large,
-                    onClick = { onDeleteClick() }
+                    onClick = { onStatusClick() }
                 ) {
-                    Text(stringResource(R.string.employee_delete))
+                    Text(stringResource(R.string.employee_status_edit))
                 }
                 Spacer(Modifier.width(8.dp))
                 CommonButton(
@@ -331,7 +358,7 @@ private fun EmployeeListItemCard(
                     size = ButtonSize.Large,
                     onClick = { onEditClick() }
                 ) {
-                    Text(stringResource(R.string.employee_edit))
+                    Text(stringResource(R.string.employee_position_edit))
                 }
             }
         }

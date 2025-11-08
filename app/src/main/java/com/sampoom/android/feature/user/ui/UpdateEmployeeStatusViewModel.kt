@@ -2,10 +2,10 @@ package com.sampoom.android.feature.user.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sampoom.android.core.model.UserPosition
+import com.sampoom.android.core.model.EmployeeStatus
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.core.util.GlobalMessageHandler
-import com.sampoom.android.feature.user.domain.usecase.EditEmployeeUseCase
+import com.sampoom.android.feature.user.domain.usecase.UpdateEmployeeStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,17 +14,17 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class EditEmployeeViewModel @Inject constructor(
+class UpdateEmployeeStatusViewModel @Inject constructor(
     private val messageHandler: GlobalMessageHandler,
-    private val editEmployeeUseCase: EditEmployeeUseCase
+    private val updateEmployeeStatusUseCase: UpdateEmployeeStatusUseCase
 ) : ViewModel() {
 
     private companion object {
-        private const val TAG = "EditEmployeeViewModel"
+        private const val TAG = "UpdateEmployeeStatusViewModel"
     }
 
-    private val _uiState = MutableStateFlow(EditEmployeeUiState())
-    val uiState: StateFlow<EditEmployeeUiState> = _uiState
+    private val _uiState = MutableStateFlow(UpdateEmployeeStatusUiState())
+    val uiState: StateFlow<UpdateEmployeeStatusUiState> = _uiState
 
     private var errorLabel: String = ""
     private var editEmployeeLabel: String = ""
@@ -34,9 +34,9 @@ class EditEmployeeViewModel @Inject constructor(
         editEmployeeLabel = editEmployee
     }
 
-    fun onEvent(event: EditEmployeeUiEvent) {
+    fun onEvent(event: UpdateEmployeeStatusUiEvent) {
         when (event) {
-            is EditEmployeeUiEvent.Initialize -> {
+            is UpdateEmployeeStatusUiEvent.Initialize -> {
                 _uiState.update {
                     it.copy(
                         employee = event.employee,
@@ -45,10 +45,10 @@ class EditEmployeeViewModel @Inject constructor(
                     )
                 }
             }
-            is EditEmployeeUiEvent.EditEmployee -> {
-                editEmployee(event.position)
+            is UpdateEmployeeStatusUiEvent.EditEmployeeStatus -> {
+                editEmployeeStatus(event.employeeStatus)
             }
-            is EditEmployeeUiEvent.Dismiss -> {
+            is UpdateEmployeeStatusUiEvent.Dismiss -> {
                 _uiState.update {
                     it.copy(
                         employee = null,
@@ -60,17 +60,17 @@ class EditEmployeeViewModel @Inject constructor(
         }
     }
 
-    private fun editEmployee(newPosition: UserPosition) {
+    private fun editEmployeeStatus(newEmployeeStatus: EmployeeStatus) {
         viewModelScope.launch {
             val currentEmployee = _uiState.value.employee ?: run {
                 messageHandler.showMessage(message = errorLabel, isError = true)
                 return@launch
             }
 
-            val updateEmployee = currentEmployee.copy(position = newPosition)
+            val updateEmployee = currentEmployee.copy(employeeStatus = newEmployeeStatus)
             _uiState.update { it.copy(isLoading = true, error = null) }
 
-            editEmployeeUseCase(updateEmployee, "AGENCY")
+            updateEmployeeStatusUseCase(updateEmployee, "AGENCY")
                 .onSuccess { employee ->
                     _uiState.update {
                         it.copy(

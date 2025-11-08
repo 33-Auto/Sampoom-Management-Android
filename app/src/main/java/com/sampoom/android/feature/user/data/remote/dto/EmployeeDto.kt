@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.user.data.remote.dto
 
+import com.sampoom.android.core.model.EmployeeStatus
 import com.sampoom.android.core.model.UserPosition
 
 data class EmployeeDto(
@@ -11,6 +12,7 @@ data class EmployeeDto(
     val organizationId: Long,
     val branch: String,
     val position: UserPosition,
+    val employeeStatus: EmployeeStatus?,
     val startedAt: String?,
     val endedAt: String?
 )

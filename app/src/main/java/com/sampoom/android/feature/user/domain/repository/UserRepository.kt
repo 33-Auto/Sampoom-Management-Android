@@ -11,5 +11,6 @@ interface UserRepository {
     suspend fun updateProfile(user: User): Result<User>
     fun getEmployeeList(): Flow<PagingData<Employee>>
     suspend fun editEmployee(employee: Employee, workspace: String): Result<Employee>
+    suspend fun updateEmployeeStatus(employee: Employee, workspace: String): Result<Employee>
     suspend fun getEmployeeCount(): Result<Int>
 }

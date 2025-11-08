@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.part.ui
 
+import android.widget.Space
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -519,7 +521,7 @@ private fun PartItemCard(
             Icon(
                 painterResource(R.drawable.chevron_right),
                 contentDescription = stringResource(R.string.common_detail),
-                tint = disableColor()
+                tint = textSecondaryColor()
             )
         }
     }
@@ -644,10 +646,12 @@ private fun SearchPartItem(
                 )
             }
 
+            Spacer(Modifier.width(8.dp))
+
             Icon(
                 painterResource(R.drawable.chevron_right),
                 contentDescription = stringResource(R.string.common_detail),
-                tint = disableColor()
+                tint = textSecondaryColor()
             )
         }
     }
