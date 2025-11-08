@@ -1,6 +1,5 @@
 package com.sampoom.android.feature.user.ui
 
-import android.R.attr.text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,7 +58,6 @@ import com.sampoom.android.core.util.employeeStatusToKorean
 import com.sampoom.android.core.util.formatDate
 import com.sampoom.android.core.util.positionToKorean
 import com.sampoom.android.feature.user.domain.model.Employee
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

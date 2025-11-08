@@ -1,10 +1,10 @@
 package com.sampoom.android.feature.user.data.remote.api
 
 import com.sampoom.android.core.model.ApiResponse
-import com.sampoom.android.feature.user.data.remote.dto.GetProfileResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.EditEmployeeRequestDto
 import com.sampoom.android.feature.user.data.remote.dto.EditEmployeeResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.EmployeeListDto
+import com.sampoom.android.feature.user.data.remote.dto.GetProfileResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.UpdateEmployeeStatusRequestDto
 import com.sampoom.android.feature.user.data.remote.dto.UpdateEmployeeStatusResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.UpdateProfileRequestDto

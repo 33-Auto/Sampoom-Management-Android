@@ -39,7 +39,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.theme.FailRed
 import com.sampoom.android.core.ui.theme.backgroundCardColor
@@ -50,7 +49,6 @@ import com.sampoom.android.core.util.formatDate
 import com.sampoom.android.core.util.positionToKorean
 import com.sampoom.android.feature.user.domain.model.User
 import com.sampoom.android.feature.user.ui.UpdateProfileBottomSheet
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

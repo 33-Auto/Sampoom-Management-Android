@@ -3,8 +3,8 @@ package com.sampoom.android.feature.dashboard.ui
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.core.util.AuthValidator
+import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.core.util.ValidationResult
 import com.sampoom.android.feature.user.domain.model.User
 import com.sampoom.android.feature.user.domain.usecase.GetStoredUserUseCase

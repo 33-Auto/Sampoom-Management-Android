@@ -3,7 +3,6 @@ package com.sampoom.android.feature.user.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.sampoom.android.core.model.EmployeeStatus
 import com.sampoom.android.core.preferences.AuthPreferences
 import com.sampoom.android.core.util.retry
 import com.sampoom.android.feature.user.data.mapper.toModel

@@ -9,9 +9,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.feature.user.domain.model.User
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.flow.first
 
 // Per official guidance, DataStore instance should be single and at top-level.
 private val Context.authDataStore by preferencesDataStore(name = "auth_prefs")
