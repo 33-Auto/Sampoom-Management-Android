@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
 import com.sampoom.android.core.util.GlobalMessageHandler
-import com.sampoom.android.feature.auth.domain.AuthValidator
-import com.sampoom.android.feature.auth.domain.ValidationResult
+import com.sampoom.android.core.util.AuthValidator
+import com.sampoom.android.core.util.ValidationResult
 import com.sampoom.android.feature.auth.domain.usecase.LoginUseCase
+import com.sampoom.android.feature.user.domain.usecase.GetProfileUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val messageHandler: GlobalMessageHandler,
     private val singIn: LoginUseCase,
+    private val getProfile: GetProfileUseCase,
     private val application: Application
 ) : ViewModel() {
 
@@ -86,9 +88,21 @@ class LoginViewModel @Inject constructor(
         _uiState.update { it.copy(loading = true, success = false) }
         singIn(s.email, s.password)
             .onSuccess {
-                _uiState.update {
-                    it.copy(loading = false, success = true)
-                }
+                getProfile("AGENCY")
+                    .onSuccess {
+                        _uiState.update {
+                            it.copy(loading = false, success = true)
+                        }
+                    }
+                    .onFailure { throwable ->
+                        val backendMessage = throwable.serverMessageOrNull()
+                        val error = backendMessage ?: (throwable.message ?: errorLabel)
+                        messageHandler.showMessage(message = error, isError = true)
+
+                        _uiState.update {
+                            it.copy(loading = false, success = false)
+                        }
+                    }
             }
             .onFailure { throwable ->
                 val backendMessage = throwable.serverMessageOrNull()
@@ -98,6 +112,7 @@ class LoginViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(loading = false, success = false)
                 }
+                return@launch
             }
         Log.d(TAG, "submit: ${_uiState.value}")
     }

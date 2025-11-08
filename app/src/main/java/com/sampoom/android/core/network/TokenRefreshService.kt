@@ -3,7 +3,7 @@ package com.sampoom.android.core.network
 import com.sampoom.android.core.preferences.AuthPreferences
 import com.sampoom.android.feature.auth.data.remote.api.AuthApi
 import com.sampoom.android.feature.auth.data.remote.dto.RefreshRequestDto
-import com.sampoom.android.feature.auth.domain.model.User
+import com.sampoom.android.feature.user.domain.model.User
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject

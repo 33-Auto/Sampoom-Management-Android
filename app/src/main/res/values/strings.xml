@@ -114,6 +114,16 @@
     <string name="order_detail_toast_order_receive">입고 처리되었습니다</string>
     <string name="order_detail_total_amount">총 가격</string>
 
+    <!-- 직원 관리 -->
+    <string name="employee_title">직원관리</string>
+    <string name="employee_empty_employee">직원이 없습니다.</string>
+    <string name="employee_email">이메일</string>
+    <string name="employee_startedAt">가입일</string>
+    <string name="employee_delete">삭제</string>
+    <string name="employee_edit">수정</string>
+    <string name="employee_edit_edited">직원 수정이 완료되었습니다.</string>
+    <string name="employee_edit_deleted">직원 삭제가 완료되었습니다.</string>
+
     <!-- 주문 상태 -->
     <string name="order_status_pending">대기중</string>
     <string name="order_status_confirmed">주문확인</string>
@@ -127,6 +137,8 @@
     <!-- 설정 -->
     <string name="setting_title">설정</string>
     <string name="setting_edit_profile">프로필 수정</string>
+    <string name="setting_edit_profile_placeholder_username">이름 입력</string>
+    <string name="setting_edit_profile_edited">프로필 수정이 완료되었습니다.</string>
     <string name="setting_logout">로그아웃</string>
     <string name="setting_dialog_logout">로그아웃 하시겠습니까?</string>
 

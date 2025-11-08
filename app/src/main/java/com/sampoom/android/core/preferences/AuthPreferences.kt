@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.sampoom.android.core.model.UserPosition
-import com.sampoom.android.feature.auth.domain.model.User
+import com.sampoom.android.feature.user.domain.model.User
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton

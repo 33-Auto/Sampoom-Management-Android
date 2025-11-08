@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.dashboard.ui
 
+import android.R.attr.onClick
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,7 +48,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.sampoom.android.R
-import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.theme.FailRed
@@ -56,15 +56,16 @@ import com.sampoom.android.core.ui.theme.SuccessGreen
 import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
-import com.sampoom.android.feature.auth.domain.model.User
 import com.sampoom.android.feature.dashboard.domain.model.Dashboard
 import com.sampoom.android.feature.dashboard.domain.model.WeeklySummary
 import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.ui.OrderItem
+import com.sampoom.android.feature.user.domain.model.User
 
 @Composable
 fun DashboardScreen(
     paddingValues: PaddingValues,
+    onEmployeeClick: () -> Unit,
     onSettingClick: () -> Unit,
     onNavigateOrderDetail: (Order) -> Unit,
     onNavigationOrder: () -> Unit,
@@ -75,20 +76,7 @@ fun DashboardScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullToRefreshState()
     val orderListPaged = viewModel.orderListPaged.collectAsLazyPagingItems()
-    val isManager = when (user?.position) {
-        UserPosition.STAFF,
-        UserPosition.SENIOR_STAFF,
-        UserPosition.ASSISTANT_MANAGER,
-        UserPosition.MANAGER,
-        UserPosition.DEPUTY_GENERAL_MANAGER,
-        UserPosition.GENERAL_MANAGER,
-        UserPosition.DIRECTOR,
-        UserPosition.VICE_PRESIDENT,
-        UserPosition.PRESIDENT,
-        UserPosition.CHAIRMAN -> true
-
-        else -> false
-    }
+    val isManager = user?.role == "ADMIN"
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)
@@ -99,6 +87,7 @@ fun DashboardScreen(
         onRefresh = {
             viewModel.onEvent(DashboardUiEvent.LoadDashboard)
             orderListPaged.refresh()
+            viewModel.refreshUser()
         },
         state = pullRefreshState,
         modifier = Modifier.fillMaxSize(),
@@ -135,7 +124,7 @@ fun DashboardScreen(
                 Row {
                     if (isManager) {
                         IconButton(
-                            onClick = { }
+                            onClick = { onEmployeeClick() }
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.employee),
@@ -163,7 +152,14 @@ fun DashboardScreen(
             ) {
                 item { TitleSection(user) }
 
-                item { ButtonSection(isManager, uiState.dashboard) }
+                item {
+                    ButtonSection(
+                        isManager = isManager,
+                        dashboard = uiState.dashboard,
+                        employeeCount = uiState.employeeCount,
+                        onEmployeeClick = { onEmployeeClick() }
+                    )
+                }
 
                 item {
                     OrderListSection(
@@ -234,8 +230,10 @@ fun TitleSection(
 
 @Composable
 fun ButtonSection(
+    onEmployeeClick: () -> Unit,
     isManager: Boolean,
-    dashboard: Dashboard?
+    dashboard: Dashboard?,
+    employeeCount: Int?
 ) {
     Column(
         modifier = Modifier
@@ -252,9 +250,9 @@ fun ButtonSection(
                 ),
                 painter = painterResource(R.drawable.employee),
                 painterDescription = stringResource(R.string.dashboard_employee),
-                text = 45.toString(),   // TODO : API 연동
+                text = employeeCount?.toString() ?: stringResource(R.string.common_slash),
                 subText = stringResource(R.string.dashboard_employee),
-                onClick = { }
+                onClick = { onEmployeeClick() }
             )
         }
 
@@ -267,17 +265,16 @@ fun ButtonSection(
                 painter = painterResource(R.drawable.car),
                 painterDescription = stringResource(R.string.dashboard_parts_all),
                 text = (dashboard?.totalParts ?: stringResource(R.string.common_slash)).toString(),
-                subText = stringResource(R.string.dashboard_parts_all),
-                onClick = { }
+                subText = stringResource(R.string.dashboard_parts_all)
             )
 
             ButtonCard(
                 modifier = Modifier.weight(1f),
                 painter = painterResource(R.drawable.block),
                 painterDescription = stringResource(R.string.dashboard_parts_out_of_stock),
-                text = (dashboard?.outOfStockParts ?: stringResource(R.string.common_slash)).toString(),
-                subText = stringResource(R.string.dashboard_parts_out_of_stock),
-                onClick = { }
+                text = (dashboard?.outOfStockParts
+                    ?: stringResource(R.string.common_slash)).toString(),
+                subText = stringResource(R.string.dashboard_parts_out_of_stock)
             )
         }
 
@@ -289,18 +286,18 @@ fun ButtonSection(
                 modifier = Modifier.weight(1f),
                 painter = painterResource(R.drawable.warning),
                 painterDescription = stringResource(R.string.dashboard_parts_low_stock),
-                text = (dashboard?.lowStockParts ?: stringResource(R.string.common_slash)).toString(),
-                subText = stringResource(R.string.dashboard_parts_low_stock),
-                onClick = { }
+                text = (dashboard?.lowStockParts
+                    ?: stringResource(R.string.common_slash)).toString(),
+                subText = stringResource(R.string.dashboard_parts_low_stock)
             )
 
             ButtonCard(
                 modifier = Modifier.weight(1f),
                 painter = painterResource(R.drawable.parts),
                 painterDescription = stringResource(R.string.dashboard_parts_on_hand),
-                text = (dashboard?.totalQuantity ?: stringResource(R.string.common_slash)).toString(),
-                subText = stringResource(R.string.dashboard_parts_on_hand),
-                onClick = { }
+                text = (dashboard?.totalQuantity
+                    ?: stringResource(R.string.common_slash)).toString(),
+                subText = stringResource(R.string.dashboard_parts_on_hand)
             )
         }
     }
@@ -313,7 +310,7 @@ fun ButtonCard(
     painterDescription: String,
     text: String,
     subText: String,
-    onClick: () -> Unit
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -484,7 +481,8 @@ fun WeeklySummarySection(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = (weeklySummary?.inStockParts ?: stringResource(R.string.common_slash)).toString(),
+                        text = (weeklySummary?.inStockParts
+                            ?: stringResource(R.string.common_slash)).toString(),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = SuccessGreen
@@ -501,7 +499,8 @@ fun WeeklySummarySection(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = (weeklySummary?.outStockParts ?: stringResource(R.string.common_slash)).toString(),
+                        text = (weeklySummary?.outStockParts
+                            ?: stringResource(R.string.common_slash)).toString(),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = FailRed
