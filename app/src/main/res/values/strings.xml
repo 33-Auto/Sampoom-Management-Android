@@ -118,7 +118,10 @@
     <string name="employee_title">직원관리</string>
     <string name="employee_empty_employee">직원이 없습니다.</string>
     <string name="employee_email">이메일</string>
-    <string name="employee_startedAt">가입일</string>
+    <string name="employee_createdAt">최초생성일</string>
+    <string name="employee_startedAt">근무시작일</string>
+    <string name="employee_endedAt">근무종료일</string>
+    <string name="employee_deletedAt">퇴사일</string>
     <string name="employee_status_edit">재직상태 변경</string>
     <string name="employee_placeholder_status_edit">재직상태 선택</string>
     <string name="employee_position_edit">직급 변경</string>

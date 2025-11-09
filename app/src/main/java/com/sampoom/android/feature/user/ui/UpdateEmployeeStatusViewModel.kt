@@ -67,7 +67,7 @@ class UpdateEmployeeStatusViewModel @Inject constructor(
                 return@launch
             }
 
-            val updateEmployee = currentEmployee.copy(employeeStatus = newEmployeeStatus)
+            val updateEmployee = currentEmployee.copy(status = newEmployeeStatus)
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             updateEmployeeStatusUseCase(updateEmployee, "AGENCY")

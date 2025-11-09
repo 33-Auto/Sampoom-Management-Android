@@ -288,7 +288,7 @@ private fun EmployeeListItemCard(
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
-                    text = employeeStatusToKorean(employee.employeeStatus),
+                    text = employeeStatusToKorean(employee.status),
                     color = textColor(),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Light
@@ -325,12 +325,60 @@ private fun EmployeeListItemCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
+                    text = stringResource(R.string.employee_createdAt),
+                    color = textSecondaryColor(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = formatDate(employee.createdAt ?: stringResource(R.string.common_slash)),
+                    color = textSecondaryColor(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
                     text = stringResource(R.string.employee_startedAt),
                     color = textSecondaryColor(),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
                     text = formatDate(employee.startedAt ?: stringResource(R.string.common_slash)),
+                    color = textSecondaryColor(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.employee_endedAt),
+                    color = textSecondaryColor(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = formatDate(employee.endedAt ?: stringResource(R.string.common_slash)),
+                    color = textSecondaryColor(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.employee_deletedAt),
+                    color = textSecondaryColor(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = formatDate(employee.deletedAt ?: stringResource(R.string.common_slash)),
                     color = textSecondaryColor(),
                     style = MaterialTheme.typography.bodyMedium
                 )

@@ -124,9 +124,11 @@ class UserRepositoryImpl @Inject constructor(
                 organizationId = employee.organizationId,
                 branch = employee.branch,
                 position = updatedEmployee.position,
-                employeeStatus = employee.employeeStatus,
+                status = employee.status,
+                createdAt = employee.createdAt,
                 startedAt = employee.startedAt,
-                endedAt = employee.endedAt
+                endedAt = employee.endedAt,
+                deletedAt = employee.deletedAt
             )
 
             completeEmployee
@@ -139,7 +141,7 @@ class UserRepositoryImpl @Inject constructor(
     ): Result<Employee> {
         return runCatching {
             val requestDto = UpdateEmployeeStatusRequestDto(
-                employeeStatus = employee.employeeStatus?.name ?: "-"
+                employeeStatus = employee.status.name
             )
             val dto = api.updateEmployeeStatus(
                 userId = employee.userId,
@@ -158,9 +160,11 @@ class UserRepositoryImpl @Inject constructor(
                 organizationId = employee.organizationId,
                 branch = employee.branch,
                 position = employee.position,
-                employeeStatus = updateEmployeeStatus.employeeStatus,
+                status = updateEmployeeStatus.status,
+                createdAt = employee.createdAt,
                 startedAt = employee.startedAt,
-                endedAt = employee.endedAt
+                endedAt = employee.endedAt,
+                deletedAt = employee.deletedAt
             )
 
             completedEmployeeStatus

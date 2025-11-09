@@ -57,9 +57,11 @@ fun EditEmployeeResponseDto.toModel(): Employee = Employee(
     organizationId = 0,
     branch = "",
     position = position.toUserPosition(),
-    employeeStatus = EmployeeStatus.ACTIVE,
+    status = EmployeeStatus.ACTIVE,
+    createdAt = null,
     startedAt = null,
-    endedAt = null
+    endedAt = null,
+    deletedAt = null
 )
 
 fun UpdateEmployeeStatusResponseDto.toModel(): Employee = Employee(
@@ -71,9 +73,11 @@ fun UpdateEmployeeStatusResponseDto.toModel(): Employee = Employee(
     organizationId = 0,
     branch = "",
     position = UserPosition.STAFF,
-    employeeStatus = employeeStatus.toEmployeeStatus(),
+    status = employeeStatus.toEmployeeStatus(),
+    createdAt = null,
     startedAt = null,
-    endedAt = null
+    endedAt = null,
+    deletedAt = null
 )
 
 fun EmployeeDto.toModel(): Employee = Employee(
@@ -85,9 +89,11 @@ fun EmployeeDto.toModel(): Employee = Employee(
     organizationId,
     branch,
     position,
-    employeeStatus ?: EmployeeStatus.ACTIVE,
+    status ?: EmployeeStatus.ACTIVE,
+    createdAt,
     startedAt,
-    endedAt
+    endedAt,
+    deletedAt
 )
 
 private fun String.toEmployeeStatus(): EmployeeStatus = try {

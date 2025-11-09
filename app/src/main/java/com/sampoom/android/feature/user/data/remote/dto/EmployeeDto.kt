@@ -12,7 +12,9 @@ data class EmployeeDto(
     val organizationId: Long,
     val branch: String,
     val position: UserPosition,
-    val employeeStatus: EmployeeStatus?,
+    val status: EmployeeStatus?,
+    val createdAt: String?,
     val startedAt: String?,
-    val endedAt: String?
+    val endedAt: String?,
+    val deletedAt: String?
 )

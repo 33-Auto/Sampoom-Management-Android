@@ -39,7 +39,7 @@ fun UpdateEmployeeStatusBottomSheet(
     viewModel: UpdateEmployeeStatusViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var selectedStatus by rememberSaveable { mutableStateOf(employee.employeeStatus) }
+    var selectedStatus by rememberSaveable { mutableStateOf(employee.status) }
     var employeeStatusMenuExpanded by remember { mutableStateOf(false) }
 
     val errorLabel = stringResource(R.string.common_error)
@@ -47,7 +47,7 @@ fun UpdateEmployeeStatusBottomSheet(
 
     LaunchedEffect(employee) {
         viewModel.onEvent(UpdateEmployeeStatusUiEvent.Initialize(employee))
-        selectedStatus = employee.employeeStatus
+        selectedStatus = employee.status
     }
 
     LaunchedEffect(errorLabel, editEmployeeLabel) {
@@ -106,7 +106,7 @@ fun UpdateEmployeeStatusBottomSheet(
 
         CommonButton(
             modifier = Modifier.fillMaxWidth(),
-            enabled = !uiState.isLoading && selectedStatus != employee.employeeStatus,
+            enabled = !uiState.isLoading && selectedStatus != employee.status,
             onClick = { viewModel.onEvent(UpdateEmployeeStatusUiEvent.EditEmployeeStatus(selectedStatus)) }
         ) {
             Text(stringResource(R.string.common_confirm))
