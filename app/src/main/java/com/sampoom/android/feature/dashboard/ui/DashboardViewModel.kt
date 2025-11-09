@@ -12,7 +12,6 @@ import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.domain.usecase.GetOrderUseCase
 import com.sampoom.android.feature.user.domain.model.User
 import com.sampoom.android.feature.user.domain.usecase.GetEmployeeCountUseCase
-import com.sampoom.android.feature.user.domain.usecase.GetEmployeeUseCase
 import com.sampoom.android.feature.user.domain.usecase.GetStoredUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow

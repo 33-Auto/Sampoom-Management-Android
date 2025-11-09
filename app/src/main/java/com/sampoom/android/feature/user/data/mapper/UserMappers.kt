@@ -1,9 +1,11 @@
 package com.sampoom.android.feature.user.data.mapper
 
+import com.sampoom.android.core.model.EmployeeStatus
 import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.feature.user.data.remote.dto.EditEmployeeResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.EmployeeDto
 import com.sampoom.android.feature.user.data.remote.dto.GetProfileResponseDto
+import com.sampoom.android.feature.user.data.remote.dto.UpdateEmployeeStatusResponseDto
 import com.sampoom.android.feature.user.data.remote.dto.UpdateProfileResponseDto
 import com.sampoom.android.feature.user.domain.model.Employee
 import com.sampoom.android.feature.user.domain.model.User
@@ -55,8 +57,27 @@ fun EditEmployeeResponseDto.toModel(): Employee = Employee(
     organizationId = 0,
     branch = "",
     position = position.toUserPosition(),
+    status = EmployeeStatus.ACTIVE,
+    createdAt = null,
     startedAt = null,
-    endedAt = null
+    endedAt = null,
+    deletedAt = null
+)
+
+fun UpdateEmployeeStatusResponseDto.toModel(): Employee = Employee(
+    userId = userId,
+    email = "",
+    role = "",
+    userName = userName,
+    workspace = workspace,
+    organizationId = 0,
+    branch = "",
+    position = UserPosition.STAFF,
+    status = employeeStatus.toEmployeeStatus(),
+    createdAt = null,
+    startedAt = null,
+    endedAt = null,
+    deletedAt = null
 )
 
 fun EmployeeDto.toModel(): Employee = Employee(
@@ -68,6 +89,15 @@ fun EmployeeDto.toModel(): Employee = Employee(
     organizationId,
     branch,
     position,
+    status ?: EmployeeStatus.ACTIVE,
+    createdAt,
     startedAt,
-    endedAt
+    endedAt,
+    deletedAt
 )
+
+private fun String.toEmployeeStatus(): EmployeeStatus = try {
+    EmployeeStatus.valueOf(this.uppercase())
+} catch (_: IllegalArgumentException) {
+    EmployeeStatus.ACTIVE
+}

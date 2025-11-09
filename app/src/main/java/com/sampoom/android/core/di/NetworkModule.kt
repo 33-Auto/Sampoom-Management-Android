@@ -3,10 +3,10 @@ package com.sampoom.android.core.di
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.sampoom.android.BuildConfig
-import com.sampoom.android.core.preferences.AuthPreferences
 import com.sampoom.android.core.network.TokenAuthenticator
 import com.sampoom.android.core.network.TokenInterceptor
 import com.sampoom.android.core.network.TokenRefreshService
+import com.sampoom.android.core.preferences.AuthPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -40,7 +40,8 @@ class EmployeeListViewModel @Inject constructor(
         when (event) {
             is EmployeeListUiEvent.LoadEmployeeList -> {}
             is EmployeeListUiEvent.RetryEmployeeList -> {}
-            is EmployeeListUiEvent.ShowBottomSheet -> _uiState.update { it.copy(selectedEmployee = event.employee) }
+            is EmployeeListUiEvent.ShowEditBottomSheet -> _uiState.update { it.copy(selectedEmployee = event.employee, bottomSheetType = EmployeeBottomSheetType.EDIT) }
+            is EmployeeListUiEvent.ShowStatusBottomSheet -> _uiState.update { it.copy(selectedEmployee = event.employee, bottomSheetType = EmployeeBottomSheetType.STATUS) }
             is EmployeeListUiEvent.DismissBottomSheet -> _uiState.update { it.copy(selectedEmployee = null) }
         }
     }

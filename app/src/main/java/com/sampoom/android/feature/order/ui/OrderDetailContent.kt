@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import com.sampoom.android.R
 import com.sampoom.android.core.ui.component.StatusChip
 import com.sampoom.android.core.ui.theme.backgroundCardColor
-import com.sampoom.android.core.ui.theme.disableColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.core.util.formatWon
@@ -33,7 +32,6 @@ import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.domain.model.OrderPart
 import com.sampoom.android.feature.order.domain.model.subtotal
 import com.sampoom.android.feature.order.domain.model.totalCost
-import kotlin.collections.forEach
 
 @Composable
 fun OrderDetailContent(

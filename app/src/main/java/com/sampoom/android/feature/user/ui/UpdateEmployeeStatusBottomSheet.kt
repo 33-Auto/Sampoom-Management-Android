@@ -24,30 +24,30 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sampoom.android.R
-import com.sampoom.android.core.model.UserPosition
+import com.sampoom.android.core.model.EmployeeStatus
 import com.sampoom.android.core.ui.component.CommonButton
 import com.sampoom.android.core.ui.component.CommonTextField
-import com.sampoom.android.core.util.positionToKorean
+import com.sampoom.android.core.util.employeeStatusToKorean
 import com.sampoom.android.feature.user.domain.model.Employee
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditEmployeeBottomSheet(
+fun UpdateEmployeeStatusBottomSheet(
     employee: Employee,
     onDismiss: () -> Unit,
-    onEmployeeUpdated: (Employee) -> Unit = {},
-    viewModel: EditEmployeeViewModel = hiltViewModel()
+    onStatusUpdated: (Employee) -> Unit = {},
+    viewModel: UpdateEmployeeStatusViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var selectedPosition by rememberSaveable { mutableStateOf(employee.position) }
-    var positionMenuExpanded by remember { mutableStateOf(false) }
+    var selectedStatus by rememberSaveable { mutableStateOf(employee.status) }
+    var employeeStatusMenuExpanded by remember { mutableStateOf(false) }
 
     val errorLabel = stringResource(R.string.common_error)
-    val editEmployeeLabel = stringResource(R.string.employee_edit_edited)
+    val editEmployeeLabel = stringResource(R.string.employee_edit_status_edited)
 
     LaunchedEffect(employee) {
-        viewModel.onEvent(EditEmployeeUiEvent.Initialize(employee))
-        selectedPosition = employee.position
+        viewModel.onEvent(UpdateEmployeeStatusUiEvent.Initialize(employee))
+        selectedStatus = employee.status
     }
 
     LaunchedEffect(errorLabel, editEmployeeLabel) {
@@ -56,7 +56,7 @@ fun EditEmployeeBottomSheet(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            uiState.employee?.let(onEmployeeUpdated)
+            uiState.employee?.let(onStatusUpdated)
             viewModel.clearStatus()
             onDismiss()
         }
@@ -70,8 +70,8 @@ fun EditEmployeeBottomSheet(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         ExposedDropdownMenuBox(
-            expanded = positionMenuExpanded,
-            onExpandedChange = { positionMenuExpanded = it }
+            expanded = employeeStatusMenuExpanded,
+            onExpandedChange = { employeeStatusMenuExpanded = it }
         ) {
             CommonTextField(
                 modifier = Modifier
@@ -81,21 +81,21 @@ fun EditEmployeeBottomSheet(
                         enabled = true
                     ),
                 readOnly = true,
-                value = positionToKorean(selectedPosition),
+                value = employeeStatusToKorean(selectedStatus),
                 onValueChange = {},
-                placeholder = stringResource(R.string.signup_placeholder_position),
+                placeholder = stringResource(R.string.employee_placeholder_status_edit),
                 singleLine = true
             )
             ExposedDropdownMenu(
-                expanded = positionMenuExpanded,
-                onDismissRequest = { positionMenuExpanded = false }
+                expanded = employeeStatusMenuExpanded,
+                onDismissRequest = { employeeStatusMenuExpanded = false }
             ) {
-                UserPosition.entries.forEach { position ->
+                EmployeeStatus.entries.forEach { status ->
                     DropdownMenuItem(
-                        text = { Text(positionToKorean(position)) },
+                        text = { Text(employeeStatusToKorean(status)) },
                         onClick = {
-                            selectedPosition = position
-                            positionMenuExpanded = false
+                            selectedStatus = status
+                            employeeStatusMenuExpanded = false
                         }
                     )
                 }
@@ -106,8 +106,8 @@ fun EditEmployeeBottomSheet(
 
         CommonButton(
             modifier = Modifier.fillMaxWidth(),
-            enabled = !uiState.isLoading && selectedPosition != employee.position,
-            onClick = { viewModel.onEvent(EditEmployeeUiEvent.EditEmployee(selectedPosition)) }
+            enabled = !uiState.isLoading && selectedStatus != employee.status,
+            onClick = { viewModel.onEvent(UpdateEmployeeStatusUiEvent.EditEmployeeStatus(selectedStatus)) }
         ) {
             Text(stringResource(R.string.common_confirm))
         }

@@ -6,11 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.R
 import com.sampoom.android.core.network.serverMessageOrNull
-import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.core.util.AuthValidator
 import com.sampoom.android.core.util.AuthValidator.validateEmail
 import com.sampoom.android.core.util.AuthValidator.validatePassword
 import com.sampoom.android.core.util.AuthValidator.validatePasswordCheck
+import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.core.util.ValidationResult
 import com.sampoom.android.feature.auth.domain.usecase.GetVendorUseCase
 import com.sampoom.android.feature.auth.domain.usecase.SignUpUseCase

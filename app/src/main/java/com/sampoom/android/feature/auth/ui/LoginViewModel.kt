@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sampoom.android.core.network.serverMessageOrNull
-import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.core.util.AuthValidator
+import com.sampoom.android.core.util.GlobalMessageHandler
 import com.sampoom.android.core.util.ValidationResult
 import com.sampoom.android.feature.auth.domain.usecase.LoginUseCase
 import com.sampoom.android.feature.user.domain.usecase.GetProfileUseCase

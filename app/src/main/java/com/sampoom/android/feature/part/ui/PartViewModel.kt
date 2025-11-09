@@ -13,7 +13,6 @@ import com.sampoom.android.feature.part.domain.usecase.GetCategoryUseCase
 import com.sampoom.android.feature.part.domain.usecase.GetGroupUseCase
 import com.sampoom.android.feature.part.domain.usecase.SearchPartsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
