@@ -1,7 +1,7 @@
 package com.sampoom.android.feature.auth.domain.usecase
 
-import com.sampoom.android.feature.auth.domain.model.User
 import com.sampoom.android.feature.auth.domain.repository.AuthRepository
+import com.sampoom.android.feature.user.domain.model.User
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(

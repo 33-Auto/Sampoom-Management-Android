@@ -203,7 +203,7 @@ fun PartDetailBottomSheet(
         Row(modifier = Modifier.fillMaxWidth()) {
             CommonButton(
                 modifier = Modifier.weight(1F),
-                variant = ButtonVariant.Error,
+                variant = ButtonVariant.Secondary,
                 size = ButtonSize.Large,
                 leadingIcon = {
                     Icon(

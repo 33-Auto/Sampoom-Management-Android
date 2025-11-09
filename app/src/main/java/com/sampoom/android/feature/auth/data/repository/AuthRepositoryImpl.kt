@@ -7,10 +7,9 @@ import com.sampoom.android.feature.auth.data.remote.api.AuthApi
 import com.sampoom.android.feature.auth.data.remote.dto.LoginRequestDto
 import com.sampoom.android.feature.auth.data.remote.dto.RefreshRequestDto
 import com.sampoom.android.feature.auth.data.remote.dto.SignUpRequestDto
-import com.sampoom.android.feature.auth.domain.model.User
 import com.sampoom.android.feature.auth.domain.model.VendorList
 import com.sampoom.android.feature.auth.domain.repository.AuthRepository
-import com.sampoom.android.feature.outbound.data.mapper.toModel
+import com.sampoom.android.feature.user.domain.model.User
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
@@ -63,29 +62,7 @@ class AuthRepositoryImpl @Inject constructor(
             val loginUser = loginDto.data.toModel()
 
             preferences.saveUser(loginUser)
-
-            val profileUser = retry(times = 5, initialDelay = 300) {
-                getProfile("AGENCY").getOrThrow()
-            }
-
-            val user = User(
-                userId = loginUser.userId,
-                userName = profileUser.userName,
-                email = profileUser.email,
-                role = profileUser.role,
-                accessToken = loginUser.accessToken,
-                refreshToken = loginUser.refreshToken,
-                expiresIn = loginUser.expiresIn,
-                position = profileUser.position,
-                workspace = profileUser.workspace,
-                branch = profileUser.branch,
-                agencyId = profileUser.agencyId,
-                startedAt = profileUser.startedAt,
-                endedAt = profileUser.endedAt
-            )
-
-            preferences.saveUser(user)
-            user
+            loginUser
         }
     }
 
@@ -125,14 +102,6 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isSignedIn(): Boolean = preferences.hasToken()
-
-    override suspend fun getProfile(workspace: String): Result<User> {
-        return runCatching {
-            val dto = api.getProfile(workspace)
-            if (!dto.success) throw Exception(dto.message)
-            dto.data.toModel()
-        }
-    }
 
     override suspend fun getVendorList(): Result<VendorList> {
         return runCatching {

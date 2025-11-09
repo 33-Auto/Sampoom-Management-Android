@@ -1,6 +1,5 @@
 package com.sampoom.android.feature.outbound.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -50,7 +48,6 @@ import com.sampoom.android.core.ui.theme.backgroundCardColor
 import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.core.ui.theme.textSecondaryColor
 import com.sampoom.android.core.util.formatWon
-import com.sampoom.android.feature.cart.domain.model.subtotal
 import com.sampoom.android.feature.outbound.domain.model.OutboundPart
 import com.sampoom.android.feature.outbound.domain.model.subtotal
 
@@ -96,7 +93,9 @@ fun OutboundListScreen(
             )
         }
     ) {
-        Column(Modifier.fillMaxSize().padding(paddingValues)) {
+        Column(Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -198,7 +197,7 @@ fun OutboundListScreen(
                                 .align(Alignment.BottomEnd)
                                 .padding(16.dp)
                                 .padding(end = 72.dp),
-                            variant = ButtonVariant.Error,
+                            variant = ButtonVariant.Secondary,
                             size = ButtonSize.Large,
                             onClick = { showConfirmDialog = true }
                         ) { Text("${formatWon(uiState.totalCost)} ${stringResource(R.string.outbound_order_parts)}") }

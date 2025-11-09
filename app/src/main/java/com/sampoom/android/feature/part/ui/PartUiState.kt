@@ -2,7 +2,6 @@ package com.sampoom.android.feature.part.ui
 
 import com.sampoom.android.feature.part.domain.model.Category
 import com.sampoom.android.feature.part.domain.model.Group
-import com.sampoom.android.feature.part.domain.model.SearchResult
 
 data class PartUiState(
     // Part
