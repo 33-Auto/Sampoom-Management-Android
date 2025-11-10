@@ -20,6 +20,7 @@ class PartRepositoryImpl @Inject constructor(
     private val authPreferences: AuthPreferences,
     private val pagingSourceFactory: PartPagingSource.Factory
 ) : PartRepository {
+    /** 카테고리 조회 */
     override suspend fun getCategoryList(): Result<CategoryList> {
         return runCatching {
             val dto = api.getCategoryList()
@@ -28,6 +29,7 @@ class PartRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 그룹 조회 */
     override suspend fun getGroupList(categoryId: Long): Result<GroupList> {
         return runCatching {
             val response = api.getGroupList(categoryId)
@@ -36,6 +38,7 @@ class PartRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 부품 조회 */
     override suspend fun getPartList(groupId: Long): Result<PartList> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
@@ -45,6 +48,7 @@ class PartRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 부품 검색 */
     override fun searchParts(keyword: String): Flow<PagingData<SearchResult>> {
         return Pager(
             config = PagingConfig(pageSize = 20),

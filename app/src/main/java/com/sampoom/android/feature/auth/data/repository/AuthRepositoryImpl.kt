@@ -18,6 +18,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val preferences: AuthPreferences
 ) : AuthRepository {
 
+    /** 회원가입 */
     override suspend fun signUp(
         email: String,
         password: String,
@@ -46,6 +47,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 로그인 */
     override suspend fun signIn(
         email: String,
         password: String
@@ -66,6 +68,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 로그아웃 */
     override suspend fun signOut(): Result<Unit> {
         return runCatching {
             val dto = api.logout()
@@ -77,6 +80,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 토큰 갱신 */
     override suspend fun refreshToken(): Result<User> {
         return runCatching {
             val refreshToken =
@@ -95,14 +99,17 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 토큰 제거 */
     override suspend fun clearTokens(): Result<Unit> {
         return runCatching {
             preferences.clear()
         }
     }
 
+    /** 로그인 여부 */
     override suspend fun isSignedIn(): Boolean = preferences.hasToken()
 
+    /** 대리점 조회 */
     override suspend fun getVendorList(): Result<VendorList> {
         return runCatching {
             val dto = api.getVendors()

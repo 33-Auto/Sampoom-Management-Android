@@ -24,6 +24,7 @@ class OrderRepositoryImpl @Inject constructor(
     private val authPreferences: AuthPreferences,
     private val pagingSourceFactory: OrderPagingSource.Factory
 ) : OrderRepository {
+    /** 주문 내역 리스트 조회 */
     override fun getOrderList(): Flow<PagingData<Order>> {
         return Pager(
             config = PagingConfig(pageSize = 20),
@@ -31,6 +32,7 @@ class OrderRepositoryImpl @Inject constructor(
         ).flow
     }
 
+    /** 주문 처리 */
     override suspend fun createOrder(cartList: CartList): Result<Order> {
         return runCatching {
             val agencyName = authPreferences.getStoredUser()?.branch ?: throw Exception()
@@ -67,6 +69,7 @@ class OrderRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 주문 상태 완료 처리 */
     override suspend fun completeOrder(orderId: Long): Result<Unit> {
         return runCatching {
             val dto = api.completeOrder(orderId)
@@ -74,6 +77,7 @@ class OrderRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 주문 내역 입고 처리 */
     override suspend fun receiveOrder(items: List<Pair<Long, Long>>): Result<Unit> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
@@ -87,6 +91,7 @@ class OrderRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 주문 내역 상세 조회 */
     override suspend fun getOrderDetail(orderId: Long): Result<Order> {
         return runCatching {
             val dto = api.getOrderDetail(orderId)
@@ -95,6 +100,7 @@ class OrderRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 주문 취소 처리 */
     override suspend fun cancelOrder(orderId: Long): Result<Unit> {
         return runCatching {
             val dto = api.cancelOrder(orderId)

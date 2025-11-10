@@ -20,8 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val messageHandler: GlobalMessageHandler,
-    private val singIn: LoginUseCase,
-    private val getProfile: GetProfileUseCase,
+    private val loginUseCase: LoginUseCase,
+    private val getProfileUseCase: GetProfileUseCase,
     private val application: Application
 ) : ViewModel() {
 
@@ -86,9 +86,9 @@ class LoginViewModel @Inject constructor(
 
         val s = _uiState.value
         _uiState.update { it.copy(loading = true, success = false) }
-        singIn(s.email, s.password)
+        loginUseCase(s.email, s.password)
             .onSuccess {
-                getProfile("AGENCY")
+                getProfileUseCase("AGENCY")
                     .onSuccess {
                         _uiState.update {
                             it.copy(loading = false, success = true)

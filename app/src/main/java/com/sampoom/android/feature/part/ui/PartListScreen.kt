@@ -207,6 +207,7 @@ fun PartListScreen(
     }
 }
 
+/** 부품 리스트 아이템 섹션 */
 @Composable
 private fun PartListItemCard(
     part: Part,

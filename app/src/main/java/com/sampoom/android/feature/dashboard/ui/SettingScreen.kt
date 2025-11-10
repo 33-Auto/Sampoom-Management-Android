@@ -184,6 +184,7 @@ fun SettingScreen(
     }
 }
 
+/** 프로필 조회 섹션 */
 @Composable
 fun UserSection(
     user: User?,
@@ -236,6 +237,7 @@ fun UserSection(
     }
 }
 
+/** 설정 항목 섹션 */
 @Composable
 private fun SettingSection(
     onEditProfileClick: () -> Unit,
