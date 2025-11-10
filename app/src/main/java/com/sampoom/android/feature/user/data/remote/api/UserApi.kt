@@ -16,12 +16,15 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface UserApi {
+    // 프로필 조회
     @GET("user/profile")
     suspend fun getProfile(@Query("workspace") workspace: String): ApiResponse<GetProfileResponseDto>
 
+    // 프로필 수정
     @PATCH("user/profile")
     suspend fun updateProfile(@Body body: UpdateProfileRequestDto): ApiResponse<UpdateProfileResponseDto>
 
+    // 직원 프로필 수정
     @PATCH("user/profile/{userId}")
     suspend fun editEmployee(
         @Path("userId") userId: Long,
@@ -29,6 +32,7 @@ interface UserApi {
         @Body body: EditEmployeeRequestDto
     ): ApiResponse<EditEmployeeResponseDto>
 
+    // 직원 목록 조회
     @GET("user/info")
     suspend fun getEmployeeList(
         @Query("workspace") workspace: String,
@@ -37,6 +41,7 @@ interface UserApi {
         @Query("size") size: Int = 20
     ): ApiResponse<EmployeeListDto>
 
+    // 직원 상태 수정
     @PATCH("user/status/{userId}")
     suspend fun updateEmployeeStatus(
         @Path("userId") userId: Long,

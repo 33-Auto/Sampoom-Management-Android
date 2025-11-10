@@ -65,12 +65,10 @@ fun EmployeeListScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: EmployeeListViewModel = hiltViewModel()
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val errorLabel = stringResource(R.string.common_error)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val employeeListPaged = viewModel.employeeListPaged.collectAsLazyPagingItems()
     val pullRefreshState = rememberPullToRefreshState()
-    val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
     val sheetState = rememberModalBottomSheetState(true)
     val selectedEmployee = uiState.selectedEmployee
     val bottomSheetType = uiState.bottomSheetType

@@ -256,6 +256,7 @@ fun OutboundListScreen(
     }
 }
 
+/** 출고 목록 카테고리 > 그룹 섹션 */
 @Composable
 private fun OutboundSection(
     categoryName: String,
@@ -285,6 +286,7 @@ private fun OutboundSection(
     }
 }
 
+/** 출고 목록 부품 섹션 */
 @Composable
 private fun OutboundPartItem(
     part: OutboundPart,

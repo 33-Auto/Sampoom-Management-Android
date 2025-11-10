@@ -116,6 +116,16 @@ fun AppNavHost(
             }
     }
 
+    LaunchedEffect(Unit) {
+        authViewModel.logoutEvent.collect {
+            navController.navigate(ROUTE_LOGIN) {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
+
+    // 앱 로그인 도중 로딩 상태 표시로 화면 깜빡임 제거
     if (isLoading) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -128,22 +138,24 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-//            startDestination = ROUTE_HOME,
         startDestination = if (isLoggedIn) ROUTE_HOME else ROUTE_LOGIN,
         modifier = Modifier.background(backgroundColor())
     ) {
+        // 로그인
         composable(ROUTE_LOGIN) {
             LoginScreen(
                 onSuccess = {
                     authViewModel.updateLoginState()
                     navController.navigate(ROUTE_HOME) {
-                        popUpTo(ROUTE_LOGIN) { inclusive = true } // 로그인 화면 스택 제거
+                        popUpTo(ROUTE_LOGIN) { inclusive = true }
                     }
                 },
                 onNavigateSignUp = {
                     navController.navigate(ROUTE_SIGNUP)
                 })
         }
+
+        // 회원가입
         composable(ROUTE_SIGNUP) {
             SignUpScreen(
                 onSuccess = {
@@ -156,7 +168,11 @@ fun AppNavHost(
                 }
             )
         }
+
+        // 홈
         composable(ROUTE_HOME) { MainScreen(navController, user) }
+
+        // 부품 조회
         composable(ROUTE_PARTS) {
             PartScreen(
                 onNavigateBack = {
@@ -169,6 +185,8 @@ fun AppNavHost(
                 }
             )
         }
+
+        // 부품 리스트 조회
         composable(
             ROUTE_PART_LIST,
             arguments = listOf(
@@ -183,6 +201,8 @@ fun AppNavHost(
                 navController = navController
             )
         }
+
+        // 주문 상세
         composable(
             ROUTE_ORDER_DETAIL,
             arguments = listOf(
@@ -196,6 +216,8 @@ fun AppNavHost(
                 }
             )
         }
+
+        // 설정
         composable(
             ROUTE_SETTINGS
         ) {
@@ -212,6 +234,8 @@ fun AppNavHost(
                 }
             )
         }
+
+        // 직원 관리
         composable(ROUTE_EMPLOYEE) {
             EmployeeListScreen(
                 onNavigateBack = {
@@ -238,6 +262,7 @@ fun MainScreen(
             navController = navController,
             startDestination = ROUTE_DASHBOARD
         ) {
+            // 대시보드
             composable(ROUTE_DASHBOARD) {
                 DashboardScreen(
                     paddingValues = innerPadding,
@@ -260,16 +285,22 @@ fun MainScreen(
                     }
                 )
             }
+
+            // 출고 목록
             composable(ROUTE_OUTBOUND) {
                 OutboundListScreen(
                     paddingValues = innerPadding
                 )
             }
+
+            // 장바구니
             composable(ROUTE_CART) {
                 CartListScreen(
                     paddingValues = innerPadding
                 )
             }
+
+            // 주문 관리
             composable(ROUTE_ORDERS) {
                 OrderListScreen(
                     paddingValues = innerPadding,
@@ -283,6 +314,7 @@ fun MainScreen(
     }
 }
 
+/** Floating Button */
 @Composable
 fun PartsFab(navController: NavHostController) {
     FloatingActionButton(
@@ -305,6 +337,7 @@ fun PartsFab(navController: NavHostController) {
     }
 }
 
+/** Navigation Bar */
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val bottomNavItems = listOf(

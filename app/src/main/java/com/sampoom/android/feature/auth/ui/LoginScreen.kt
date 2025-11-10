@@ -47,12 +47,11 @@ fun LoginScreen(
     val emailLabel = stringResource(R.string.login_title_email)
     val passwordLabel = stringResource(R.string.login_title_password)
     val errorLabel = stringResource(R.string.common_error)
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(emailLabel, passwordLabel, errorLabel) {
         viewModel.bindLabel(emailLabel, passwordLabel, errorLabel)
     }
-
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.success) {
         if (uiState.success) onSuccess()

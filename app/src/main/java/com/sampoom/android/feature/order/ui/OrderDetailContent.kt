@@ -33,6 +33,7 @@ import com.sampoom.android.feature.order.domain.model.OrderPart
 import com.sampoom.android.feature.order.domain.model.subtotal
 import com.sampoom.android.feature.order.domain.model.totalCost
 
+/** 주문 상세 내역 화면 */
 @Composable
 fun OrderDetailContent(
     order: Order,
@@ -70,7 +71,7 @@ fun OrderDetailContent(
     }
 }
 
-
+/** 주문 정보 섹션 */
 @Composable
 private fun OrderInfoCard(order: Order) {
     Card(
@@ -127,6 +128,7 @@ private fun OrderInfoCard(order: Order) {
     }
 }
 
+/** 주문 내역 섹션 */
 @Composable
 private fun OrderInfoRow(
     label: String,
@@ -172,6 +174,7 @@ private fun OrderSection(
     }
 }
 
+/** 부품 내역 섹션 */
 @Composable
 private fun OrderPartItem(
     part: OrderPart
@@ -219,7 +222,7 @@ private fun OrderPartItem(
             }
 
             Spacer(Modifier.padding(4.dp))
-            Divider(Modifier.background(textSecondaryColor()))
+            Divider(Modifier.background(textSecondaryColor()).height(0.5.dp))
             Spacer(Modifier.padding(4.dp))
 
             Text(

@@ -12,6 +12,7 @@ class DashboardRepositoryImpl @Inject constructor(
     private val api: DashboardApi,
     private val authPreferences: AuthPreferences
 ) : DashboardRepository {
+    /** 대시보드 조회 */
     override suspend fun getDashboard(): Result<Dashboard> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
@@ -20,6 +21,7 @@ class DashboardRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 이번 주 요약 조회 */
     override suspend fun getWeeklySummary(): Result<WeeklySummary> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()

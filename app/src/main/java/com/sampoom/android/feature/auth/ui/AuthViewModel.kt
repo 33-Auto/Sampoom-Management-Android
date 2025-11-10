@@ -2,6 +2,7 @@ package com.sampoom.android.feature.auth.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sampoom.android.core.network.TokenLogoutEmitter
 import com.sampoom.android.feature.auth.domain.usecase.CheckLoginStateUseCase
 import com.sampoom.android.feature.auth.domain.usecase.ClearTokensUseCase
 import com.sampoom.android.feature.auth.domain.usecase.SignOutUseCase
@@ -19,7 +20,8 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val checkLoginStateUseCase: CheckLoginStateUseCase,
     private val signOutUseCase: SignOutUseCase,
-    private val clearTokensUseCase: ClearTokensUseCase
+    private val clearTokensUseCase: ClearTokensUseCase,
+    tokenLogoutEmitter: TokenLogoutEmitter
 ) : ViewModel() {
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
@@ -37,6 +39,9 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoggedIn.value = checkLoginStateUseCase()
             _isLoading.value = false
+            tokenLogoutEmitter.events.collect {
+                signOut()
+            }
         }
     }
 

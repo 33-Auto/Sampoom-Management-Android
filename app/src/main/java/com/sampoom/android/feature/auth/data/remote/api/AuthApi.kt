@@ -15,20 +15,26 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 
 interface AuthApi {
+    // 회원가입
     @POST("auth/signup")
     @Headers("X-No-Auth: true")
     suspend fun signUp(@Body body: SignUpRequestDto): ApiResponse<SignUpResponseDto>
 
+    // 토큰 갱신
     @POST("auth/refresh")
+    @Headers("X-No-Auth: true")
     suspend fun refresh(@Body body: RefreshRequestDto): ApiResponse<RefreshResponseDto>
 
+    // 로그아웃
     @POST("auth/logout")
     suspend fun logout(): ApiSuccessResponse
 
+    // 로그인
     @POST("auth/login")
     @Headers("X-No-Auth: true")
     suspend fun login(@Body body: LoginRequestDto): ApiResponse<LoginResponseDto>
 
+    // 대리점 조회
     @GET("site/vendors")
     suspend fun getVendors(): ApiResponse<List<GetVendorsResponseDto>>
 }

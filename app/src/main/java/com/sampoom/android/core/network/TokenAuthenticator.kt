@@ -11,10 +11,12 @@ import okhttp3.Route
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** 토큰 Authentication 인증 로직 */
 @Singleton
 class TokenAuthenticator @Inject constructor(
     private val authPreferences: AuthPreferences,
-    private val tokenRefreshService: TokenRefreshService
+    private val tokenRefreshService: TokenRefreshService,
+    private val tokenLogoutEmitter: TokenLogoutEmitter
 ) : Authenticator {
     private val refreshMutex = Mutex()
 
@@ -41,7 +43,10 @@ class TokenAuthenticator @Inject constructor(
             when (e.code()) {
                 400, 401 -> {
                     // 인증 실패: 토큰 삭제
-                    runBlocking { authPreferences.clear() }
+                    runBlocking {
+                        authPreferences.clear()
+                        tokenLogoutEmitter.emit()
+                    }
                     null
                 }
                 403 -> {

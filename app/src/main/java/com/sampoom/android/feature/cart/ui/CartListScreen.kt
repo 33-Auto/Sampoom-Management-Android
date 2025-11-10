@@ -252,6 +252,7 @@ fun CartListScreen(
     }
 }
 
+/** 장바구니 카테고리 > 그룹 별 섹션 */
 @Composable
 private fun CartSection(
     categoryName: String,
@@ -281,6 +282,7 @@ private fun CartSection(
     }
 }
 
+/** 장바구니 부품 아이템 */
 @Composable
 private fun CartPartItem(
     part: CartPart,
