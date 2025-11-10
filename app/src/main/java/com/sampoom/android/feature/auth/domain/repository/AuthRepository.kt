@@ -7,7 +7,7 @@ interface AuthRepository {
     suspend fun signUp(
         email: String,
         password: String,
-        workspace: String,
+        role: String,
         branch: String,
         userName: String,
         position: String

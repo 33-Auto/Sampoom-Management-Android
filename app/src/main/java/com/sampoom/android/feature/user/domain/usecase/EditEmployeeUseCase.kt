@@ -7,5 +7,5 @@ import javax.inject.Inject
 class EditEmployeeUseCase @Inject constructor(
     private val repository: UserRepository
 ) {
-    suspend operator fun invoke(employee: Employee, workspace: String): Result<Employee> = repository.editEmployee(employee, workspace)
+    suspend operator fun invoke(employee: Employee, role: String): Result<Employee> = repository.editEmployee(employee, role)
 }
