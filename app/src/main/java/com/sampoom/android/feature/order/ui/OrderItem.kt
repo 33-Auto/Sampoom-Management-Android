@@ -27,6 +27,7 @@ import com.sampoom.android.core.util.formatWon
 import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.domain.model.totalCost
 
+/** 주문 아이템 섹션 */
 @Composable
 fun OrderItem(
     order: Order,

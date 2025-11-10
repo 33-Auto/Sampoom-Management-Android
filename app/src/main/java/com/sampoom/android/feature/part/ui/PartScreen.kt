@@ -444,7 +444,7 @@ fun PartScreen(
     }
 }
 
-// Category 아이템
+/** Category 아이템 */
 @Composable
 fun CategoryItem(
     category: Category,
@@ -481,6 +481,7 @@ fun CategoryItem(
     }
 }
 
+/** 카테고리 이미지 Mapper */
 private fun resourceMapper(code: String): Int {
     return when (code) {
         "ENG" -> R.drawable.engine
@@ -493,6 +494,7 @@ private fun resourceMapper(code: String): Int {
     }
 }
 
+/** 부품 아이템 섹션 */
 @Composable
 private fun PartItemCard(
     group: Group,
@@ -525,6 +527,7 @@ private fun PartItemCard(
     }
 }
 
+/** 검색 결과 리스트 섹션 */
 @Composable
 fun SearchResultsList(
     searchResults: LazyPagingItems<SearchResult>,
@@ -585,6 +588,7 @@ fun SearchResultsList(
     }
 }
 
+/** 부품 검색 아이템 섹샨 */
 @Composable
 private fun SearchPartItem(
     part: Part,

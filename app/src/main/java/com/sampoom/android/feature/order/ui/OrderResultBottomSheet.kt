@@ -42,6 +42,7 @@ import com.sampoom.android.core.ui.theme.textColor
 import com.sampoom.android.feature.order.domain.model.Order
 import com.sampoom.android.feature.order.domain.model.OrderStatus
 
+/** 주문 완료 Bottom Sheet */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderResultBottomSheet(
@@ -141,6 +142,7 @@ fun OrderResultBottomSheet(
     }
 }
 
+/** 주문 완료 Bottom Sheet Header */
 @Composable
 private fun OrderCompleteHeader() {
     Row(

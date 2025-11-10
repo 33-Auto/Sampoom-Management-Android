@@ -43,6 +43,7 @@ import com.sampoom.android.core.ui.theme.textSecondaryColor
  *   onClick = { ... }
  * )
  */
+
 @Composable
 fun CommonButton(
     modifier: Modifier = Modifier,

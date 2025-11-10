@@ -3,11 +3,14 @@ package com.sampoom.android.core.network
 import com.sampoom.android.core.preferences.AuthPreferences
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
 import javax.inject.Inject
 
+/** 토큰 Interceptor */
 class TokenInterceptor @Inject constructor(
-    private val authPreferences: AuthPreferences
+    private val authPreferences: AuthPreferences,
+    private val tokenLogoutEmitter: TokenLogoutEmitter
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
@@ -17,7 +20,7 @@ class TokenInterceptor @Inject constructor(
             val requestWithoutFlag = originalRequest.newBuilder()
                 .removeHeader("X-No-Auth")
                 .build()
-            return chain.proceed(requestWithoutFlag)
+            return proceedAndLogoutOnForbidden(chain, requestWithoutFlag)
         }
 
         val existingAuth = originalRequest.header("Authorization")
@@ -29,10 +32,21 @@ class TokenInterceptor @Inject constructor(
                 val newRequest = originalRequest.newBuilder()
                     .header("Authorization", "Bearer $accessToken")
                     .build()
-                return chain.proceed(newRequest)
+                return proceedAndLogoutOnForbidden(chain, newRequest)
             }
         }
 
-        return chain.proceed(originalRequest)
+        return proceedAndLogoutOnForbidden(chain, originalRequest)
+    }
+
+    private fun proceedAndLogoutOnForbidden(chain: Interceptor.Chain, request: Request): Response {
+        val response = chain.proceed(request)
+        if (response.code == 401) {
+            runBlocking {
+                authPreferences.clear()
+                tokenLogoutEmitter.emit()
+            }
+        }
+        return response
     }
 }

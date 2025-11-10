@@ -22,10 +22,12 @@ class UserRepositoryImpl @Inject constructor(
     private val preferences: AuthPreferences,
     private val pagingSourceFactory: EmployeePagingSource.Factory
 ) : UserRepository {
+    /** 유저 프로필 조회 */
     override suspend fun getStoredUser(): User? {
         return preferences.getStoredUser()
     }
 
+    /** 프로필 조회 */
     override suspend fun getProfile(workspace: String): Result<User> {
         return runCatching {
             retry(times = 5, initialDelay = 300) {
@@ -60,6 +62,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 프로필 수정 */
     override suspend fun updateProfile(user: User): Result<User> {
         return runCatching {
             val requestDto = UpdateProfileRequestDto(
@@ -92,6 +95,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 직원 목록 조회 */
     override fun getEmployeeList(): Flow<PagingData<Employee>> {
         return Pager(
             config = PagingConfig(pageSize = 20),
@@ -99,6 +103,7 @@ class UserRepositoryImpl @Inject constructor(
         ).flow
     }
 
+    /** 직원 프로필 수정 */
     override suspend fun editEmployee(
         employee: Employee,
         workspace: String
@@ -135,6 +140,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 직원 상태 수정 */
     override suspend fun updateEmployeeStatus(
         employee: Employee,
         workspace: String
@@ -171,6 +177,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 직원 수 조회 */
     override suspend fun getEmployeeCount(): Result<Int> {
         return runCatching {
             val user = preferences.getStoredUser() ?: throw Exception()

@@ -59,10 +59,6 @@ class SignUpViewModel @Inject constructor(
             _state.value = _state.value.copy(name = e.name)
             validateName()
         }
-//        is SignUpUiEvent.BranchChanged -> {
-//            _state.value = _state.value.copy(branch = e.branch)
-//            validateBranch()
-//        }
         is SignUpUiEvent.VendorChanged -> {
             _state.value = _state.value.copy(
                 selectedVendor = e.vendor,
@@ -83,9 +79,7 @@ class SignUpViewModel @Inject constructor(
             validatePassword()
             if (_state.value.passwordCheck.isNotBlank()) {
                 validatePasswordCheck()
-            } else {
-
-            }
+            } else { }
         }
         is SignUpUiEvent.PasswordCheckChanged -> {
             _state.value = _state.value.copy(passwordCheck = e.passwordCheck)

@@ -13,6 +13,7 @@ class CartRepositoryImpl @Inject constructor(
     private val api: CartApi,
     private val authPreferences: AuthPreferences
 ) : CartRepository {
+    /** 장바구니 리스트 조회 */
     override suspend fun getCartList(): Result<CartList> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
@@ -22,6 +23,7 @@ class CartRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 장바구니 추가 */
     override suspend fun addCart(
         partId: Long,
         quantity: Long
@@ -33,6 +35,7 @@ class CartRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 장바구니 삭제 */
     override suspend fun deleteCart(cartItemId: Long): Result<Unit> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
@@ -41,6 +44,7 @@ class CartRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 장바구니 전체 삭제 */
     override suspend fun deleteAllCart(): Result<Unit> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
@@ -49,6 +53,7 @@ class CartRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 장바구니 수량 수정 */
     override suspend fun updateCartQuantity(
         cartItemId: Long,
         quantity: Long

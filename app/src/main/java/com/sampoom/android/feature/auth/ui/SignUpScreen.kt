@@ -1,5 +1,6 @@
 package com.sampoom.android.feature.auth.ui
 
+import android.R.attr.labelTextSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -67,21 +68,19 @@ fun SignUpScreen(
     val emailFocus = remember { FocusRequester() }
     val passwordFocus = remember { FocusRequester() }
     val passwordCheckFocus = remember { FocusRequester() }
+    val positionItems = remember { UserPosition.entries }
+    var positionMenuExpanded by remember { mutableStateOf(false) }
+    var vendorMenuExpanded by remember { mutableStateOf(false) }
+
+    val state by viewModel.state.collectAsState()
 
     LaunchedEffect(nameLabel, branchLabel, positionLabel, errorLabel) {
         viewModel.bindLabels(nameLabel, branchLabel, positionLabel, errorLabel)
     }
 
-    val state by viewModel.state.collectAsState()
-    val labelTextSize = 16.sp
-
     LaunchedEffect(state.success) {
         if (state.success) onSuccess()
     }
-
-    val positionItems = remember { UserPosition.entries }
-    var positionMenuExpanded by remember { mutableStateOf(false) }
-    var vendorMenuExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -97,8 +96,7 @@ fun SignUpScreen(
                 }
             )
         },
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
-//        snackbarHost = { CommonSnackBarHost(snackBarHostState) }
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
     ) { innerPadding ->
         val focusManager = LocalFocusManager.current
         Box( // 터치 감지용 컨테이너
@@ -127,7 +125,7 @@ fun SignUpScreen(
                 Spacer(Modifier.height(48.dp))
                 Text(
                     text = stringResource(R.string.signup_title_name),
-                    fontSize = labelTextSize
+                    fontSize = 16.sp
                 )
                 CommonTextField(
                     modifier = Modifier.fillMaxWidth().focusRequester(nameFocus),
@@ -142,7 +140,7 @@ fun SignUpScreen(
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.signup_title_branch),
-                    fontSize = labelTextSize
+                    fontSize = 16.sp
                 )
                 ExposedDropdownMenuBox(
                     expanded = vendorMenuExpanded,
@@ -191,7 +189,7 @@ fun SignUpScreen(
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.signup_title_position),
-                    fontSize = labelTextSize
+                    fontSize = 16.sp
                 )
                 ExposedDropdownMenuBox(
                     expanded = positionMenuExpanded,
@@ -231,7 +229,7 @@ fun SignUpScreen(
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.signup_title_email),
-                    fontSize = labelTextSize
+                    fontSize = 16.sp
                 )
                 CommonTextField(
                     modifier = Modifier.fillMaxWidth().focusRequester(emailFocus),
@@ -246,7 +244,7 @@ fun SignUpScreen(
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.signup_title_password),
-                    fontSize = labelTextSize
+                    fontSize = 16.sp
                 )
                 CommonTextField(
                     modifier = Modifier.fillMaxWidth().focusRequester(passwordFocus),
@@ -262,7 +260,7 @@ fun SignUpScreen(
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.signup_title_password_check),
-                    fontSize = labelTextSize
+                    fontSize = 16.sp
                 )
                 CommonTextField(
                     modifier = Modifier.fillMaxWidth().focusRequester(passwordCheckFocus)   ,

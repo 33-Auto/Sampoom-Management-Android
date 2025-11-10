@@ -13,6 +13,7 @@ class OutboundRepositoryImpl @Inject constructor(
     private val api: OutboundApi,
     private val authPreferences: AuthPreferences
 ) : OutboundRepository {
+    /** 출고 처리 내역 리스트 조회 */
     override suspend fun getOutboundList(): Result<OutboundList> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
@@ -22,6 +23,7 @@ class OutboundRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 출고 처리 */
     override suspend fun processOutbound(): Result<Unit> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
@@ -30,6 +32,7 @@ class OutboundRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 출고 목록 추가 */
     override suspend fun addOutbound(
         partId: Long,
         quantity: Long
@@ -42,6 +45,7 @@ class OutboundRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 출고 목록 삭제 */
     override suspend fun deleteOutbound(outboundId: Long): Result<Unit> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
@@ -50,6 +54,7 @@ class OutboundRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 출고 목록 전체 삭제 */
     override suspend fun deleteAllOutbound(): Result<Unit> {
         return runCatching {
             val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
@@ -58,6 +63,7 @@ class OutboundRepositoryImpl @Inject constructor(
         }
     }
 
+    /** 출고 목록 수량 변경 */
     override suspend fun updateOutboundQuantity(
         outboundId: Long,
         quantity: Long

@@ -16,6 +16,7 @@ import javax.inject.Singleton
 // Per official guidance, DataStore instance should be single and at top-level.
 private val Context.authDataStore by preferencesDataStore(name = "auth_prefs")
 
+/** Encrypt Shared Preferences with CryptoManager */
 @Singleton
 class AuthPreferences @Inject constructor(
     @param:ApplicationContext private val context: Context,
@@ -39,6 +40,7 @@ class AuthPreferences @Inject constructor(
         val USER_ENDED_AT: Preferences.Key<String> = stringPreferencesKey("user_ended_at")
     }
 
+    /** User 모델 저장 */
     suspend fun saveUser(user: User) {
         val expiresAt = System.currentTimeMillis() + (user.expiresIn * 1000)
         dataStore.edit { prefs ->
@@ -58,6 +60,7 @@ class AuthPreferences @Inject constructor(
         }
     }
 
+    /** User 토큰 저장 */
     suspend fun saveToken(accessToken: String, refreshToken: String, expiresIn: Long) {
         val expiresAt = System.currentTimeMillis() + (expiresIn * 1000)
         dataStore.edit { prefs ->
@@ -67,6 +70,7 @@ class AuthPreferences @Inject constructor(
         }
     }
 
+    /** User 모델 조회 */
     suspend fun getStoredUser(): User? {
         val prefs = dataStore.data.first()
         val userId = prefs[Keys.USER_ID]
@@ -114,6 +118,7 @@ class AuthPreferences @Inject constructor(
         } else return null
     }
 
+    /** Access Token 조회 */
     suspend fun getAccessToken(): String? {
         val encrypted = dataStore.data.first()[Keys.ACCESS_TOKEN] ?: return null
         return try {
@@ -123,6 +128,7 @@ class AuthPreferences @Inject constructor(
         }
     }
 
+    /** RefreshToken 조회 */
     suspend fun getRefreshToken(): String? {
         val encrypted = dataStore.data.first()[Keys.REFRESH_TOKEN] ?: return null
         return try {
@@ -132,15 +138,18 @@ class AuthPreferences @Inject constructor(
         }
     }
 
+    /** Token 만료 조회 */
     suspend fun isTokenExpired(): Boolean {
         val expiresAt = dataStore.data.first()[Keys.TOKEN_EXPIRES_AT]
         return expiresAt == null || System.currentTimeMillis() > expiresAt
     }
 
+    /** 저장된 User 모델 삭제 */
     suspend fun clear() {
         dataStore.edit { it.clear() }
     }
 
+    /** 토큰 여부 판별 */
     suspend fun hasToken(): Boolean {
         val accessToken = getAccessToken()
         val refreshToken = getRefreshToken()

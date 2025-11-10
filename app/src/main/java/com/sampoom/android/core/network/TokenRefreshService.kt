@@ -9,6 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** 토큰 Refresh 로직 */
 @Singleton
 class TokenRefreshService @Inject constructor(
     private val authPreferences: AuthPreferences

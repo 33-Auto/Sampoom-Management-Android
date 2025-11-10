@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.sampoom.android.BuildConfig
 import com.sampoom.android.core.network.TokenAuthenticator
 import com.sampoom.android.core.network.TokenInterceptor
+import com.sampoom.android.core.network.TokenLogoutEmitter
 import com.sampoom.android.core.network.TokenRefreshService
 import com.sampoom.android.core.preferences.AuthPreferences
 import dagger.Module
@@ -24,9 +25,10 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideTokenInterceptor(
-        authPreferences: AuthPreferences
+        authPreferences: AuthPreferences,
+        tokenLogoutEmitter: TokenLogoutEmitter
     ): TokenInterceptor {
-        return TokenInterceptor(authPreferences)
+        return TokenInterceptor(authPreferences, tokenLogoutEmitter)
     }
 
     @Provides
@@ -41,7 +43,7 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(
         tokenInterceptor: TokenInterceptor,
-        tokenAuthenticator: TokenAuthenticator
+//        tokenAuthenticator: TokenAuthenticator
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -58,7 +60,7 @@ object NetworkModule {
                 }
             )
             .addInterceptor(tokenInterceptor) // 토큰 자동 삽입
-            .authenticator(tokenAuthenticator) // 토큰 갱신 (Interceptor 대신)
+//            .authenticator(tokenAuthenticator) // 토큰 갱신 (Interceptor 대신)
             .build()
     }
 

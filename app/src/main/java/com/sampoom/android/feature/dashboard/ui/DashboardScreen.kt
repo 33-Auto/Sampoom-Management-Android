@@ -47,6 +47,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.sampoom.android.R
+import com.sampoom.android.core.model.UserPosition
 import com.sampoom.android.core.ui.component.EmptyContent
 import com.sampoom.android.core.ui.component.ErrorContent
 import com.sampoom.android.core.ui.theme.FailRed
@@ -75,7 +76,15 @@ fun DashboardScreen(
     val user by viewModel.user.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullToRefreshState()
     val orderListPaged = viewModel.orderListPaged.collectAsLazyPagingItems()
-    val isManager = user?.role == "ADMIN"
+    val isManager = user?.position in setOf(
+        UserPosition.MANAGER,
+        UserPosition.DEPUTY_GENERAL_MANAGER,
+        UserPosition.GENERAL_MANAGER,
+        UserPosition.DIRECTOR,
+        UserPosition.VICE_PRESIDENT,
+        UserPosition.PRESIDENT,
+        UserPosition.CHAIRMAN
+    )
 
     LaunchedEffect(errorLabel) {
         viewModel.bindLabel(errorLabel)
@@ -184,6 +193,7 @@ fun DashboardScreen(
     }
 }
 
+/** 대시보드 타이들 섹션 */
 @Composable
 fun TitleSection(
     user: User?
@@ -227,6 +237,7 @@ fun TitleSection(
     }
 }
 
+/** 부품 통계 섹션 */
 @Composable
 fun ButtonSection(
     onEmployeeClick: () -> Unit,
@@ -302,6 +313,7 @@ fun ButtonSection(
     }
 }
 
+/** 통계 카드 */
 @Composable
 fun ButtonCard(
     modifier: Modifier,
@@ -353,6 +365,7 @@ fun ButtonCard(
     }
 }
 
+/** 주문 내역 섹션 */
 @Composable
 fun OrderListSection(
     orderListPaged: LazyPagingItems<Order>,
@@ -447,6 +460,7 @@ fun OrderListSection(
     }
 }
 
+/** 이번 주 요약 섹션 */
 @Composable
 fun WeeklySummarySection(
     modifier: Modifier,
