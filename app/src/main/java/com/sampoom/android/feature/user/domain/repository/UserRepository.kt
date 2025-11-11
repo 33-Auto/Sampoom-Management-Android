@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     suspend fun getStoredUser(): User?
-    suspend fun getProfile(role: String): Result<User>
+    suspend fun getProfile(workspace: String): Result<User>
     suspend fun updateProfile(user: User): Result<User>
     fun getEmployeeList(): Flow<PagingData<Employee>>
-    suspend fun editEmployee(employee: Employee, role: String): Result<Employee>
-    suspend fun updateEmployeeStatus(employee: Employee, role: String): Result<Employee>
+    suspend fun editEmployee(employee: Employee, workspace: String): Result<Employee>
+    suspend fun updateEmployeeStatus(employee: Employee, workspace: String): Result<Employee>
     suspend fun getEmployeeCount(): Result<Int>
 }

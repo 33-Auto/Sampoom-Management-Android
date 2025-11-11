@@ -28,10 +28,10 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     /** 프로필 조회 */
-    override suspend fun getProfile(role: String): Result<User> {
+    override suspend fun getProfile(workspace: String): Result<User> {
         return runCatching {
             retry(times = 5, initialDelay = 300) {
-                val dto = api.getProfile(role)
+                val dto = api.getProfile(workspace)
                 if (!dto.success) throw Exception(dto.message)
                 val profileUser = dto.data.toModel()
                 val loginUser = preferences.getStoredUser()
@@ -46,6 +46,7 @@ class UserRepositoryImpl @Inject constructor(
                         refreshToken = loginUser.refreshToken,    // 저장된 토큰
                         expiresIn = loginUser.expiresIn,          // 저장된 토큰
                         position = profileUser.position,
+                        workspace = profileUser.workspace,
                         branch = profileUser.branch,
                         agencyId = profileUser.agencyId,
                         startedAt = profileUser.startedAt,
@@ -81,6 +82,7 @@ class UserRepositoryImpl @Inject constructor(
                     refreshToken = storedUser.refreshToken,
                     expiresIn = storedUser.expiresIn,
                     position = user.position,
+                    workspace = user.workspace,
                     branch = user.branch,
                     agencyId = user.agencyId,
                     startedAt = user.startedAt,
@@ -104,7 +106,7 @@ class UserRepositoryImpl @Inject constructor(
     /** 직원 프로필 수정 */
     override suspend fun editEmployee(
         employee: Employee,
-        role: String
+        workspace: String
     ): Result<Employee> {
         return runCatching {
             val requestDto = EditEmployeeRequestDto(
@@ -112,7 +114,7 @@ class UserRepositoryImpl @Inject constructor(
             )
             val dto = api.editEmployee(
                 userId = employee.userId,
-                role = role,
+                workspace = workspace,
                 body = requestDto
             )
             if (!dto.success) throw Exception(dto.message)
@@ -121,8 +123,9 @@ class UserRepositoryImpl @Inject constructor(
             val completeEmployee = Employee(
                 userId = updatedEmployee.userId,
                 email = employee.email,
-                role = updatedEmployee.role.takeIf { it.isNotBlank() } ?: employee.role,
+                role = employee.role,
                 userName = updatedEmployee.userName.takeIf { it.isNotBlank() } ?: employee.userName,
+                workspace = updatedEmployee.workspace.takeIf { it.isNotBlank() } ?: employee.workspace,
                 organizationId = employee.organizationId,
                 branch = employee.branch,
                 position = updatedEmployee.position,
@@ -140,7 +143,7 @@ class UserRepositoryImpl @Inject constructor(
     /** 직원 상태 수정 */
     override suspend fun updateEmployeeStatus(
         employee: Employee,
-        role: String
+        workspace: String
     ): Result<Employee> {
         return runCatching {
             val requestDto = UpdateEmployeeStatusRequestDto(
@@ -148,7 +151,7 @@ class UserRepositoryImpl @Inject constructor(
             )
             val dto = api.updateEmployeeStatus(
                 userId = employee.userId,
-                role = role,
+                workspace = workspace,
                 body = requestDto
             )
             if (!dto.success) throw Exception(dto.message)
@@ -157,8 +160,9 @@ class UserRepositoryImpl @Inject constructor(
             val completedEmployeeStatus = Employee(
                 userId = updateEmployeeStatus.userId,
                 email = employee.email,
-                role = updateEmployeeStatus.role.takeIf { it.isNotBlank() } ?: employee.role,
+                role = employee.role,
                 userName = updateEmployeeStatus.userName.takeIf { it.isNotBlank() } ?: employee.userName,
+                workspace = updateEmployeeStatus.workspace.takeIf { it.isNotBlank() } ?: employee.workspace,
                 organizationId = employee.organizationId,
                 branch = employee.branch,
                 position = employee.position,
@@ -177,11 +181,11 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun getEmployeeCount(): Result<Int> {
         return runCatching {
             val user = preferences.getStoredUser() ?: throw Exception()
-            val role = user.role
+            val workspace = user.workspace
             val organizationId = user.agencyId
 
             val dto = api.getEmployeeList(
-                role = role,
+                workspace = workspace,
                 organizationId = organizationId,
                 page = 0,
                 size = 1

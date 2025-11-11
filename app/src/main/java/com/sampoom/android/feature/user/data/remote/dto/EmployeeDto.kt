@@ -8,6 +8,7 @@ data class EmployeeDto(
     val email: String,
     val role: String,
     val userName: String,
+    val workspace: String,
     val organizationId: Long,
     val branch: String,
     val position: UserPosition,

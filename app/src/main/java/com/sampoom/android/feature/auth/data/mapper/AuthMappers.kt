@@ -15,6 +15,7 @@ fun LoginResponseDto.toModel(): User = User(
     refreshToken = refreshToken,
     expiresIn = expiresIn,
     position = UserPosition.STAFF,
+    workspace = "",
     branch = "",
     agencyId = 0,
     startedAt = null,

@@ -6,6 +6,7 @@ data class GetProfileResponseDto(
     val email: String,
     val role: String,
     val position: String,
+    val workspace: String,
     val branch: String,
     val organizationId: Long,
     val startedAt: String,

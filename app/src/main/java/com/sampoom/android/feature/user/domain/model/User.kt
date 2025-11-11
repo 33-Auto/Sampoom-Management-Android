@@ -11,6 +11,7 @@ data class User(
     val refreshToken: String,
     val expiresIn: Long,
     val position: UserPosition,
+    val workspace: String,
     val branch: String,
     val agencyId: Long,
     val startedAt: String?,
