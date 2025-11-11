@@ -157,7 +157,7 @@ class SignUpViewModel @Inject constructor(
         singUp(
             email = s.email,
             password = s.password,
-            workspace = s.workspace,
+            role = s.role,
             branch = s.branch,
             userName = s.name,
             position = s.position!!.name

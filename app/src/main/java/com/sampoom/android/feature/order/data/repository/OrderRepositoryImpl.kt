@@ -35,6 +35,7 @@ class OrderRepositoryImpl @Inject constructor(
     /** 주문 처리 */
     override suspend fun createOrder(cartList: CartList): Result<Order> {
         return runCatching {
+            val agencyId = authPreferences.getStoredUser()?.agencyId ?: throw Exception()
             val agencyName = authPreferences.getStoredUser()?.branch ?: throw Exception()
             val items = cartList.items.map { cart ->
                 OrderCategoryDto(
@@ -59,6 +60,7 @@ class OrderRepositoryImpl @Inject constructor(
             }
 
             val request = OrderRequestDto(
+                agencyId = agencyId,
                 agencyName = agencyName,
                 items = items
             )

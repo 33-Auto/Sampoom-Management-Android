@@ -5,7 +5,7 @@ import com.sampoom.android.feature.auth.domain.model.Vendor
 
 data class SignUpUiState(
     val name: String = "",
-    val workspace: String = "AGENCY",
+    val role: String = "AGENCY",
     val branch: String = "",
     val position: UserPosition? = null,
     val email: String = "",
