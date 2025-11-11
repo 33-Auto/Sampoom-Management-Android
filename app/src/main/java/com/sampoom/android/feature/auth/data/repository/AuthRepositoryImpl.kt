@@ -70,6 +70,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     /** 로그아웃 */
     override suspend fun signOut(): Result<Unit> {
+        preferences.clear()
         return runCatching {
             val dto = api.logout()
             if (!dto.success) throw Exception(dto.message)

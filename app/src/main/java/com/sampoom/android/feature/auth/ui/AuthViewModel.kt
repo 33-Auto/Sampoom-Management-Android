@@ -50,7 +50,7 @@ class AuthViewModel @Inject constructor(
     }
 
     fun signOut() = viewModelScope.launch {
-        signOutUseCase()
+//        signOutUseCase()
         _isLoggedIn.value = false
         _logoutEvent.emit(Unit)
     }

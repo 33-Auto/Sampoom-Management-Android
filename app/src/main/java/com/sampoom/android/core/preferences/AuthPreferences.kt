@@ -31,7 +31,6 @@ class AuthPreferences @Inject constructor(
         val USER_ID: Preferences.Key<String> = stringPreferencesKey("user_id")
         val USER_NAME: Preferences.Key<String> = stringPreferencesKey("user_name")
         val USER_EMAIL: Preferences.Key<String> = stringPreferencesKey("user_email")
-        val USER_ROLE: Preferences.Key<String> = stringPreferencesKey("user_role")
         val USER_POSITION: Preferences.Key<String> = stringPreferencesKey("user_position")
         val USER_WORKSPACE: Preferences.Key<String> = stringPreferencesKey("user_workspace")
         val USER_BRANCH: Preferences.Key<String> = stringPreferencesKey("user_branch")
@@ -50,7 +49,6 @@ class AuthPreferences @Inject constructor(
             prefs[Keys.USER_ID] = cryptoManager.encrypt(user.userId.toString())
             prefs[Keys.USER_NAME] = cryptoManager.encrypt(user.userName)
             prefs[Keys.USER_EMAIL] = cryptoManager.encrypt(user.email)
-            prefs[Keys.USER_ROLE] = cryptoManager.encrypt(user.role)
             prefs[Keys.USER_POSITION] = cryptoManager.encrypt(user.position.name)
             prefs[Keys.USER_WORKSPACE] = cryptoManager.encrypt(user.workspace)
             prefs[Keys.USER_BRANCH] = cryptoManager.encrypt(user.branch)
@@ -76,7 +74,6 @@ class AuthPreferences @Inject constructor(
         val userId = prefs[Keys.USER_ID]
         val userName = prefs[Keys.USER_NAME]
         val userEmail = prefs[Keys.USER_EMAIL]
-        val userRole = prefs[Keys.USER_ROLE]
         val accessToken = prefs[Keys.ACCESS_TOKEN]
         val refreshToken = prefs[Keys.REFRESH_TOKEN]
         val expiresAt = prefs[Keys.TOKEN_EXPIRES_AT]
@@ -87,7 +84,7 @@ class AuthPreferences @Inject constructor(
         val userStartedAt = prefs[Keys.USER_STARTED_AT]
         val userEndedAt = prefs[Keys.USER_ENDED_AT]
 
-        if (userId != null && userName != null && userEmail != null && userRole != null &&
+        if (userId != null && userName != null && userEmail != null &&
             accessToken != null && refreshToken != null && userPosition != null && userWorkspace != null && userBranch != null && userAgencyId != null && userStartedAt != null && userEndedAt != null
         ) {
             try {
@@ -99,12 +96,15 @@ class AuthPreferences @Inject constructor(
                     cryptoManager.decrypt(userId).toLong(),
                     cryptoManager.decrypt(userName),
                     cryptoManager.decrypt(userEmail),
-                    cryptoManager.decrypt(userRole),
                     cryptoManager.decrypt(accessToken),
                     cryptoManager.decrypt(refreshToken),
                     remaining,
                     cryptoManager.decrypt(userPosition).let { decrypted ->
-                        try { UserPosition.valueOf(decrypted.uppercase()) } catch (_: Exception) { UserPosition.STAFF }
+                        try {
+                            UserPosition.valueOf(decrypted.uppercase())
+                        } catch (_: Exception) {
+                            UserPosition.STAFF
+                        }
                     },
                     cryptoManager.decrypt(userWorkspace),
                     cryptoManager.decrypt(userBranch),

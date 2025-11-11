@@ -6,7 +6,6 @@ import com.sampoom.android.core.model.UserPosition
 data class EmployeeDto(
     val userId: Long,
     val email: String,
-    val role: String,
     val userName: String,
     val workspace: String,
     val organizationId: Long,

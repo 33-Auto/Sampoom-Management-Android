@@ -10,7 +10,6 @@ fun LoginResponseDto.toModel(): User = User(
     userId = userId,
     userName = "",
     email = "",
-    role = "",
     accessToken = accessToken,
     refreshToken = refreshToken,
     expiresIn = expiresIn,

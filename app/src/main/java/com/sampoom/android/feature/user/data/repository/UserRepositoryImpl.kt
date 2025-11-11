@@ -41,7 +41,6 @@ class UserRepositoryImpl @Inject constructor(
                         userId = profileUser.userId,
                         userName = profileUser.userName,
                         email = profileUser.email,
-                        role = profileUser.role,
                         accessToken = loginUser.accessToken,      // 저장된 토큰
                         refreshToken = loginUser.refreshToken,    // 저장된 토큰
                         expiresIn = loginUser.expiresIn,          // 저장된 토큰
@@ -77,7 +76,6 @@ class UserRepositoryImpl @Inject constructor(
                     userId = updatedProfile.userId,
                     userName = updatedProfile.userName,
                     email = user.email,
-                    role = user.role,
                     accessToken = storedUser.accessToken,
                     refreshToken = storedUser.refreshToken,
                     expiresIn = storedUser.expiresIn,
@@ -123,7 +121,6 @@ class UserRepositoryImpl @Inject constructor(
             val completeEmployee = Employee(
                 userId = updatedEmployee.userId,
                 email = employee.email,
-                role = employee.role,
                 userName = updatedEmployee.userName.takeIf { it.isNotBlank() } ?: employee.userName,
                 workspace = updatedEmployee.workspace.takeIf { it.isNotBlank() } ?: employee.workspace,
                 organizationId = employee.organizationId,
@@ -160,7 +157,6 @@ class UserRepositoryImpl @Inject constructor(
             val completedEmployeeStatus = Employee(
                 userId = updateEmployeeStatus.userId,
                 email = employee.email,
-                role = employee.role,
                 userName = updateEmployeeStatus.userName.takeIf { it.isNotBlank() } ?: employee.userName,
                 workspace = updateEmployeeStatus.workspace.takeIf { it.isNotBlank() } ?: employee.workspace,
                 organizationId = employee.organizationId,
