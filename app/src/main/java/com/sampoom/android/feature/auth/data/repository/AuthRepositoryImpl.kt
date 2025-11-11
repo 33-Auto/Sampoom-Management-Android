@@ -22,7 +22,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signUp(
         email: String,
         password: String,
-        role: String,
+        workspace: String,
         branch: String,
         userName: String,
         position: String
@@ -32,7 +32,7 @@ class AuthRepositoryImpl @Inject constructor(
                 SignUpRequestDto(
                     email = email,
                     password = password,
-                    role = role,
+                    workspace = workspace,
                     branch = branch,
                     userName = userName,
                     position = position
@@ -55,7 +55,7 @@ class AuthRepositoryImpl @Inject constructor(
         return runCatching {
             val loginDto = api.login(
                 LoginRequestDto(
-                    role = "AGENCY",
+                    workspace = "AGENCY",
                     email = email,
                     password = password
                 )
@@ -70,6 +70,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     /** 로그아웃 */
     override suspend fun signOut(): Result<Unit> {
+        preferences.clear()
         return runCatching {
             val dto = api.logout()
             if (!dto.success) throw Exception(dto.message)

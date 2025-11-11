@@ -10,14 +10,14 @@ class SignUpUseCase @Inject constructor(
     suspend operator fun invoke(
         email: String,
         password: String,
-        role: String,
+        workspace: String,
         branch: String,
         userName: String,
         position: String
     ): Result<User> = repository.signUp(
         email = email,
         password = password,
-        role = role,
+        workspace = workspace,
         branch = branch,
         userName = userName,
         position = position

@@ -7,5 +7,5 @@ import javax.inject.Inject
 class GetProfileUseCase @Inject constructor(
     private val repository: UserRepository
 ) {
-    suspend operator fun invoke(role: String): Result<User> = repository.getProfile(role)
+    suspend operator fun invoke(workspace: String): Result<User> = repository.getProfile(workspace)
 }
